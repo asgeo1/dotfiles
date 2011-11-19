@@ -1,2 +1,9 @@
 --type-set
 coffeescript=.eco,.coffee
+
+--type-set
+plsql=.tab,.bdy,.spc,.seq,.tps,.trg,.prc,.vw,.fnc,.syn
+
+--ignore-dir=.bundle
+
+--smart-case
