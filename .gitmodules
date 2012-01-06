@@ -3,7 +3,7 @@
 	url = http://github.com/sjl/gundo.vim.git
 [submodule ".vim/bundle/nerdtree"]
 	path = .vim/bundle/nerdtree
-	url = https://github.com/mkomitee/nerdtree.git
+	url = https://github.com/scrooloose/nerdtree.git
 [submodule ".vim/bundle/ack"]
 	path = .vim/bundle/ack
 	url = https://github.com/mileszs/ack.vim.git
