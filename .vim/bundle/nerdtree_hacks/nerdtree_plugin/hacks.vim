@@ -18,7 +18,7 @@ call NERDTreeAddKeyMap({
        \ 'quickhelpText': 'open split reusing if able' })
 
 function! NERDTreeCustomOpenSplit(node)
-    call a:node.open({'split': 'h', 'reuse': (g:NERDTreeCustomReuseWindows ? 1 : 0)})
+    call a:node.open({'where': 'h', 'reuse': g:NERDTreeCustomReuseWindows})
 endfunction
 
 call NERDTreeAddKeyMap({
@@ -28,7 +28,7 @@ call NERDTreeAddKeyMap({
        \ 'quickhelpText': 'open vsplit reusing if able' })
 
 function! NERDTreeCustomOpenVSplit(node)
-    call a:node.open({'split': 'v', 'reuse': (g:NERDTreeCustomReuseWindows ? 1 : 0)})
+    call a:node.open({'where': 'v', 'reuse': g:NERDTreeCustomReuseWindows})
 endfunction
 
 call NERDTreeAddKeyMap({
@@ -38,7 +38,7 @@ call NERDTreeAddKeyMap({
        \ 'quickhelpText': 'open in new tab reusing if able' })
 
 function! NERDTreeCustomOpenInTab(node)
-    call a:node.open({'split': 't', 'reuse': (g:NERDTreeCustomReuseWindows ? 1 : 0)})
+    call a:node.open({'where': 't', 'reuse': g:NERDTreeCustomReuseWindows})
 endfunction
 
 call NERDTreeAddKeyMap({
@@ -48,5 +48,5 @@ call NERDTreeAddKeyMap({
        \ 'quickhelpText': 'open in new background tab reusing if able' })
 
 function! NERDTreeCustomOpenInTabSilent(node)
-    call a:node.open({'split': 'T', 'reuse': (g:NERDTreeCustomReuseWindows ? 1 : 0)})
+    call a:node.open({'where': 't', 'stay': 1, 'reuse': g:NERDTreeCustomReuseWindows})
 endfunction
