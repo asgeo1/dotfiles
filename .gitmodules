@@ -55,3 +55,27 @@
 [submodule "/Users/asgeo1/Projects/dotfiles/.oh-my-zsh"]
 	path = /Users/asgeo1/Projects/dotfiles/.oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
+[submodule ".vim/bundle/textobj-function"]
+	path = .vim/bundle/textobj-function
+	url = https://github.com/kana/vim-textobj-function.git
+[submodule ".vim/bundle/textobj-user"]
+	path = .vim/bundle/textobj-user
+	url = https://github.com/kana/vim-textobj-user.git
+[submodule ".vim/bundle/textobj-rubyblock"]
+	path = .vim/bundle/textobj-rubyblock
+	url = https://github.com/nelstrom/vim-textobj-rubyblock.git
+[submodule ".vim/bundle/textobj-rubysymbol"]
+	path = .vim/bundle/textobj-rubysymbol
+	url = https://github.com/bootleq/vim-textobj-rubysymbol.git
+[submodule ".vim/bundle/textobj-indent"]
+	path = .vim/bundle/textobj-indent
+	url = https://github.com/austintaylor/vim-indentobject.git
+[submodule ".vim/bundle/textobj-arg"]
+	path = .vim/bundle/textobj-arg
+	url = https://github.com/vim-scripts/argtextobj.vim.git
+[submodule ".vim/bundle/indexedsearch"]
+	path = .vim/bundle/indexedsearch
+	url = https://github.com/vim-scripts/IndexedSearch.git
+[submodule ".vim/bundle/easymotion"]
+	path = .vim/bundle/easymotion
+	url = https://github.com/Lokaltog/vim-easymotion.git
