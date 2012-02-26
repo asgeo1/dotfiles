@@ -79,3 +79,9 @@
 [submodule ".vim/bundle/easymotion"]
 	path = .vim/bundle/easymotion
 	url = https://github.com/Lokaltog/vim-easymotion.git
+[submodule ".vim/bundle/ruby"]
+	path = .vim/bundle/ruby
+	url = https://github.com/vim-ruby/vim-ruby.git
+[submodule ".vim/bundle/coffeescript"]
+	path = .vim/bundle/coffeescript
+	url = https://github.com/kchmck/vim-coffee-script.git
