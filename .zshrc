@@ -32,6 +32,3 @@ ZSH_THEME="robbyrussell"
 plugins=(git osx rails ruby terminalapp vi-mode)
 
 source $ZSH/oh-my-zsh.sh
-
-# Customize to your needs...
-export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/X11/bin
