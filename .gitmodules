@@ -52,8 +52,8 @@
 [submodule ".vim/bundle/vim-colors-solarized"]
 	path = .vim/bundle/vim-colors-solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
-[submodule "/Users/asgeo1/Projects/dotfiles/.oh-my-zsh"]
-	path = /Users/asgeo1/Projects/dotfiles/.oh-my-zsh
+[submodule ".oh-my-zsh"]
+	path = .oh-my-zsh
 	url = git://github.com/robbyrussell/oh-my-zsh.git
 [submodule ".vim/bundle/textobj-function"]
 	path = .vim/bundle/textobj-function
