@@ -33,6 +33,3 @@ plugins=(git osx rails ruby terminalapp vi-mode)
 
 source $ZSH/oh-my-zsh.sh
 source ~/.colors/mintty-solarized-dark.sh
-
-# Things I don't want to publish to github
-[[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
