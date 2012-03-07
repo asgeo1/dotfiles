@@ -5,11 +5,7 @@ ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-<<<<<<< HEAD
-ZSH_THEME="robbyrussell"
-=======
 ZSH_THEME="asgeo1"
->>>>>>> e38890534ffd42bc4032d9332398e3a60b876fd2
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -36,9 +32,6 @@ ZSH_THEME="asgeo1"
 plugins=(git osx rails ruby terminalapp vi-mode)
 
 source $ZSH/oh-my-zsh.sh
-<<<<<<< HEAD
-=======
 
 # Colors for mintty terminal
 [[ -s "$HOME/.colors/solarized.dark" ]] && source "$HOME/.colors/solarized.dark"
->>>>>>> e38890534ffd42bc4032d9332398e3a60b876fd2
