@@ -1,0 +1,22 @@
+[merge]
+	tool = vimdiff
+	prompt = false
+[core]
+	editor = /usr/bin/vim
+	excludesfile = ~/.gitignore_global
+
+	# Checkout Windows-style, commit Unix-style (core.autocrlf = true)
+	# Checkout as-is, commit Unix-style (core.autocrlf = input)
+	# Checkout as-is, commit as-is (core.autocrlf = false)
+	autocrlf = false
+
+	# Have diff and other tools not see CR characters as a difference. I.e. no
+	# more ^M characters in diffs
+	whitespace = cr-at-eol
+[diff]
+	tool = vimdiff
+	prompt = false
+[color]
+	ui = true
+[format]
+	pretty = %Cred%h%x09%Creset%C(bold blue)%an%x09%Creset%Cgreen(%cr)%x09%Creset %s
