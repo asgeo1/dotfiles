@@ -34,4 +34,4 @@ plugins=(git osx rails ruby terminalapp vi-mode)
 source $ZSH/oh-my-zsh.sh
 
 # Colors for mintty terminal
-[[ -s "$HOME/.colors/solarized.dark" ]] && source "$HOME/.colors/solarized.dark"
+[[ -s "$HOME/.colors/mintty-solarized-dark.sh" ]] && source "$HOME/.colors/mintty-solarized-dark.sh"
