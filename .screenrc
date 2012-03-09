@@ -1,0 +1,28 @@
+vbell off # Turns visual bell off
+
+# terminfo and termcap for nice 256 color terminal
+# allow bold colors - necessary for some reason
+attrcolor b ".I"
+
+# tell screen how to set colors. AB = background, AF=foreground
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+# erase background with current bg color
+defbce "on"
+
+startup_message "off"
+
+# prevents screen from popping up its startup message; and defines the number
+# of scrollback lines available.
+startup_message off
+defscrollback 10000
+
+# http://alan.blogs.eneev.ru/2011/01/git-completion-under-screen-in-cygwin.html
+#
+# Also, this is needed to start zsh, as screen does not obey the shell as
+# configured in /etc/passwd
+shell /bin/zsh
+
+# shortcuts for mintty:
+bindkey "^[[1;5I" next
+bindkey "^[[1;6I" prev
