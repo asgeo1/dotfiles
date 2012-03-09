@@ -368,6 +368,23 @@ set titlestring=%t%(\ [%R%M]%)"     " Set title bar
 set colorcolumn=80                  " Put the "color column" at col 80
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Mintty
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" show cursor as block in normal mode and line in insert mode - doesn't seem
+" to work under GNU Screen
+let &t_ti.="\e[1 q"
+let &t_SI.="\e[5 q"
+let &t_EI.="\e[1 q"
+let &t_te.="\e[0 q"
+
+" get rid of timeout issues when pressing esc - is this even working?
+let &t_ti.="\e[?7727h"
+let &t_te.="\e[?7727l"
+noremap <Esc>O[ <Esc>
+"noremap! <Esc>O[ <Esc>
+noremap! <Esc>O[ <C-c>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Text Formatting/Layout
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 filetype indent on  " Turn on special indenting rules for this filetype
