@@ -12,3 +12,4 @@ BoldAsFont=no
 FontSmoothing=default
 FontIsBold=no
 SwitchShortcuts=no
+CursorBlinks=yes

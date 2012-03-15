@@ -20,3 +20,5 @@
 	ui = true
 [format]
 	pretty = %Cred%h%x09%Creset%C(bold blue)%an%x09%Creset%Cgreen(%cr)%x09%Creset %s
+[alias]
+	l = "!source ~/.githelpers && pretty_git_log"
