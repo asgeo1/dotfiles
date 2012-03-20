@@ -427,16 +427,21 @@ if has("win32")
 endif
 set foldopen-=search    " Don't open folds when you search into them
 set foldopen-=undo      " Don't open folds when you undo stuff
-let php_folding = 2     " Fold PHP functions and classes and stuff between {} blocks
+"turning off for now - changing from insert to normal mode is too slow on
+"large files
+"let php_folding = 1     " Fold PHP functions and classes and stuff between {} blocks
 autocmd Filetype php :set foldlevel=1
 autocmd Filetype php :set foldlevelstart=1
-autocmd Filetype js :set foldlevelstart=2
+autocmd Filetype js  :set foldlevelstart=2
 
 " Don't screw up folds when inserting text that might affect them, until
 " leaving insert mode. Foldmethod is local to the window. Protect against
 " screwing up folding when switching between windows.
-autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+if exists("php_folding") && (php_folding==1 || php_folding==2)
+    autocmd Filetype php :autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+    autocmd Filetype php :autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+endif
+
 
 " Set a nicer foldtext function
 set foldtext=MyFoldText()
