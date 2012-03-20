@@ -1,6 +1,6 @@
 Transparency=off
 OpaqueWhenFocused=no
-CursorColour=191,191,191
+CursorColour=167,179,180
 CursorType=block
 Locale=en_US
 Charset=UTF-8
@@ -12,4 +12,4 @@ BoldAsFont=no
 FontSmoothing=default
 FontIsBold=no
 SwitchShortcuts=no
-CursorBlinks=yes
+CursorBlinks=no
