@@ -91,3 +91,6 @@
 [submodule ".vim/bundle/php"]
 	path = .vim/bundle/php
 	url = https://github.com/madflow/vim-php.git
+[submodule ".vim/bundle/javascript"]
+	path = .vim/bundle/javascript
+	url = https://github.com/pangloss/vim-javascript.git
