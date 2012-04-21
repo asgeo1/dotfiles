@@ -35,3 +35,6 @@ source $ZSH/oh-my-zsh.sh
 
 # Colors for mintty terminal
 [[ -s "$HOME/.colors/mintty-solarized-dark.sh" ]] && source "$HOME/.colors/mintty-solarized-dark.sh"
+
+# use mvim (which has ruby+python support rather than stock vim on OSX
+[[ -s "/Applications/MacVim.app/Contents/MacOS/Vim" ]] && alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
