@@ -7,6 +7,9 @@ ZSH=$HOME/.oh-my-zsh
 # time that oh-my-zsh is loaded.
 ZSH_THEME="asgeo1"
 
+# Turn on vim command line editing
+bindkey -v
+
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
@@ -35,3 +38,6 @@ source $ZSH/oh-my-zsh.sh
 
 # Colors for mintty terminal
 [[ -s "$HOME/.colors/mintty-solarized-dark.sh" ]] && source "$HOME/.colors/mintty-solarized-dark.sh"
+
+# use mvim (which has ruby+python support rather than stock vim on OSX
+[[ -s "/Applications/MacVim.app/Contents/MacOS/Vim" ]] && alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
