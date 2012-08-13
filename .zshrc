@@ -41,3 +41,5 @@ source $ZSH/oh-my-zsh.sh
 
 # use mvim (which has ruby+python support rather than stock vim on OSX
 [[ -s "/Applications/MacVim.app/Contents/MacOS/Vim" ]] && alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
+
+export EDITOR=vim
