@@ -95,7 +95,7 @@ endif
 if has("win32")
     set guifont=consolas:h10    " Set font
 else
-    set guifont=monaco:h12      " Set font
+    set guifont=Monaco-Powerline:h12      " Set font
 endif
 
 set background=dark             " We are using a dark background
@@ -357,12 +357,13 @@ set noerrorbells                    " Don't make noise on errors that have messa
 " Don't blink or make noise on errors that have no message. Need to set this
 " with autocmd, because variable t_vb is always reset after when gui starts
 autocmd GUIEnter * set visualbell t_vb=""
-set laststatus=1                    " Only show statusline if there is more than one window
+set laststatus=2                    " Always show the status line
 if ! &term =~ 'xterm'
     winpos 5 5                          " Start Vim at this co-ordinates of the screen
 endif
 set showcmd                         " Show information on the command in status line such as number of lines highlighted
-set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-7.(%l,%v%)\ %{&ff},%Y
+" Using vim-powerline to set the status line now
+"set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-7.(%l,%v%)\ %{&ff},%Y
 set guioptions=cagt                 " What components and options of the GUI should be used (c=console dialogs for simple choices, a = autoselect, m = menu bar, g = inactive menu items are gray, t = tearoff menu items, T = include Toolbar, r = righthand scrollbar always present, R = righthand scrollbar always present when vert. split window, b = bottom scrollbar is present, e = show GUI tab line)
 set titlestring=%t%(\ [%R%M]%)"     " Set title bar
 set colorcolumn=80                  " Put the "color column" at col 80
@@ -472,19 +473,21 @@ endif
 
 " if you want your tags to include vars/objects do:
 " coffeetags --vim-conf --include-vars
- let g:tagbar_type_coffee = {
-  \ 'kinds' : [
-  \   'f:functions',
-  \   'o:object'
-  \ ],
-  \ 'kind2scope' : {
-  \  'f' : 'object',
-  \   'o' : 'object'
-  \},
-  \ 'sro' : ".",
-  \ 'ctagsbin' : 'coffeetags',
-  \ 'ctagsargs' : ' ',
-  \}
+if executable('coffeetags')
+  let g:tagbar_type_coffee = {
+        \ 'ctagsbin' : 'coffeetags',
+        \ 'ctagsargs' : '',
+        \ 'kinds' : [
+        \ 'f:functions',
+        \ 'o:object',
+        \ ],
+        \ 'sro' : ".",
+        \ 'kind2scope' : {
+        \ 'f' : 'object',
+        \ 'o' : 'object',
+        \ }
+        \ }
+endif
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Netrw Plugin
@@ -548,6 +551,11 @@ noremap <Leader>cr <Esc>:RepoRoot<CR>:pwd<CR>
 " Gundo
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <F5> :GundoToggle<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Powerline
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:Powerline_symbols = 'fancy'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
