@@ -254,6 +254,8 @@ set wildignore+=*.o,*.obj,*.exe,*.dll,*.manifest " compiled object files
 set wildignore+=*.spl                            " compiled spelling word lists
 set wildignore+=*.sw?                            " Vim swap files
 set wildignore+=*.DS_Store                       " OSX bullshit
+set wildignore+=.sass-cache                      " Sass
+set wildignore+=*/tmp/*                          " Temporary files
 
 set ruler                           " Show the cursor position all the time
 set cmdheight=1                     " The command bar is 2 high
