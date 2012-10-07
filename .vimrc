@@ -680,7 +680,21 @@ function! s:Kwbd(kwbdStage)
   endif
 endfunction
 
-
+" virtual tabstops using spaces
+let my_tab=4
+" allow toggling between local and default mode
+function! TabToggle()
+  if &expandtab
+    set shiftwidth=4
+    set softtabstop=0
+    set noexpandtab
+  else
+    execute "set shiftwidth=".g:my_tab
+    execute "set softtabstop=".g:my_tab
+    set expandtab
+  endif
+endfunction
+nmap <leader>q mz:execute TabToggle()<CR>'z
 
 " Clear highlights
 noremap <F7> :let @/=''<CR> :echo 'Highlights Cleared'<CR>
