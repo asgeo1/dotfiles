@@ -560,6 +560,18 @@ nnoremap <F5> :GundoToggle<CR>
 let g:Powerline_symbols = 'fancy'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Suckless
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+noremap <silent> <leader>wh :call WindowMove("h")<CR>
+noremap <silent> <leader>wj :call WindowMove("j")<CR>
+noremap <silent> <leader>wk :call WindowMove("k")<CR>
+noremap <silent> <leader>wl :call WindowMove("l")<CR>
+noremap <silent> <leader>wH :call WindowResize("h")<CR>
+noremap <silent> <leader>wJ :call WindowResize("j")<CR>
+noremap <silent> <leader>wK :call WindowResize("k")<CR>
+noremap <silent> <leader>wL :call WindowResize("l")<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Replace leading spaces with tabs. Select range, then hit :SuperRetab($width) - by p0g and FallingCow

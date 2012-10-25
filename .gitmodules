@@ -100,3 +100,6 @@
 [submodule ".vim/bundle/bclose"]
 	path = .vim/bundle/bclose
 	url = https://github.com/rbgrouleff/bclose.vim
+[submodule ".vim/bundle/suckless"]
+	path = .vim/bundle/suckless
+	url = https://github.com/fabi1cazenave/suckless.vim.git
