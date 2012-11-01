@@ -1,16 +1,56 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" VIM CONFIGURATION FILE
-"
-" Written by Adam George
-"
-" Last Modified 12-Aug-2011
+" Adam's VIM CONFIGURATION FILE
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Pathogen
+" Vundle
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call pathogen#infect()
-call pathogen#helptags()
+set nocompatible
+filetype off
+
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+" let Vundle manage Vundle
+Bundle 'gmarik/vundle'
+
+" Github bundles
+Bundle 'tpope/vim-fugitive'
+Bundle 'mileszs/ack.vim'
+Bundle 'kchmck/vim-coffee-script'
+Bundle 'zklinger/dbext'
+Bundle 'Lokaltog/vim-easymotion'
+Bundle 'sjl/gundo.vim'
+Bundle 'pangloss/vim-javascript'
+Bundle 'scrooloose/nerdcommenter'
+Bundle 'scrooloose/nerdtree'
+Bundle 'asgeo1/nerdtree_hacks'
+Bundle 'scrooloose/syntastic'
+Bundle 'tpope/vim-rails'
+Bundle 'tpope/vim-repeat'
+Bundle 'tpope/vim-surround'
+Bundle 'jmcantrell/vim-reporoot'
+Bundle 'vim-ruby/vim-ruby'
+Bundle 'majutsushi/tagbar'
+Bundle 'kana/vim-textobj-function'
+Bundle 'kana/vim-textobj-user'
+Bundle 'austintaylor/vim-indentobject'
+Bundle 'nelstrom/vim-textobj-rubyblock'
+Bundle 'bootleq/vim-textobj-rubysymbol'
+Bundle 'altercation/vim-colors-solarized'
+Bundle 'kien/ctrlp.vim'
+Bundle 'Lokaltog/vim-powerline'
+Bundle 'spolu/dwm.vim'
+Bundle 'briancollins/vim-jst'
+Bundle 'rbgrouleff/bclose.vim'
+Bundle 'fabi1cazenave/suckless.vim'
+
+" Vim-scripts bundles
+Bundle 'IndexedSearch'
+Bundle 'scratch.vim'
+Bundle 'taglist.vim'
+Bundle 'argtextobj.vim'
+Bundle 'ZoomWin'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Performance issues of editing remote files - this function will turn off several features which lead to poor performance when
