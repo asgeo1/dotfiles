@@ -4,6 +4,9 @@ coffeescript=.eco,.coffee
 --type-set
 plsql=.tab,.bdy,.spc,.seq,.tps,.trg,.prc,.vw,.fnc,.syn
 
+--type-add
+ruby=page
+
 --ignore-dir=.bundle
 
 --smart-case
