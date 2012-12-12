@@ -6,6 +6,8 @@ plsql=.tab,.bdy,.spc,.seq,.tps,.trg,.prc,.vw,.fnc,.syn
 
 --type-add
 ruby=page
+--type-add
+ruby=widget
 
 --ignore-dir=.bundle
 
