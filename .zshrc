@@ -43,3 +43,5 @@ source $ZSH/oh-my-zsh.sh
 [[ -s "/Applications/MacVim.app/Contents/MacOS/Vim" ]] && alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
 
 export EDITOR=vim
+
+zstyle ':completion:*' users asgeo1 root
