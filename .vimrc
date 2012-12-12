@@ -30,6 +30,8 @@ Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
+Bundle 'mattn/webapi-vim'
+Bundle 'mattn/gist-vim'
 
 Bundle 'kana/vim-textobj-function'
 Bundle 'kana/vim-textobj-user'
@@ -571,6 +573,11 @@ let NERDTreeUseExistingWindows = 1
 " Reporoot Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <Leader>cr <Esc>:RepoRoot<CR>:pwd<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" gist-vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:gist_show_privates = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Powerline
