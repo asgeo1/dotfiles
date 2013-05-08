@@ -572,6 +572,7 @@ let g:ackhighlight=1
 let php_parent_error_close = 1      " Show ({ that aren't closed properlly
 let php_parent_error_open = 1       " Show )} that aren't opened properlly
 let php_asp_tags = 1                " Color <? and ?> tags
+let loaded_syntastic_php_php_checker = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTree Plugin
