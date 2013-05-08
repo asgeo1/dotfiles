@@ -32,6 +32,7 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
+Bundle 'airblade/vim-gitgutter'
 
 Bundle 'kana/vim-textobj-function'
 Bundle 'kana/vim-textobj-user'
@@ -443,6 +444,7 @@ au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
 
 " Don't use the Special group for @variables - looks too garish in solarised
 hi def link coffeeSpecialVar Identifier
+hi clear SignColumn
 
 " PL/SQL goodies
 au BufNewFile,BufReadPost *.bdy,*.spc,*.trg,*.fnc,*.prc,*.vw setl filetype=plsql listchars=tab:\ \ ,trail:\ ,extends:>,precedes:<
@@ -535,6 +537,12 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_root_markers = ['Gemfile']
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Git Gutter Plugin
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:gitgutter_on_bufenter = 0
+let g:gitgutter_all_on_focusgained = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Dbext Plugin
