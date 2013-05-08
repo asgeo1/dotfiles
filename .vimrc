@@ -635,6 +635,13 @@ function! s:RemoveExtraneousWhitespace()
     :silent! %s/[ \t]*$//g
 endfunction
 
+" Turn off backups (needed when using CodeKit)
+function! DisableBackups()
+    :set nobackup
+    :set nowritebackup
+    :set noswapfile
+endfunction
+
 " Sort tab pages
 func! s:SortTabs()
     for i in range(tabpagenr('$'),1,-1)
@@ -705,6 +712,8 @@ noremap <silent> <F10> :SortTabs<CR>:echo 'Tabs Sorted'<CR>
 " Toggle cursor line on/off
 command! -nargs=0 CursorLineColToggle call s:CursorLineColToggle()
 noremap <silent> <F12> :CursorLineColToggle<CR>:echo 'Toggled Column/Line'<CR>
+
+nmap <leader>db mz:execute DisableBackups()<CR>'z
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
