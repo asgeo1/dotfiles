@@ -9,6 +9,11 @@ ruby=page
 --type-add
 ruby=widget
 
+--type-add
+html=.haml
+--type-add
+css=.sass,.scss
+
 --ignore-dir=.bundle
 --ignore-dir=app/components
 --ignore-dir=.tmp
