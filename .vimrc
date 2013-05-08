@@ -538,7 +538,10 @@ endif
 " Ctrl-P Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>p'
-let g:ctrlp_root_markers = ['Gemfile']
+let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json']
+let g:ctrlp_custom_ignore = {
+  \ 'dir': '\v[\/](node_modules|components)$'
+  \ }
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Git Gutter Plugin
