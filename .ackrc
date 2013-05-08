@@ -10,5 +10,8 @@ ruby=page
 ruby=widget
 
 --ignore-dir=.bundle
+--ignore-dir=app/components
+--ignore-dir=.tmp
+--ignore-dir=node_modules
 
 --smart-case
