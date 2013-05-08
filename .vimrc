@@ -33,6 +33,7 @@ Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
 Bundle 'airblade/vim-gitgutter'
+Bundle 'editorconfig/editorconfig-vim'
 
 Bundle 'kana/vim-textobj-function'
 Bundle 'kana/vim-textobj-user'
@@ -44,6 +45,7 @@ Bundle 'tpope/vim-rails'
 Bundle 'pangloss/vim-javascript'
 Bundle 'briancollins/vim-jst'
 Bundle 'vim-ruby/vim-ruby'
+Bundle 'groenewege/vim-less'
 Bundle 'altercation/vim-colors-solarized'
 
 " Vim-scripts bundles
