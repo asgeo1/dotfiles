@@ -8,7 +8,15 @@
 set nocompatible
 filetype off
 
-set rtp+=~/.vim/bundle/vundle/
+set shell=cmd
+set shellcmdflag=/c
+
+if has("win32")
+  set rtp+=$HOME/vimfiles/bundle/vundle/
+else
+  set rtp+=~/.vim/bundle/vundle/
+endif
+
 call vundle#rc()
 
 " let Vundle manage Vundle
@@ -32,8 +40,10 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
-Bundle 'airblade/vim-gitgutter'
-Bundle 'editorconfig/editorconfig-vim'
+if !has("win32")
+  Bundle 'airblade/vim-gitgutter'
+  Bundle 'editorconfig/editorconfig-vim'
+endif
 
 Bundle 'kana/vim-textobj-function'
 Bundle 'kana/vim-textobj-user'
@@ -135,7 +145,7 @@ if &t_Co > 2 || has("gui_running")
 endif
 
 if has("win32")
-    set guifont=consolas:h10    " Set font
+    set guifont=consolas:h10.5    " Set font
 else
     set guifont=Monaco-Powerline:h12      " Set font
 endif
@@ -162,10 +172,10 @@ if has("persistent_undo")
 endif
 
 if has("win32")
-    set backupdir=C:/Program\ Files/Vim/vimfiles/tmp/backup   " Where to put backup file
-    set directory=C:/Program\ Files/Vim/vimfiles/tmp/swap     " Directory is the directory for temp file
+    set backupdir=$HOME/vimfiles/tmp/backup   " Where to put backup file
+    set directory=$HOME/vimfiles/tmp/swap     " Directory is the directory for temp file
     if has("persistent_undo")
-        set undodir=C:/Program\ Files/Vim/vimfiles/tmp/undo   " Where to save undo history
+        set undodir=$HOME/vimfiles/tmp/undo   " Where to save undo history
     endif
 else
     set backupdir=~/.vim/tmp/backup     " Where to put backup file
@@ -317,7 +327,7 @@ if ! &term =~ 'xterm'
     set wmw=0                       " The minimal width of a window, when it's not the current window
 endif
 if has("win32") && has("gui_running")
-    au GUIEnter * :silent Fullscreen " Turn on full-screen mode
+    "au GUIEnter * :silent Fullscreen " Turn on full-screen mode
 elseif has("gui_macvim")
     set fuoptions+=maxhorz          " Unsure the fullscreen view is maximised - useful for when changing monitor sizes after saving session
     set fuoptions+=maxvert
@@ -400,7 +410,8 @@ set scrolloff=10                    " Keep 10 lines (top/bottom) for scope. This
 set noerrorbells                    " Don't make noise on errors that have messages
 " Don't blink or make noise on errors that have no message. Need to set this
 " with autocmd, because variable t_vb is always reset after when gui starts
-autocmd GUIEnter * set visualbell t_vb=""
+set noerrorbells visualbell t_vb=    "(console)
+autocmd GUIEnter * set visualbell t_vb=""  "(gui)
 set laststatus=2                    " Always show the status line
 if ! &term =~ 'xterm'
     winpos 5 5                          " Start Vim at this co-ordinates of the screen
@@ -511,7 +522,7 @@ augroup END
 " Tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("win32")
-    autocmd Filetype php :set tags=$VIM/vimfiles/tags/zf
+    autocmd Filetype php :set tags=$HOME/vimfiles/tags/zf
 else
     autocmd Filetype php :set tags=~/.vim/tags/zf
 endif
