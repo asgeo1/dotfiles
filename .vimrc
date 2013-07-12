@@ -8,8 +8,12 @@
 set nocompatible
 filetype off
 
-set shell=cmd
-set shellcmdflag=/c
+if has("win32")
+  set shell=cmd
+  set shellcmdflag=/c
+else
+  set shell=/bin/zsh
+endif
 
 if has("win32")
   set rtp+=$HOME/vimfiles/bundle/vundle/
@@ -133,7 +137,6 @@ set clipboard=unnamed   " The unnamed register is the \" register, and the Windo
 set nocompatible        " Set vim not compatible with vi
 set history=50          " Keep 50 lines of command line history
 set cf                  " Enable error files and error jumping
-set shell=/bin/zsh
 filetype on             " Detect the type of file
 let mapleader = ","     " Slash (\) to cumbersome to type as the leader character
 
