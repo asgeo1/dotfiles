@@ -23,6 +23,9 @@ endif
 
 call vundle#rc()
 
+" Workaround in windows for issue with escaping shell commands
+au FileType vundle setlocal noshellslash
+
 " let Vundle manage Vundle
 Bundle 'gmarik/vundle'
 
