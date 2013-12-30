@@ -458,6 +458,10 @@ autocmd Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
 
 " Coffeescript, use two-space indentation
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.rb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.yml setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.erb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.scss setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " Coffeescript, use indentation for folding
 au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
