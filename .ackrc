@@ -4,10 +4,17 @@ coffeescript=.eco,.coffee
 --type-set
 plsql=.tab,.bdy,.spc,.seq,.tps,.trg,.prc,.vw,.fnc,.syn
 
+--type-set
+jbuilder=.jbuilder
+
 --type-add
 ruby=page
 --type-add
 ruby=widget
+--type-add
+ruby=inc
+--type-add
+ruby=nav
 
 --type-add
 html=.haml
@@ -16,7 +23,9 @@ css=.sass,.scss
 
 --ignore-dir=.bundle
 --ignore-dir=app/components
+--ignore-dir=bower_components
 --ignore-dir=.tmp
 --ignore-dir=node_modules
+--ignore-dir=.gems
 
 --smart-case
