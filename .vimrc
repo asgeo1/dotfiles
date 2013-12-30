@@ -37,7 +37,7 @@ Bundle 'rbgrouleff/bclose.vim'
 Bundle 'fabi1cazenave/suckless.vim'
 Bundle 'majutsushi/tagbar'
 Bundle 'kien/ctrlp.vim'
-Bundle 'Lokaltog/vim-powerline'
+Bundle 'bling/vim-airline'
 Bundle 'tpope/vim-repeat'
 Bundle 'tpope/vim-surround'
 Bundle 'jmcantrell/vim-reporoot'
@@ -58,6 +58,7 @@ Bundle 'austintaylor/vim-indentobject'
 Bundle 'nelstrom/vim-textobj-rubyblock'
 Bundle 'bootleq/vim-textobj-rubysymbol'
 Bundle 'kchmck/vim-coffee-script'
+Bundle 'AndrewRadev/vim-eco'
 Bundle 'tpope/vim-rails'
 Bundle 'pangloss/vim-javascript'
 Bundle 'briancollins/vim-jst'
@@ -153,7 +154,7 @@ endif
 if has("win32")
     set guifont=consolas:h10.5    " Set font
 else
-    set guifont=Monaco-Powerline:h12      " Set font
+    set guifont=Monaco-Powerline-New:h12      " Set font
 endif
 
 set background=dark             " We are using a dark background
@@ -611,9 +612,9 @@ noremap <Leader>cr <Esc>:RepoRoot<CR>:pwd<CR>
 let g:gist_show_privates = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Powerline
+" Airline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:Powerline_symbols = 'fancy'
+let g:airline_powerline_fonts = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
