@@ -45,3 +45,5 @@ source $ZSH/oh-my-zsh.sh
 export EDITOR=vim
 
 zstyle ':completion:*' users asgeo1 root
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init - zsh)"
