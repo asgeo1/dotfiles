@@ -165,7 +165,7 @@ if !has("gui_running")
     set t_Co=256
 endif
 
-colorscheme solarized
+silent! colorscheme solarized
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
