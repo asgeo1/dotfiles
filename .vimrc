@@ -77,66 +77,6 @@ Bundle 'argtextobj.vim'
 Bundle 'adt.vim'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Performance issues of editing remote files - this function will turn off several features which lead to poor performance when
-" editing remote files via mapped network shares in windows
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:NotEditingRemotely = 1
-
-function! s:ToggleRemoteFile()
-    if exists("g:NotEditingRemotely")
-        " Disable the matchparen.vim plugin
-        :NoMatchParen
-
-        " Turn off detection of the type of file
-        filetype off
-
-        " Disable the netrwPlugin.vim
-        au! Network
-        au! FileExplorer
-
-        " Remove tag scanning (t) and included file scanning (i)
-        set complete=.,w,b,u
-
-        " Remove these autocommands which were added by vimBallPlugin.vim
-        au! BufEnter *.vba
-        au! BufEnter *.vba.gz
-        au! BufEnter *.vba.bz2
-        au! BufEnter *.vba.zip
-
-        " Remove these custom autogroups (cannot be redone)
-        au! lastTabPageVisited
-        au! setFoldText
-
-        unlet g:NotEditingRemotely
-
-        :echo 'Remote Edit mode turned on'
-    else
-        " Enable the matchparen.vim plugin
-        :DoMatchParen
-
-        " Turn on detection of files
-        filetype on
-
-        " Add back in tag scanning (t) and included file scanning (i)
-        " . = current buffer
-        " w = buffers from other windows
-        " b = other loaded buffers in the buffer list
-        " u = unloaded buffers in the buffer list
-        " t = tag completion
-        " i = scan current and included files (see 'include' option)
-        " k = scan the files given with the 'dictionary' option
-        set complete=.,w,b,u,t,i
-
-        let g:NotEditingRemotely = 1
-
-        :echo 'Remote Edit mode turned off'
-    endif
-endfunction
-
-command! -nargs=0 ToggleRemoteFile call s:ToggleRemoteFile()
-noremap <F6> :ToggleRemoteFile<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set clipboard=unnamed   " The unnamed register is the \" register, and the Windows Clipboard is the * register.
@@ -195,120 +135,11 @@ else
         set undodir=~/.vim/tmp/undo     " Where to save undo history
     endif
 endif
-set makeef=error.err                    " When using make, where should it dump the file
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Saving Sessions and Views
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" This is pissing me off :-/
-" set sessionoptions=help,blank,winpos,resize,winsize   " what is saved in a session
-" set viewoptions=folds,options,cursor                  " what is saved in a view
-" set viminfo='1000,f1,:100,/100,%,!                    " what is saved in .viminfo file
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-function! GuiTabLabel()
-    let label = ''
-    let bufnrlist = tabpagebuflist(v:lnum)
-
-    " Append the tab number
-    let label .= tabpagenr().': '
-
-    " Add '+' if one of the buffers in the tab page is modified
-    for bufnr in bufnrlist
-        if getbufvar(bufnr, "&modified")
-            let label .= '* '
-            break
-        endif
-    endfor
-
-    " Append the buffer name
-    let name = bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
-        if name == ''
-        " give a name to no-name documents
-        if &buftype=='quickfix'
-            let name = '[Quickfix List]'
-        else
-            let name = '[No Name]'
-        endif
-    else
-        " get only the file name
-        let name = fnamemodify(name,":t")
-    endif
-
-    let label .= name
-
-    " Append the number of windows in the tab page
-    let wincount = tabpagewinnr(v:lnum, '$')
-
-    if wincount > 1
-        let wincount = ' [' . wincount . ']'
-    else
-        let wincount = ''
-    endif
-
-    return label . wincount
-endfunction
-
-" set up tab tooltips with every buffer name
-function! GuiTabToolTip()
-    let tip = ''
-    let bufnrlist = tabpagebuflist(v:lnum)
-
-    for bufnr in bufnrlist
-        " separate buffer entries
-        if tip!=''
-            let tip .= ' | '
-        endif
-
-        " Add name of buffer
-        let name=bufname(bufnr)
-
-        if name == ''
-            " give a name to no name documents
-            if getbufvar(bufnr,'&buftype')=='quickfix'
-                let name = '[Quickfix List]'
-            else
-                let name = '[No Name]'
-            endif
-        else
-            let name = fnamemodify(name,":p")
-        endif
-
-        let tip.=name
-
-        " add modified/modifiable flags
-        if getbufvar(bufnr, "&modified")
-            let tip .= ' [+]'
-        endif
-
-        if getbufvar(bufnr, "&modifiable")==0
-            let tip .= ' [-]'
-        endif
-    endfor
-
-    return tip
-endfunction
-
-
-" =======================================================
-" IMPLEMENT A MOST RECENTLY USED MAPPING FOR TAB PAGES
-map gb :exe "tabn " . g:ltv<CR>
-
-function! SetLastTabPageVisited()
-    let g:ltv = tabpagenr()
-endfunction
-
-augroup lastTabPageVisited
-    au!
-
-    autocmd VimEnter * let g:ltv = 1
-    autocmd TabLeave * call SetLastTabPageVisited()
-augroup END
-" =======================================================
-
-
 set wildmenu                        " Turn on wildmenu (command line completion suggestions)
 set wildignore+=.hg,.git,.svn                    " Version control
 set wildignore+=*.aux,*.out,*.toc                " LaTeX intermediate files
@@ -386,8 +217,6 @@ set showtabline=0                       " Don't show tab line by default
 set switchbuf=usetab,useopen,split      " usetab  = jump to first tab that contains the specified buffer
                                         " useopen = Jump to the first open window that contains the specified buffer
                                         " split   = split window rather than using current window
-set guitablabel=%{GuiTabLabel()}        " Set custom tab page titles
-set guitabtooltip=%{GuiTabToolTip()}    " Set custom tab tool tips
 
 " dynamically resize size of quickfix windows based on contents, min 3, max 25
 au FileType qf call AdjustWindowHeight(3, 25)
@@ -431,12 +260,9 @@ if ! &term =~ 'xterm'
     winpos 5 5                          " Start Vim at this co-ordinates of the screen
 endif
 set showcmd                         " Show information on the command in status line such as number of lines highlighted
-" Using vim-powerline to set the status line now
-"set statusline=%<%f\ %h%m%r%{fugitive#statusline()}%=%-7.(%l,%v%)\ %{&ff},%Y
 set guioptions=cagt                 " What components and options of the GUI should be used (c=console dialogs for simple choices, a = autoselect, m = menu bar, g = inactive menu items are gray, t = tearoff menu items, T = include Toolbar, r = righthand scrollbar always present, R = righthand scrollbar always present when vert. split window, b = bottom scrollbar is present, e = show GUI tab line)
 set titlestring=%t%(\ [%R%M]%)"     " Set title bar
 set colorcolumn=80                  " Put the "color column" at col 80
-autocmd Filetype java :set colorcolumn=100
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Text Formatting/Layout
@@ -462,7 +288,7 @@ set fileencodings=ucs-bom,utf8,prc
 set encoding=utf-8
 
 " Set what is counted as a keyword in PHP
-autocmd Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
+au Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
 
 " Coffeescript, use two-space indentation
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
@@ -473,6 +299,9 @@ au BufNewFile,BufReadPost *.scss setl shiftwidth=2 tabstop=2 softtabstop=2 expan
 
 " Coffeescript, use indentation for folding
 au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
+
+" Java/android should have wider columns
+au Filetype java :set colorcolumn=100
 
 " Don't use the Special group for @variables - looks too garish in solarised
 hi def link coffeeSpecialVar Identifier
@@ -776,20 +605,6 @@ vnoremap > >gv
 vnoremap <S-Tab> <gv
 vnoremap <Tab> >gv
 
-" Use auto commands because 'nmap <C-Tab> :bn<cr>' wasn't working
-autocmd GUIEnter * :map <C-Tab> :bn<CR>
-autocmd GUIEnter * :map <C-S-Tab> :bp<cr>
-
-""""""""""""""""""""""""""
-" New/Save/Close commands
-""""""""""""""""""""""""""
-" Remap exit command imap
-inoremap <M-F4> <ESC>:confirm:quit<CR>
-nnoremap <M-F4> :confirm:quit<CR>
-" Map close buffer
-inoremap <C-F4> <ESC>:if !&modified <CR> :bwipe!<cr> :endif<cr><cr>
-nnoremap <C-F4> :if !&modified <CR> :bwipe!<cr> :endif<cr><cr>
-
 """""""""""""""""""""
 " Insert blank lines
 """""""""""""""""""""
@@ -815,21 +630,6 @@ imap <M-j> <Esc>:m+<CR>==gi
 imap <M-k> <Esc>:m-2<CR>==gi
 vmap <M-j> :m'>+<CR>gv=`<my`>mzgv`yo`z
 vmap <M-k> :m'<-2<CR>gv=`>my`<mzgv`yo`z
-
-"""""""""""""""""""""
-" Toggle sections of the UI on/off
-"""""""""""""""""""""
-if has("win32")
-    nnoremap <C-F1> :if &go=~#'m'<Bar>set go-=m<Bar>else<Bar>set go+=m<Bar>endif<CR>
-    nnoremap <C-F2> :if &go=~#'T'<Bar>set go-=T<Bar>else<Bar>set go+=T<Bar>endif<CR>
-    nnoremap <C-F3> :if &go=~#'r'<Bar>set go-=r<Bar>else<Bar>set go+=r<Bar>endif<CR>
-    nnoremap <C-F4> :if &go=~#'e'<Bar>set go-=e<Bar>set showtabline=0<Bar>else<Bar>set go+=e<Bar>set showtabline=2<Bar>endif<CR>
-else
-    "menubar is not relevant to mac
-    nnoremap <D-F2> :if &go=~#'T'<Bar>set go-=T<Bar>else<Bar>set go+=T<Bar>endif<CR>
-    nnoremap <D-F3> :if &go=~#'r'<Bar>set go-=r<Bar>else<Bar>set go+=r<Bar>endif<CR>
-    nnoremap <D-F4> :if &go=~#'e'<Bar>set go-=e<Bar>set showtabline=0<Bar>else<Bar>set go+=e<Bar>set showtabline=2<Bar>endif<CR>
-endif
 
 """""""""""""""""""""
 " Change to directory of current file, and then print the working
