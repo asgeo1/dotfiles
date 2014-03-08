@@ -74,6 +74,7 @@ Bundle 'pwicks86/eclim-for-vundle'
 Bundle 'IndexedSearch'
 Bundle 'scratch.vim'
 Bundle 'argtextobj.vim'
+Bundle 'adt.vim'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Performance issues of editing remote files - this function will turn off several features which lead to poor performance when
