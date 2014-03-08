@@ -828,4 +828,4 @@ endif
 " Change to directory of current file, and then print the working
 " directory
 """""""""""""""""""""
-nnoremap <leader>cd :lcd %:p:h<CR>:pwd<CR>
+nnoremap <leader>cD :lcd %:p:h<CR>:pwd<CR>
