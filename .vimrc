@@ -315,6 +315,8 @@ set wildignore+=*.sw?                            " Vim swap files
 set wildignore+=*.DS_Store                       " OSX bullshit
 set wildignore+=.sass-cache                      " Sass
 set wildignore+=*/tmp/*                          " Temporary files
+set wildignore+=*/bin/*                          " Build artefacts
+set wildignore+=*/gen/*                          " Build artefacts
 
 set ruler                           " Show the cursor position all the time
 set cmdheight=1                     " The command bar is 2 high
@@ -562,7 +564,7 @@ endif
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json']
 let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|components|bower_components|.gems)$'
+  \ 'dir': '\v[\/](node_modules|components|bower_components|.gems|bin|gen)$'
   \ }
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -604,6 +606,7 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
+let NERDTreeIgnore=['\gen$', '^bin$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Reporoot Plugin

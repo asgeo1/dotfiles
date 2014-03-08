@@ -27,5 +27,7 @@ css=.sass,.scss
 --ignore-dir=.tmp
 --ignore-dir=node_modules
 --ignore-dir=.gems
+--ignore-dir=bin
+--ignore-dir=gen
 
 --smart-case
