@@ -434,6 +434,7 @@ set showcmd                         " Show information on the command in status 
 set guioptions=cagt                 " What components and options of the GUI should be used (c=console dialogs for simple choices, a = autoselect, m = menu bar, g = inactive menu items are gray, t = tearoff menu items, T = include Toolbar, r = righthand scrollbar always present, R = righthand scrollbar always present when vert. split window, b = bottom scrollbar is present, e = show GUI tab line)
 set titlestring=%t%(\ [%R%M]%)"     " Set title bar
 set colorcolumn=80                  " Put the "color column" at col 80
+autocmd Filetype java :set colorcolumn=100
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Text Formatting/Layout
