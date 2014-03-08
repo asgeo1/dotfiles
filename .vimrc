@@ -130,6 +130,8 @@ else
     endif
 endif
 
+set autoread                            " When a file has been detected to have been changed outside of Vim and it has not been changed inside of Vim, automatically read it again. When the file has been deleted this is not done.
+
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -161,6 +163,7 @@ endif
 set mousehide                       " Hide mouse cursor when not in use
 set shortmess=at                    " Shortens messages to avoid 'press a key' prompt 
 set report=0                        " Tell us when anything is changed via :...
+set ttyfast                         " Indicates a fast terminal connection.  More characters will be sent to the screen for redrawing, instead of using insert/delete line commands.
 if ! &term =~ 'xterm'
     set wmh=0                       " The minimal height of a window, when it's not the current window
     set wmw=0                       " The minimal width of a window, when it's not the current window
