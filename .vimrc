@@ -44,19 +44,13 @@ Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
-Bundle 'mattn/webapi-vim'
-Bundle 'mattn/gist-vim'
 Bundle 'airblade/vim-rooter'
+
 if !has("win32")
   Bundle 'airblade/vim-gitgutter'
   Bundle 'editorconfig/editorconfig-vim'
 endif
 
-Bundle 'kana/vim-textobj-function'
-Bundle 'kana/vim-textobj-user'
-Bundle 'austintaylor/vim-indentobject'
-Bundle 'nelstrom/vim-textobj-rubyblock'
-Bundle 'bootleq/vim-textobj-rubysymbol'
 Bundle 'kchmck/vim-coffee-script'
 Bundle 'AndrewRadev/vim-eco'
 Bundle 'tpope/vim-rails'
@@ -64,6 +58,7 @@ Bundle 'pangloss/vim-javascript'
 Bundle 'briancollins/vim-jst'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'groenewege/vim-less'
+
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
@@ -73,7 +68,6 @@ Bundle 'pwicks86/eclim-for-vundle'
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
 Bundle 'scratch.vim'
-Bundle 'argtextobj.vim'
 Bundle 'adt.vim'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
