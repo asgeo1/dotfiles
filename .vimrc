@@ -92,7 +92,7 @@ endif
 if has("win32")
     set guifont=consolas:h10.5    " Set font
 else
-    set guifont=Monaco-Powerline-New:h12      " Set font
+    set guifont=Monaco\ for\ Powerline:h12      " Set font
 endif
 
 set background=dark             " We are using a dark background
