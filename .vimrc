@@ -68,6 +68,7 @@ Bundle 'altercation/vim-colors-solarized'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
 Bundle 'dr-chip-vim-scripts/ZoomWin'
+Bundle 'pwicks86/eclim-for-vundle'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
@@ -631,6 +632,7 @@ let g:gist_show_privates = 1
 " Airline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#eclim#enabled = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
