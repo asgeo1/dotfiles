@@ -577,6 +577,11 @@ let g:ctrlp_custom_ignore = {
 let g:gitgutter_eager = 0
 let g:gitgutter_realtime = 0
 
+" fix issue with background color of gitgutter signs
+highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
+highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
+highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Dbext Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
