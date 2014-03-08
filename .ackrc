@@ -30,4 +30,6 @@ css=.sass,.scss
 --ignore-dir=bin
 --ignore-dir=gen
 
+--ignore-file=match:.vimtags
+
 --smart-case

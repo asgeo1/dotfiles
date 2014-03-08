@@ -65,6 +65,8 @@ Bundle 'briancollins/vim-jst'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'groenewege/vim-less'
 Bundle 'altercation/vim-colors-solarized'
+Bundle 'xolox/vim-misc'
+Bundle 'xolox/vim-easytags'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
@@ -317,6 +319,7 @@ set wildignore+=.sass-cache                      " Sass
 set wildignore+=*/tmp/*                          " Temporary files
 set wildignore+=*/bin/*                          " Build artefacts
 set wildignore+=*/gen/*                          " Build artefacts
+set wildignore+=.vimtags                         " tags file
 
 set ruler                           " Show the cursor position all the time
 set cmdheight=1                     " The command bar is 2 high
@@ -534,12 +537,6 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("win32")
-    autocmd Filetype php :set tags=$HOME/vimfiles/tags/zf
-else
-    autocmd Filetype php :set tags=~/.vim/tags/zf
-endif
-
 " if you want your tags to include vars/objects do:
 " coffeetags --vim-conf --include-vars
 if executable('coffeetags')
@@ -558,13 +555,19 @@ if executable('coffeetags')
         \ }
 endif
 
+" easytags.vim:
+set tags=.vimtags;~
+let g:easytags_dynamic_files = 1
+let g:easytags_by_filetype = 1
+let g:easytags_auto_highlight = 0
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ctrl-P Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json']
 let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|components|bower_components|.gems|bin|gen)$'
+  \ 'dir': '\v[\/](node_modules|components|bower_components|.gems|bin|gen|.vimtags)$'
   \ }
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -606,7 +609,7 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['\gen$', '^bin$']
+let NERDTreeIgnore=['\gen$', '^bin$', '\~$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Reporoot Plugin
