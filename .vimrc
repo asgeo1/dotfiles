@@ -466,6 +466,7 @@ let g:airline#extensions#eclim#enabled = 1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:EclimEclipseHome = '/users/asgeo1/Development/Android/eclipse'
 let g:EclimHome = glob(g:EclimEclipseHome . '/plugins/org.eclim_*')
+let g:EclimShowQuickfixSigns = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
