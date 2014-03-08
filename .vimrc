@@ -40,13 +40,13 @@ Bundle 'kien/ctrlp.vim'
 Bundle 'bling/vim-airline'
 Bundle 'tpope/vim-repeat'
 Bundle 'tpope/vim-surround'
-Bundle 'jmcantrell/vim-reporoot'
 Bundle 'scrooloose/syntastic'
 Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'mattn/webapi-vim'
 Bundle 'mattn/gist-vim'
+Bundle 'airblade/vim-rooter'
 if !has("win32")
   Bundle 'airblade/vim-gitgutter'
   Bundle 'editorconfig/editorconfig-vim'
@@ -612,9 +612,9 @@ let NERDTreeUseExistingWindows = 1
 let NERDTreeIgnore=['\gen$', '^bin$', '\~$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Reporoot Plugin
+" Vim-rooter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <Leader>cr <Esc>:RepoRoot<CR>:pwd<CR>
+let g:rooter_patterns = ['.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/', 'project.properties', 'AndroidManifest.xml']
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " gist-vim
