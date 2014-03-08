@@ -562,7 +562,7 @@ endfunction
 nmap <leader>q mz:execute TabToggle()<CR>'z
 
 " Clear highlights
-noremap <F7> :let @/=''<CR> :echo 'Highlights Cleared'<CR>
+noremap <leader>ch :let @/=''<CR> :echo 'Highlights Cleared'<CR>
 
 " Replace ^M with proper new lines
 command! -nargs=0 ReplaceCarrotM call s:ReplaceCarrotM()
