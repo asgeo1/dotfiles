@@ -67,12 +67,12 @@ Bundle 'groenewege/vim-less'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
+Bundle 'dr-chip-vim-scripts/ZoomWin'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
 Bundle 'scratch.vim'
 Bundle 'argtextobj.vim'
-Bundle 'ZoomWin'
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Performance issues of editing remote files - this function will turn off several features which lead to poor performance when
