@@ -1,7 +1,6 @@
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin
 export PATH="/Applications/Postgres93.app/Contents/MacOS/bin:$PATH"
 export PATH="$HOME/Projects/dotfiles/bin:$PATH"
-export PATH="/usr/local/php54/bin:$PATH"
 export PATH="$HOME/Development/Android/sdk/tools:$PATH"
 export PATH="$HOME/Development/Android/sdk/platform-tools:$PATH"
 export PATH="$HOME/Development/Android/ndk:$PATH"
