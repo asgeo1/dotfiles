@@ -62,8 +62,8 @@ Bundle 'groenewege/vim-less'
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
+Bundle 'marijnh/tern_for_vim'
 Bundle 'dr-chip-vim-scripts/ZoomWin'
-Bundle 'pwicks86/eclim-for-vundle'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
