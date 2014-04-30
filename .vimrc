@@ -395,7 +395,7 @@ let g:easytags_auto_highlight = 0
 " Ctrl-P Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>p'
-let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json']
+let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
 let g:ctrlp_custom_ignore = {
   \ 'dir': '\v[\/](node_modules|components|bower_components|.gems|bin|gen|.vimtags)$'
   \ }
@@ -449,7 +449,7 @@ let NERDTreeIgnore=['\gen$', '^bin$', '\~$']
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:rooter_patterns = ['.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/', 'project.properties', 'AndroidManifest.xml']
+let g:rooter_patterns = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " gist-vim
