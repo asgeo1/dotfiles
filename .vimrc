@@ -293,6 +293,7 @@ au BufNewFile,BufReadPost *.rb setl shiftwidth=2 tabstop=2 softtabstop=2 expandt
 au BufNewFile,BufReadPost *.yml setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 au BufNewFile,BufReadPost *.erb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 au BufNewFile,BufReadPost *.scss setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.jbuilder setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " Coffeescript, use indentation for folding
 au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
