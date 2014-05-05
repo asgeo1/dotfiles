@@ -445,7 +445,7 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['\gen$', '^bin$', '\~$']
+let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
