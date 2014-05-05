@@ -64,6 +64,7 @@ Bundle 'xolox/vim-misc'
 Bundle 'xolox/vim-easytags'
 Bundle 'marijnh/tern_for_vim'
 Bundle 'dr-chip-vim-scripts/ZoomWin'
+Bundle 'embear/vim-localvimrc'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
@@ -468,6 +469,14 @@ let g:airline#extensions#eclim#enabled = 1
 let g:EclimEclipseHome = '/users/asgeo1/Development/Android/eclipse'
 let g:EclimHome = glob(g:EclimEclipseHome . '/plugins/org.eclim_*')
 let g:EclimShowQuickfixSigns = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" localvimrc
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Make the decisions given when asked before sourcing local vimrc files
+"persistent over multiple vim runs and instances. The decisions are written to
+"the file defined by and |g:localvimrc_persistence_file|
+let g:localvimrc_persistent = 2
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
