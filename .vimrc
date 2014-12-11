@@ -59,10 +59,12 @@ Bundle 'pangloss/vim-javascript'
 Bundle 'briancollins/vim-jst'
 Bundle 'vim-ruby/vim-ruby'
 Bundle 'groenewege/vim-less'
+Bundle 'elzr/vim-json'
 
 Bundle 'altercation/vim-colors-solarized'
 Bundle 'dr-chip-vim-scripts/ZoomWin'
 Bundle 'embear/vim-localvimrc'
+Bundle 'Chiel92/vim-autoformat'
 
 " Vim-scripts bundles
 Bundle 'IndexedSearch'
@@ -477,6 +479,11 @@ let g:EclimShowQuickfixSigns = 0
 let g:localvimrc_persistent = 2
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-json
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vim_json_syntax_conceal = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <silent> <leader>wh :call WindowMove("h")<CR>
@@ -519,6 +526,13 @@ function! DisableBackups()
     :set nobackup
     :set nowritebackup
     :set noswapfile
+endfunction
+
+" Format buffer as json
+function! JsonFormatter()
+    :set filetype=javascript
+    :Autoformat
+    :set filetype=json
 endfunction
 
 " Sort tab pages
@@ -593,6 +607,7 @@ command! -nargs=0 CursorLineColToggle call s:CursorLineColToggle()
 noremap <silent> <F12> :CursorLineColToggle<CR>:echo 'Toggled Column/Line'<CR>
 
 nmap <leader>db mz:execute DisableBackups()<CR>'z
+nmap <leader>jf mz:execute JsonFormatter()<CR>'z
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
