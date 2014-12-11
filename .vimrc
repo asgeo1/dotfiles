@@ -34,7 +34,6 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'mileszs/ack.vim'
 Bundle 'Lokaltog/vim-easymotion'
 Bundle 'rbgrouleff/bclose.vim'
-Bundle 'fabi1cazenave/suckless.vim'
 "Bundle 'majutsushi/tagbar'
 Bundle 'kien/ctrlp.vim'
 Bundle 'bling/vim-airline'
@@ -48,6 +47,7 @@ Bundle 'airblade/vim-rooter'
 
 if !has("win32")
   "Too slow
+  Bundle 'fabi1cazenave/suckless.vim'
   Bundle 'airblade/vim-gitgutter'
   Bundle 'editorconfig/editorconfig-vim'
 endif
