@@ -47,6 +47,7 @@ Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'airblade/vim-rooter'
 
 if !has("win32")
+  "Too slow
   Bundle 'airblade/vim-gitgutter'
   Bundle 'editorconfig/editorconfig-vim'
 endif
