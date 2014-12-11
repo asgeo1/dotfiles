@@ -393,6 +393,7 @@ set tags=.vimtags;~
 let g:easytags_dynamic_files = 1
 let g:easytags_by_filetype = 1
 let g:easytags_auto_highlight = 0
+let g:easytags_on_cursorhold = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ctrl-P Plugin
