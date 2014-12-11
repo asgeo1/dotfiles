@@ -165,6 +165,7 @@ set mousehide                       " Hide mouse cursor when not in use
 set shortmess=at                    " Shortens messages to avoid 'press a key' prompt 
 set report=0                        " Tell us when anything is changed via :...
 set ttyfast                         " Indicates a fast terminal connection.  More characters will be sent to the screen for redrawing, instead of using insert/delete line commands.
+set timeoutlen=1000 ttimeoutlen=0   " Fix slowness of changing from visual to normal mode in the terminal
 if ! &term =~ 'xterm'
     set wmh=0                       " The minimal height of a window, when it's not the current window
     set wmw=0                       " The minimal width of a window, when it's not the current window
