@@ -44,6 +44,8 @@ Bundle 'scrooloose/nerdcommenter'
 Bundle 'scrooloose/nerdtree'
 Bundle 'asgeo1/nerdtree_hacks'
 Bundle 'airblade/vim-rooter'
+Bundle 'digitaltoad/vim-jade'
+Bundle 'wavded/vim-stylus'
 
 if !has("win32")
   "Too slow
