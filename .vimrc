@@ -21,7 +21,7 @@ call plug#begin('~/.vim/plugged')
 Plug 'altercation/vim-colors-solarized'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
-Plug 'dr-chip-vim-scripts/ZoomWin', { 'on': 'ZoomWin' }
+Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'bling/vim-airline'
 Plug 'kien/ctrlp.vim', { 'on': 'CtrlP' }
 "Plug 'majutsushi/tagbar'
@@ -470,6 +470,12 @@ let g:localvimrc_persistent = 2
 " vim-json
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:vim_json_syntax_conceal = 0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ZoomWinTab
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" declare the mapping, so vim-plug will load on-demand
+noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Suckless
