@@ -15,63 +15,54 @@ else
   set shell=/bin/zsh
 endif
 
-if has("win32")
-  set rtp+=$HOME/vimfiles/bundle/vundle/
-else
-  set rtp+=~/.vim/bundle/vundle/
-endif
+call plug#begin('~/.vim/plugged')
 
-call vundle#rc()
+" UI
+Plug 'altercation/vim-colors-solarized'
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
+Plug 'dr-chip-vim-scripts/ZoomWin', { 'on': 'ZoomWin' }
+Plug 'bling/vim-airline'
+Plug 'kien/ctrlp.vim', { 'on': 'CtrlP' }
+"Plug 'majutsushi/tagbar'
 
-" Workaround in windows for issue with escaping shell commands
-au FileType vundle setlocal noshellslash
-
-" let Vundle manage Vundle
-Bundle 'gmarik/vundle'
-
-" Github bundles
-Bundle 'tpope/vim-fugitive'
-Bundle 'mileszs/ack.vim'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'rbgrouleff/bclose.vim'
-"Bundle 'majutsushi/tagbar'
-Bundle 'kien/ctrlp.vim'
-Bundle 'bling/vim-airline'
-Bundle 'tpope/vim-repeat'
-Bundle 'tpope/vim-surround'
-Bundle 'scrooloose/syntastic'
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'scrooloose/nerdtree'
-Bundle 'asgeo1/nerdtree_hacks'
-Bundle 'airblade/vim-rooter'
-Bundle 'digitaltoad/vim-jade'
-Bundle 'wavded/vim-stylus'
+" Utilities
+Plug 'embear/vim-localvimrc'
+Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
+Plug 'tpope/vim-fugitive'
+Plug 'mileszs/ack.vim', { 'on':  'Ack' }
+Plug 'Lokaltog/vim-easymotion'
+Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'scrooloose/syntastic'
+Plug 'scrooloose/nerdcommenter'
+Plug 'airblade/vim-rooter'
 
 if !has("win32")
   "Too slow
-  Bundle 'fabi1cazenave/suckless.vim'
-  Bundle 'airblade/vim-gitgutter'
-  Bundle 'editorconfig/editorconfig-vim'
+  Plug 'fabi1cazenave/suckless.vim'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'editorconfig/editorconfig-vim'
 endif
 
-Bundle 'kchmck/vim-coffee-script'
-Bundle 'AndrewRadev/vim-eco'
-Bundle 'tpope/vim-rails'
-Bundle 'pangloss/vim-javascript'
-Bundle 'briancollins/vim-jst'
-Bundle 'vim-ruby/vim-ruby'
-Bundle 'groenewege/vim-less'
-Bundle 'elzr/vim-json'
-
-Bundle 'altercation/vim-colors-solarized'
-Bundle 'dr-chip-vim-scripts/ZoomWin'
-Bundle 'embear/vim-localvimrc'
-Bundle 'Chiel92/vim-autoformat'
+" Languages
+Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
+Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
+Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }
+Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+Plug 'briancollins/vim-jst', { 'for': 'jst' }
+Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
+Plug 'groenewege/vim-less', { 'for': 'less' }
+Plug 'elzr/vim-json', { 'for': 'json' }
+Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
+Plug 'wavded/vim-stylus', { 'for': 'styl' }
 
 " Vim-scripts bundles
-Bundle 'IndexedSearch'
-Bundle 'scratch.vim'
-Bundle 'adt.vim'
+Plug 'IndexedSearch'
+Plug 'scratch.vim', { 'on':  'Scratch' }
+
+call plug#end()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
