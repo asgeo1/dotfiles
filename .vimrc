@@ -40,9 +40,13 @@ Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
 
+"Too slow
 if !has("win32")
-  "Too slow
-  Plug 'fabi1cazenave/suckless.vim'
+  "Stuffs up the esc key with neovim
+  if !has("nvim")
+    Plug 'fabi1cazenave/suckless.vim'
+  endif
+
   Plug 'airblade/vim-gitgutter'
   Plug 'editorconfig/editorconfig-vim'
 endif
@@ -159,11 +163,16 @@ set mousehide                       " Hide mouse cursor when not in use
 set shortmess=at                    " Shortens messages to avoid 'press a key' prompt 
 set report=0                        " Tell us when anything is changed via :...
 set ttyfast                         " Indicates a fast terminal connection.  More characters will be sent to the screen for redrawing, instead of using insert/delete line commands.
-set timeoutlen=1000 ttimeoutlen=0   " Fix slowness of changing from visual to normal mode in the terminal
+set timeout
+set timeoutlen=1000
+set ttimeout
+set ttimeoutlen=0                   " Fix slowness of changing from visual to normal mode in the terminal
+
 if ! &term =~ 'xterm'
     set wmh=0                       " The minimal height of a window, when it's not the current window
     set wmw=0                       " The minimal width of a window, when it's not the current window
 endif
+
 if has("win32") && has("gui_running")
     "au GUIEnter * :silent Fullscreen " Turn on full-screen mode
 elseif has("gui_macvim")
