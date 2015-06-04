@@ -21,10 +21,11 @@ call plug#begin('~/.vim/plugged')
 Plug 'altercation/vim-colors-solarized'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
+Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'bling/vim-airline'
-Plug 'kien/ctrlp.vim', { 'on': 'CtrlP' }
+Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
 "Plug 'majutsushi/tagbar'
 
 " Utilities
@@ -56,7 +57,7 @@ Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
-Plug 'briancollins/vim-jst', { 'for': 'jst' }
+Plug 'briancollins/vim-jst', { 'for': ['jst', 'ejs'] }
 Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 Plug 'groenewege/vim-less', { 'for': 'less' }
 Plug 'elzr/vim-json', { 'for': 'json' }
@@ -294,6 +295,7 @@ au Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
 
 " Coffeescript, use two-space indentation
 au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
+au BufNewFile,BufReadPost *.eco setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 au BufNewFile,BufReadPost *.rb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 au BufNewFile,BufReadPost *.yml setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 au BufNewFile,BufReadPost *.erb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
