@@ -32,9 +32,10 @@ Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
 Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
-Plug 'mileszs/ack.vim', { 'on':  'Ack' }
+Plug 'mhinz/vim-grepper'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
+Plug 'kassio/neoterm'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/syntastic'
@@ -56,9 +57,10 @@ endif
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }
+Plug 'tpope/vim-bundler', { 'for': ['ruby', 'erb'] }
+Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'briancollins/vim-jst', { 'for': ['jst', 'ejs'] }
-Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 Plug 'groenewege/vim-less', { 'for': 'less' }
 Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
@@ -435,10 +437,10 @@ let g:dbext_default_profile_msmrs_at_ACTENT_TST          = $MSMRS_AT_ACTENT_TST
 let g:dbext_default_use_win32_filenames                  = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ack Plugin
+" Grepper
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ackprg="ack -H --nocolor --nogroup --column"
-let g:ackhighlight=1
+command! -nargs=* -complete=file GG Grepper! -open -tool git -query <args> -open -quickfix
+command! -nargs=* -complete=file Ack Grepper! -open -tool ack -query <args>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PHP Syntax Options
