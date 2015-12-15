@@ -41,6 +41,7 @@ Plug 'tpope/vim-surround'
 Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
+Plug 'janko-m/vim-test'
 
 "Too slow
 if !has("win32")
@@ -510,6 +511,17 @@ noremap <silent> <leader>wH :call WindowResize("h")<CR>
 noremap <silent> <leader>wJ :call WindowResize("j")<CR>
 noremap <silent> <leader>wK :call WindowResize("k")<CR>
 noremap <silent> <leader>wL :call WindowResize("l")<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-test
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" make test commands execute using dispatch.vim
+let test#strategy = "neoterm"
+nmap <silent> <leader>tn :TestNearest<CR>
+nmap <silent> <leader>tf :TestFile<CR>
+nmap <silent> <leader>ts :TestSuite<CR>
+nmap <silent> <leader>tl :TestLast<CR>
+nmap <silent> <leader>tv :TestVisit<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
