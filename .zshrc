@@ -48,5 +48,3 @@ alias vim="nvim"
 export EDITOR=vim
 
 zstyle ':completion:*' users asgeo1 root
-export PATH="$HOME/.rbenv/bin:$PATH"
-eval "$(rbenv init - zsh)"

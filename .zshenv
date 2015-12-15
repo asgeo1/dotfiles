@@ -5,6 +5,7 @@ export PATH="$HOME/Development/Android/sdk/tools:$PATH"
 export PATH="$HOME/Development/Android/sdk/platform-tools:$PATH"
 export PATH="$HOME/Development/Android/ndk:$PATH"
 export PATH="$HOME/.node/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:$PATH"
 export ANDROID_HOME="$HOME/Development/Android/sdk"
 export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
 export QCAR="$HOME/Development/Android/vuforia-sdk-android-2-8-8/build/java/vuforia/Vuforia.jar"
@@ -15,3 +16,5 @@ export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 
 # Things I don't want to publish to github
 [[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
+
+eval "$(rbenv init - zsh)"
