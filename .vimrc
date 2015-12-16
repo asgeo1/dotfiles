@@ -51,9 +51,8 @@ endif
 " Languages
 Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
-Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }
-Plug 'tpope/vim-bundler', { 'for': ['ruby', 'erb'] }
 Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
+Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this is a little slow on vim startup time :-/
 Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
 Plug 'briancollins/vim-jst', { 'for': ['jst', 'ejs'] }
 Plug 'groenewege/vim-less', { 'for': 'less' }
@@ -447,6 +446,24 @@ nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :TestLast<CR>
 nmap <silent> <leader>tv :TestVisit<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Python
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" skip checking if python is available at vim startup - improves vim startup
+" time
+let g:python_host_skip_check = 1
+let g:python3_host_skip_check = 1
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Ruby
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ruby_path = system('echo $HOME/.rbenv/shims')
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" editor config
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:EditorConfig_core_mode = 'external_command' " install via `brew install editorconfig`
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
