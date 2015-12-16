@@ -32,23 +32,18 @@ Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
 Plug 'mhinz/vim-grepper'
+Plug 'henrik/vim-indexed-search'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
-Plug 'kassio/neoterm'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
-Plug 'scrooloose/syntastic'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
 Plug 'janko-m/vim-test'
+Plug 'scrooloose/syntastic'
 
 "Too slow
 if !has("win32")
-  "Stuffs up the esc key with neovim
-  if !has("nvim")
-    Plug 'fabi1cazenave/suckless.vim'
-  endif
-
   Plug 'airblade/vim-gitgutter'
   Plug 'editorconfig/editorconfig-vim'
 endif
@@ -67,7 +62,6 @@ Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
 Plug 'wavded/vim-stylus', { 'for': 'styl' }
 
 " Vim-scripts bundles
-Plug 'IndexedSearch'
 Plug 'scratch.vim', { 'on':  'Scratch' }
 
 call plug#end()
@@ -192,14 +186,6 @@ if has("win32")
     au!
         " maximize the screen when vim is started
         autocmd GUIEnter * :simalt ~x
-
-        " When editing a file, always jump to the last known cursor position.
-        " Don't do it when the position is invalid or when inside an event handler
-        " (happens when dropping a file on gvim).
-        " autocmd BufReadPost *
-        "   \ if line("'\"") > 0 && line("'\"") <= line("$") |
-        "   \   exe "normal g`\"" |
-        "   \ endif
     augroup END
 endif
 
@@ -374,34 +360,6 @@ augroup setFoldText
     autocmd BufEnter * :set foldtext=MyFoldText()
 augroup END
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tags
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if you want your tags to include vars/objects do:
-" coffeetags --vim-conf --include-vars
-if executable('coffeetags')
-  let g:tagbar_type_coffee = {
-        \ 'ctagsbin' : 'coffeetags',
-        \ 'ctagsargs' : '',
-        \ 'kinds' : [
-        \ 'f:functions',
-        \ 'o:object',
-        \ ],
-        \ 'sro' : ".",
-        \ 'kind2scope' : {
-        \ 'f' : 'object',
-        \ 'o' : 'object',
-        \ }
-        \ }
-endif
-
-" easytags.vim:
-set tags=.vimtags;~
-let g:easytags_dynamic_files = 1
-let g:easytags_by_filetype = 1
-let g:easytags_auto_highlight = 0
-let g:easytags_on_cursorhold = 0
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ctrl-P Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -426,21 +384,11 @@ highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
 highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Dbext Plugin
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:dbext_default_profile_gastrading_at_GASTRADING_DEV = $GASTRADING_AT_GASTRADING_DEV
-let g:dbext_default_profile_muntzadmin_at_TRADING_DEV    = $MUNTZADMIN_AT_TRADING_DEV
-let g:dbext_default_profile_eroster_at_ACTENT_TST        = $EROSTER_AT_ACTENT_TST
-let g:dbext_default_profile_claymore_at_ACTENT_TST       = $CLAYMORE_AT_ACTENT_TST
-let g:dbext_default_profile_mineotadmin_at_ACTENT_TST    = $MINEOTADMIN_ACTENT_TST
-let g:dbext_default_profile_msmrs_at_ACTENT_TST          = $MSMRS_AT_ACTENT_TST
-let g:dbext_default_use_win32_filenames                  = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Grepper
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 command! -nargs=* -complete=file GG Grepper! -open -tool git -query <args> -open -quickfix
 command! -nargs=* -complete=file Ack Grepper! -open -tool ack -query <args>
+nnoremap <leader>* :Grepper! -tool ack -cword<cr>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PHP Syntax Options
@@ -465,11 +413,6 @@ let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_component
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:rooter_patterns = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" gist-vim
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:gist_show_privates = 1
-
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -489,27 +432,10 @@ let g:localvimrc_persistent = 2
 let g:vim_json_syntax_conceal = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Goyo
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <leader>gy <Esc>:Goyo<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ZoomWinTab
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " declare the mapping, so vim-plug will load on-demand
 noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Suckless
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <silent> <leader>wh :call WindowMove("h")<CR>
-noremap <silent> <leader>wj :call WindowMove("j")<CR>
-noremap <silent> <leader>wk :call WindowMove("k")<CR>
-noremap <silent> <leader>wl :call WindowMove("l")<CR>
-noremap <silent> <leader>wH :call WindowResize("h")<CR>
-noremap <silent> <leader>wJ :call WindowResize("j")<CR>
-noremap <silent> <leader>wK :call WindowResize("k")<CR>
-noremap <silent> <leader>wL :call WindowResize("l")<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-test
