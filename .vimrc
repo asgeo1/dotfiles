@@ -26,7 +26,6 @@ Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'bling/vim-airline'
 Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
-"Plug 'majutsushi/tagbar'
 
 " Utilities
 Plug 'embear/vim-localvimrc'
