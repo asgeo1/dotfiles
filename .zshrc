@@ -32,7 +32,7 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git osx rails ruby terminalapp vi-mode bower heroku powder powify rbenv rvm)
+plugins=(git osx rails ruby terminalapp vi-mode bower heroku powder powify rbenv rvm tmux)
 
 source $ZSH/oh-my-zsh.sh
 

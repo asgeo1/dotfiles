@@ -18,3 +18,5 @@ export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 [[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
 
 eval "$(rbenv init - zsh)"
+
+source "$HOME/Projects/dotfiles/bin/tmuxinator.zsh"
