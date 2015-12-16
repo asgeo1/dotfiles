@@ -35,6 +35,7 @@ DISABLE_AUTO_UPDATE="true"
 plugins=(git osx rails ruby terminalapp vi-mode bower heroku powder powify rbenv rvm tmux)
 
 source $ZSH/oh-my-zsh.sh
+source "$HOME/Projects/dotfiles/bin/tmuxinator.zsh"
 
 # Colors for mintty terminal
 [[ -s "$HOME/.colors/mintty-solarized-dark.sh" ]] && source "$HOME/.colors/mintty-solarized-dark.sh"
@@ -45,6 +46,6 @@ source $ZSH/oh-my-zsh.sh
 # use neovim for now
 alias vim="nvim"
 
-export EDITOR=vim
-
 zstyle ':completion:*' users asgeo1 root
+
+eval "$(rbenv init - zsh)"

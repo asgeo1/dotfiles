@@ -13,10 +13,7 @@ export QCAR_SDK_ROOT="$HOME/Development/Android/vuforia-sdk-android-2-8-8"
 #export DYLD_LIBRARY_PATH="/usr/oracle/instantclient_10_2"
 
 export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
+export EDITOR=vim
 
 # Things I don't want to publish to github
 [[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
-
-eval "$(rbenv init - zsh)"
-
-source "$HOME/Projects/dotfiles/bin/tmuxinator.zsh"
