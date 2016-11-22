@@ -93,7 +93,13 @@ endif
 set background=dark             " We are using a dark background
 
 if !has("gui_running")
-    set t_Co=256
+    if has('termguicolors')
+        set t_8f=[38;2;%lu;%lu;%lum
+        set t_8b=[48;2;%lu;%lu;%lum
+        set termguicolors
+    else
+        set t_Co=256
+    end
 endif
 
 silent! colorscheme solarized
