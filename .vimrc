@@ -372,6 +372,7 @@ exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:gitgutter_eager = 0
 let g:gitgutter_realtime = 0
+let g:gitgutter_git_executable = 'git'
 
 " fix issue with background color of gitgutter signs
 highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
