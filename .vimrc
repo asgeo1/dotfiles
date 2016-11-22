@@ -269,9 +269,9 @@ set autoindent      " Copy indent from current line when starting new line (<CR>
 set smartindent     " Turn on smartindent
                     " Do c-style indenting
 autocmd Filetype C,cpp,php,asp,aspx,java,js :set cindent
-set tabstop=4       " Number of spaces that a <Tab> in the file counts for
-set shiftwidth=4    " Set number of spaces to used for each step of (auto)indent. (Used for 'cindent', >>, <<, etc
-set softtabstop=4   " Number of spaces that a <Tab> counts for while performing editing operations, like inserting a <Tab> or using <BS>.
+set tabstop=2       " Number of spaces that a <Tab> in the file counts for
+set shiftwidth=2    " Set number of spaces to used for each step of (auto)indent. (Used for 'cindent', >>, <<, etc
+set softtabstop=2   " Number of spaces that a <Tab> counts for while performing editing operations, like inserting a <Tab> or using <BS>.
 set expandtab       " In Insert mode: Use the appropriate number of spaces to insert a <Tab>
 set nowrap          " Do not wrap lines
 set wrapmargin=0    " Turn off wrapping
@@ -285,16 +285,6 @@ set encoding=utf-8
 
 " Set what is counted as a keyword in PHP
 au Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
-
-" Coffeescript, use two-space indentation
-au BufNewFile,BufReadPost *.coffee setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.eco setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.rb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.yml setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.erb setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.scss setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.jbuilder setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
-au BufNewFile,BufReadPost *.rake setl shiftwidth=2 tabstop=2 softtabstop=2 expandtab
 
 " Coffeescript, use indentation for folding
 au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
@@ -548,11 +538,11 @@ function! s:CursorLineColToggle()
 endfunction
 
 " virtual tabstops using spaces
-let my_tab=4
+let my_tab=2
 " allow toggling between local and default mode
 function! TabToggle()
   if &expandtab
-    set shiftwidth=4
+    set shiftwidth=2
     set softtabstop=0
     set noexpandtab
   else
