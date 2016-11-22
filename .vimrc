@@ -362,7 +362,7 @@ let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'component.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
 let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|components|bower_components|.gems|bin|gen|.vimtags)$'
+  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags)$'
   \ }
 " needed so ctrl-p can be loaded as-needed
 exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
