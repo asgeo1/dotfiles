@@ -18,7 +18,7 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " UI
-Plug 'altercation/vim-colors-solarized'
+Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
 Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
@@ -102,7 +102,7 @@ if !has("gui_running")
     end
 endif
 
-silent! colorscheme solarized
+silent! colorscheme gruvbox
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
