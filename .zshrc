@@ -32,18 +32,11 @@ DISABLE_AUTO_UPDATE="true"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git osx rails ruby terminalapp vi-mode bower heroku powder powify rbenv rvm tmux tmuxinator)
+plugins=(gitfast vi-mode tmuxinator)
 
 source $ZSH/oh-my-zsh.sh
-source "$HOME/Projects/dotfiles/bin/tmuxinator.zsh"
 
-# Colors for mintty terminal
-[[ -s "$HOME/.colors/mintty-solarized-dark.sh" ]] && source "$HOME/.colors/mintty-solarized-dark.sh"
-
-# use mvim (which has ruby+python support rather than stock vim on OSX
-[[ -s "/Applications/MacVim.app/Contents/MacOS/Vim" ]] && alias vim="/Applications/MacVim.app/Contents/MacOS/Vim"
-
-# use neovim for now
+# use neovim
 alias vim="nvim"
 
 zstyle ':completion:*' users asgeo1 root
