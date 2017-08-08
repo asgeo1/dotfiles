@@ -13,6 +13,10 @@ export QCAR_SDK_ROOT="$HOME/Development/Android/vuforia-sdk-android-2-8-8"
 
 export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 export EDITOR=vim
+export OPENSSL_ROOT_DIR="/usr/local/Cellar/openssl/1.0.2l"
 
 # Things I don't want to publish to github
 [[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
+
+# adding this, as `UseKeychain` in .ssh/config not working for some reason
+# ssh-add -K 2>/dev/null;
