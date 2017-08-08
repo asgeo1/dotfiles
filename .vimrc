@@ -366,7 +366,7 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_root_markers = ['Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
+let g:ctrlp_root_markers = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
 let g:ctrlp_custom_ignore = {
   \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags)$'
   \ }
@@ -413,7 +413,8 @@ let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_component
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:rooter_patterns = ['Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
+let g:rooter_patterns = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
+let g:rooter_silent_chdir = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Airline
