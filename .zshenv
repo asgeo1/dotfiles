@@ -15,6 +15,9 @@ export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 export EDITOR=vim
 export OPENSSL_ROOT_DIR="/usr/local/Cellar/openssl/1.0.2l"
 
+# for tmuxinator:
+export DISABLE_AUTO_TITLE=true
+
 # Things I don't want to publish to github
 [[ -s "$HOME/.secrets" ]] && source "$HOME/.secrets"
 
