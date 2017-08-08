@@ -388,9 +388,9 @@ highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Grepper
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-command! -nargs=* -complete=file GG Grepper! -open -tool git -query <args> -open -quickfix
-command! -nargs=* -complete=file Ack Grepper! -open -tool ack -query <args>
-nnoremap <leader>* :Grepper! -tool ack -cword<cr>
+command! -nargs=* -complete=file GG Grepper -open -tool git -query <args> -open -quickfix
+command! -nargs=* -complete=file Ack Grepper -open -tool ack -query <args>
+nnoremap <leader>* :Grepper -tool ack -cword<cr>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " PHP Syntax Options
