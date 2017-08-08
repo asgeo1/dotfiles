@@ -320,7 +320,7 @@ autocmd Filetype gitconfig :set noexpandtab
 " default off for most file types
 autocmd Filetype * :set nofoldenable
 " default on for php files
-autocmd Filetype php :set foldenable
+"autocmd Filetype php :set foldenable
 set foldmethod=indent   " Make folding indent sensitive (for those file types which do not have folding algorithms built in)
 if has("win32")
     set foldlevelstart=1    " Start with this fold level (i.e. methods in PHP files are folded)
@@ -330,7 +330,7 @@ set foldopen-=undo      " Don't open folds when you undo stuff
 "turning off for now - changing from insert to normal mode is too slow on
 "large files
 "let php_folding = 1     " Fold PHP functions and classes and stuff between {} blocks
-autocmd Filetype php :set foldlevel=1
+"autocmd Filetype php :set foldlevel=1
 autocmd Filetype php :set foldlevelstart=1
 autocmd Filetype js  :set foldlevelstart=2
 
@@ -338,8 +338,8 @@ autocmd Filetype js  :set foldlevelstart=2
 " leaving insert mode. Foldmethod is local to the window. Protect against
 " screwing up folding when switching between windows.
 if exists("php_folding") && (php_folding==1 || php_folding==2)
-    autocmd Filetype php :autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-    autocmd Filetype php :autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
+    "autocmd Filetype php :autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
+    "autocmd Filetype php :autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
 endif
 
 
