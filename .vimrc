@@ -74,7 +74,7 @@ call plug#end()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set clipboard=unnamedplus " The unnamed register is the \" register, and the Windows Clipboard is the * register.
+set clipboard=unnamed " The unnamed register is the \" register, and the Windows Clipboard is the * register.
                           " Setting 'clipboard' option to 'unnamed' so you always yank to *. Then pasting to windows apps doesn't
                           " require prefixing "*
 set nocompatible        " Set vim not compatible with vi
