@@ -53,12 +53,18 @@ Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this is a little slow on vim startup time :-/
-Plug 'pangloss/vim-javascript', { 'for': 'javascript' }
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
 Plug 'briancollins/vim-jst', { 'for': ['jst', 'ejs'] }
 Plug 'groenewege/vim-less', { 'for': 'less' }
 Plug 'elzr/vim-json', { 'for': 'json' }
 Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
 Plug 'wavded/vim-stylus', { 'for': 'styl' }
+Plug 'mxw/vim-jsx' ", { 'for': 'jsx' }
+Plug 'pearofducks/ansible-vim'
+Plug 'ekalinin/Dockerfile.vim'
+
+" Not really working...
+" Plug 'fleischie/vim-styled-components'
 
 " Vim-scripts bundles
 Plug 'scratch.vim', { 'on':  'Scratch' }
