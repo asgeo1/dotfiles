@@ -28,6 +28,7 @@ Plug 'bling/vim-airline'
 Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
 
 " Utilities
+Plug 'tpope/vim-dispatch'
 Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
@@ -41,6 +42,7 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
 Plug 'janko-m/vim-test'
 Plug 'scrooloose/syntastic'
+Plug 'szw/vim-tags'
 
 "Too slow
 if !has("win32")
@@ -428,6 +430,11 @@ let g:airline_powerline_fonts = 1
 "persistent over multiple vim runs and instances. The decisions are written to
 "the file defined by and |g:localvimrc_persistence_file|
 let g:localvimrc_persistent = 2
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-tags
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vim_tags_use_vim_dispatch = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-json
