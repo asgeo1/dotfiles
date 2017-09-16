@@ -44,6 +44,7 @@ Plug 'airblade/vim-rooter'
 Plug 'janko-m/vim-test'
 Plug 'scrooloose/syntastic'
 Plug 'szw/vim-tags'
+Plug 'tpope/vim-rbenv'
 
 "Too slow
 if !has("win32")
