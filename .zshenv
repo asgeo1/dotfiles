@@ -11,7 +11,6 @@ export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Hom
 export QCAR="$HOME/Development/Android/vuforia-sdk-android-2-8-8/build/java/vuforia/Vuforia.jar"
 export QCAR_SDK_ROOT="$HOME/Development/Android/vuforia-sdk-android-2-8-8"
 
-export NVIM_TUI_ENABLE_CURSOR_SHAPE=1
 export EDITOR=vim
 export OPENSSL_ROOT_DIR="/usr/local/Cellar/openssl/1.0.2l"
 
