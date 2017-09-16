@@ -32,6 +32,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
+Plug 'gregsexton/gitv', {'on': ['Gitv']}
 Plug 'mhinz/vim-grepper'
 Plug 'henrik/vim-indexed-search'
 Plug 'Lokaltog/vim-easymotion'
