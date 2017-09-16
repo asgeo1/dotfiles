@@ -33,7 +33,7 @@ Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
 Plug 'gregsexton/gitv', {'on': ['Gitv']}
-Plug 'mhinz/vim-grepper'
+Plug 'dyng/ctrlsf.vim'
 Plug 'henrik/vim-indexed-search'
 Plug 'Lokaltog/vim-easymotion'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
@@ -42,9 +42,10 @@ Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
 Plug 'janko-m/vim-test'
-Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
 Plug 'szw/vim-tags'
 Plug 'tpope/vim-rbenv'
+Plug 'terryma/vim-multiple-cursors'
 
 "Too slow
 if !has("win32")
@@ -53,23 +54,10 @@ if !has("win32")
 endif
 
 " Languages
-Plug 'kchmck/vim-coffee-script', { 'for': 'coffee' }
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
-Plug 'vim-ruby/vim-ruby', { 'for': ['ruby', 'erb'] }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this is a little slow on vim startup time :-/
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'jsx'] }
-Plug 'briancollins/vim-jst', { 'for': ['jst', 'ejs'] }
-Plug 'groenewege/vim-less', { 'for': 'less' }
-Plug 'elzr/vim-json', { 'for': 'json' }
-Plug 'digitaltoad/vim-jade', { 'for': 'jade' }
-Plug 'wavded/vim-stylus', { 'for': 'styl' }
-Plug 'mxw/vim-jsx' ", { 'for': 'jsx' }
-Plug 'pearofducks/ansible-vim'
-Plug 'ekalinin/Dockerfile.vim'
 Plug 'octol/vim-cpp-enhanced-highlight'
-
-" Not really working...
-" Plug 'fleischie/vim-styled-components'
+Plug 'sheerun/vim-polyglot'
 
 " Vim-scripts bundles
 Plug 'scratch.vim', { 'on':  'Scratch' }
@@ -394,21 +382,6 @@ highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
 highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Grepper
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-command! -nargs=* -complete=file GG Grepper -open -tool git -query <args> -open -quickfix
-command! -nargs=* -complete=file Ack Grepper -open -tool ack -query <args>
-nnoremap <leader>* :Grepper -tool ack -cword<cr>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" PHP Syntax Options
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let php_parent_error_close = 1      " Show ({ that aren't closed properlly
-let php_parent_error_open = 1       " Show )} that aren't opened properlly
-let php_asp_tags = 1                " Color <? and ?> tags
-let loaded_syntastic_php_php_checker = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTree Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 noremap <leader>nt <Esc>:NERDTree<CR>
@@ -428,6 +401,7 @@ let g:rooter_silent_chdir = 1
 " Airline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#ale#enabled = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " localvimrc
@@ -441,11 +415,6 @@ let g:localvimrc_persistent = 2
 " vim-tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:vim_tags_use_vim_dispatch = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-json
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:vim_json_syntax_conceal = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ZoomWinTab
@@ -463,6 +432,11 @@ nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :TestLast<CR>
 nmap <silent> <leader>tv :TestVisit<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-json
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vim_json_syntax_conceal = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python
