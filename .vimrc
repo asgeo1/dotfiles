@@ -66,6 +66,7 @@ Plug 'wavded/vim-stylus', { 'for': 'styl' }
 Plug 'mxw/vim-jsx' ", { 'for': 'jsx' }
 Plug 'pearofducks/ansible-vim'
 Plug 'ekalinin/Dockerfile.vim'
+Plug 'octol/vim-cpp-enhanced-highlight'
 
 " Not really working...
 " Plug 'fleischie/vim-styled-components'
@@ -477,6 +478,11 @@ let g:ruby_path = system('echo $HOME/.rbenv/shims')
 " editor config
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:EditorConfig_core_mode = 'external_command' " install via `brew install editorconfig`
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" cpp syntax extended
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:cpp_class_scope_highlight = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
