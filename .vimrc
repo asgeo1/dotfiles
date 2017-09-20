@@ -29,7 +29,6 @@ Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
 
 " Utilities
 Plug 'tpope/vim-dispatch'
-Plug 'embear/vim-localvimrc'
 Plug 'Chiel92/vim-autoformat', { 'on': 'Autoformat' }
 Plug 'tpope/vim-fugitive'
 Plug 'gregsexton/gitv', {'on': ['Gitv']}
@@ -154,6 +153,12 @@ set wildignore+=*/tmp/*                          " Temporary files
 set wildignore+=*/bin/*                          " Build artefacts
 set wildignore+=*/gen/*                          " Build artefacts
 set wildignore+=.vimtags                         " tags file
+set wildignore+=*/log/*
+set wildignore+=*/public/uploads/*
+set wildignore+=*/bundle.js
+set wildignore+=*/www/*                          " Cordova www directory
+set wildignore+=*/platforms/*                    " Cordova platforms directory
+set wildignore+=*/plugins/*                      " Cordova plugins directory
 
 set ruler                           " Show the cursor position all the time
 set cmdheight=1                     " The command bar is 2 high
@@ -366,7 +371,7 @@ let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_root_markers = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
 let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags)$'
+  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags|tmp|log|packs|packs-test|dist|tmp|www|platforms|plugins)$'
   \ }
 " needed so ctrl-p can be loaded as-needed
 exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
@@ -412,21 +417,13 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$']
+let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:rooter_patterns = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
 let g:rooter_silent_chdir = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" localvimrc
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"Make the decisions given when asked before sourcing local vimrc files
-"persistent over multiple vim runs and instances. The decisions are written to
-"the file defined by and |g:localvimrc_persistence_file|
-let g:localvimrc_persistent = 2
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-tags
