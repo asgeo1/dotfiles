@@ -374,6 +374,8 @@ exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF Plugin
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'bin', 'gen', 'dist', 'packs', 'packs-test']
+let g:ctrlsf_auto_close = 0
 nmap <leader>fw <Plug>CtrlSFCwordPath
 nmap <leader>fp <Plug>CtrlSFPrompt
 
