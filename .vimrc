@@ -46,6 +46,8 @@ Plug 'w0rp/ale'
 Plug 'szw/vim-tags'
 Plug 'tpope/vim-rbenv'
 Plug 'terryma/vim-multiple-cursors'
+Plug 'Valloric/YouCompleteMe', { 'for': ['cpp', 'c'] } " VERY slow on startup, but OK if just for cpp and c
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable', 'for': ['cpp', 'c'] } " bit slow on startup
 
 "Too slow
 if !has("win32")
