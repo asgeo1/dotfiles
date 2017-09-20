@@ -370,7 +370,7 @@ let g:ctrlp_map = '<leader>p'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_root_markers = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
 let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags|tmp|log|packs|packs-test|dist|tmp|www|platforms|plugins)$'
+  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags|tmp|log|packs|packs-test|dist|tmp|www|platforms|plugins|build|external)$'
   \ }
 " needed so ctrl-p can be loaded as-needed
 exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
@@ -378,7 +378,7 @@ exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF Plugin
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'bin', 'gen', 'dist', 'packs', 'packs-test']
+let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'bin', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external']
 let g:ctrlsf_auto_close = 0
 nmap <leader>fw <Plug>CtrlSFCwordPath
 nmap <leader>fp <Plug>CtrlSFPrompt
@@ -416,7 +416,7 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$']
+let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$', '^build$', '^external$']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
