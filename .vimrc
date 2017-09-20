@@ -49,7 +49,7 @@ Plug 'terryma/vim-multiple-cursors'
 Plug 'Valloric/YouCompleteMe', { 'for': ['cpp', 'c'] } " VERY slow on startup, but OK if just for cpp and c
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable', 'for': ['cpp', 'c'] } " bit slow on startup
 
-"Too slow
+"Too slow for windows, seems fine on osx
 if !has("win32")
   Plug 'airblade/vim-gitgutter'
   Plug 'editorconfig/editorconfig-vim'
@@ -57,8 +57,8 @@ endif
 
 " Languages
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
-Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this is a little slow on vim startup time :-/
-Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
+Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'sheerun/vim-polyglot'
 
 " Vim-scripts bundles
