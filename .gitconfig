@@ -29,3 +29,6 @@
 	smudge = git-lfs smudge %f
 [push]
 	default = simple
+[user]
+	name = Adam George
+	email = github@adamgeorge.com
