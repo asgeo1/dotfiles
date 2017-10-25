@@ -25,7 +25,8 @@ Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
-Plug 'ctrlpvim/ctrlp.vim', { 'on': 'CtrlP' }
+Plug '/usr/local/opt/fzf'
+Plug 'junegunn/fzf.vim'
 
 " Utilities
 Plug 'tpope/vim-dispatch'
@@ -363,16 +364,11 @@ augroup setFoldText
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Ctrl-P Plugin
+" fzf plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ctrlp_map = '<leader>p'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_root_markers = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml']
-let g:ctrlp_custom_ignore = {
-  \ 'dir': '\v[\/](node_modules|bower_components|.gems|bin|gen|.vimtags|tmp|log|packs|packs-test|dist|tmp|www|platforms|plugins|build|external)$'
-  \ }
-" needed so ctrl-p can be loaded as-needed
-exe 'nn <silent>' g:ctrlp_map ':<c-u>'.g:ctrlp_cmd.'<cr>'
+nmap <leader>p :Files<CR>
+nmap <leader>b :Buffers<CR>
+nmap <leader>t :Tags<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF Plugin

@@ -42,3 +42,13 @@ alias vim="nvim"
 zstyle ':completion:*' users asgeo1 root
 
 eval "$(rbenv init - zsh)"
+
+
+# FZF {{{1
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# configures fzf with vim
+  export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
