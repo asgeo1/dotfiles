@@ -157,6 +157,7 @@ set wildignore+=.vimtags                         " tags file
 set wildignore+=*/log/*
 set wildignore+=*/public/uploads/*
 set wildignore+=*/bundle.js
+set wildignore+=*.bundle
 set wildignore+=*/www/*                          " Cordova www directory
 set wildignore+=*/platforms/*                    " Cordova platforms directory
 set wildignore+=*/plugins/*                      " Cordova plugins directory
