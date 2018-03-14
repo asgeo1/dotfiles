@@ -46,6 +46,8 @@ Plug 'w0rp/ale'
 Plug 'szw/vim-tags'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'Valloric/YouCompleteMe', { 'for': ['cpp', 'c'] } " VERY slow on startup, but OK if just for cpp and c
+Plug 'mbbill/undotree'
+Plug 'jeetsukumaran/vim-indentwise'
 
 "Too slow for windows, seems fine on osx
 if !has("win32")
@@ -60,7 +62,7 @@ Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'sheerun/vim-polyglot'
 
 " Vim-scripts bundles
-Plug 'scratch.vim', { 'on':  'Scratch' }
+Plug 'vim-scripts/scratch.vim', { 'on':  'Scratch' }
 
 call plug#end()
 
