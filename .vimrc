@@ -494,19 +494,20 @@ endfunction
 " Remove invalid EOL characters
 " NOTE: ^M == Ctrl+Q Ctrl+M
 function! s:ReplaceCarrotM()
-    :silent! %s/$//g
-    :silent! %s///g
+    :silent! %s/$//gg
+    :silent! %s///gg
+    :silent! %s//\r/gg
 endfunction
 
 " Remove invalid EOL characters
 " NOTE: This was handy for removing some strange characters that notepad++ sometimes adds into files
 function! s:ReplaceCarrotM2()
-    :silent! %s//\r/g
+    :silent! %s//\r/gg
 endfunction
 
 " Remove extra whitespace at the end of lines
 function! s:RemoveExtraneousWhitespace()
-    :silent! %s/[ \t]*$//g
+    :silent! %s/[ \t]*$//gg
 endfunction
 
 " Turn off backups (needed when using CodeKit)
