@@ -409,7 +409,8 @@ highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " NERDTree Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <leader>nt <Esc>:NERDTree<CR>
+noremap <leader>nt <Esc>:NERDTreeToggle<CR>
+noremap <leader>nf <Esc>:NERDTreeFind<CR>
 au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
