@@ -16,13 +16,12 @@
 [diff]
 	tool = vimdiff
 	prompt = false
-[color]
-	ui = true
 [format]
 	pretty = %C(yellow)%h%x09%Creset%Cgreen(%cr)%x09%C(blue)<%an>%x09%Creset%Creset %Cred%d%Creset %s
 [alias]
 	l = "log --graph"
 	ll = "!source ~/.githelpers && pretty_git_log"
+
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean %f
