@@ -12,7 +12,7 @@ if has("win32")
   set shell=cmd
   set shellcmdflag=/c
 else
-  set shell=/bin/zsh
+  set shell=/usr/local/bin/fish
 endif
 
 call plug#begin('~/.vim/plugged')
@@ -98,8 +98,8 @@ set background=dark             " We are using a dark background
 
 if !has("gui_running")
     if has('termguicolors')
-        set t_8f=[38;2;%lu;%lu;%lum
-        set t_8b=[48;2;%lu;%lu;%lum
+        set t_8f=[38;2;%lu;%lu;%lum " Vim terminfo overrides. Needed in tmux for 256 color
+        set t_8b=[48;2;%lu;%lu;%lum " Vim terminfo overrides. Needed in tmux for 256 color
         set termguicolors
     else
         set t_Co=256
