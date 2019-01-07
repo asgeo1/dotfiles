@@ -22,11 +22,14 @@ Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
 Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
 Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
+Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
 Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
+Plug 'roxma/vim-paste-easy'
+Plug 'ryanoasis/vim-devicons'
 
 " Utilities
 Plug 'tpope/vim-dispatch'
