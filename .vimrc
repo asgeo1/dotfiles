@@ -62,6 +62,7 @@ endif
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
+Plug 'amadeus/vim-jsx', { 'for': ['javascript.jsx'] }
 Plug 'sheerun/vim-polyglot'
 Plug 'reisub0/hot-reload.vim'
 
@@ -369,6 +370,11 @@ augroup setFoldText
     " else. Override this
     autocmd BufEnter * :set foldtext=MyFoldText()
 augroup END
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Language Packs
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:polyglot_disabled = ['jsx'] "disabling because using a fork above
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ALE syntax / linting
