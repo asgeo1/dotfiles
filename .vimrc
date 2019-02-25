@@ -63,6 +63,7 @@ Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'sheerun/vim-polyglot'
+Plug 'reisub0/hot-reload.vim'
 
 " Vim-scripts bundles
 Plug 'vim-scripts/scratch.vim', { 'on':  'Scratch' }
