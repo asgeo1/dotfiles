@@ -384,6 +384,11 @@ let g:ale_linters = {
 \}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Autoformatting
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:formatters_javascript = ['xo_javascript']
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nmap <leader>p :Files<CR>
@@ -541,6 +546,10 @@ function! JsonFormatter()
     :set filetype=json
 endfunction
 
+function! AutoFormatter()
+    :Autoformat
+endfunction
+
 " Sort tab pages
 func! s:SortTabs()
     for i in range(tabpagenr('$'),1,-1)
@@ -614,6 +623,7 @@ noremap <silent> <F12> :CursorLineColToggle<CR>:echo 'Toggled Column/Line'<CR>
 
 nmap <leader>db mz:execute DisableBackups()<CR>'z
 nmap <leader>jf mz:execute JsonFormatter()<CR>'z
+nmap <leader>af mz:execute AutoFormatter()<CR>'z
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
