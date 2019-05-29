@@ -167,7 +167,7 @@ set wildignore+=*/platforms/*                    " Cordova platforms directory
 set wildignore+=*/plugins/*                      " Cordova plugins directory
 
 set ruler                           " Show the cursor position all the time
-set cmdheight=2                     " The command bar is 2 high
+set cmdheight=1                     " The command bar is 1 high
 set number                          " Turn on line numbering
 set lz                              " Do not redraw while running macros (much faster) (LazyRedraw)
 set hidden                          " You can change buffers without saving
@@ -454,10 +454,6 @@ nmap <silent> <leader>tv :TestVisit<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Conquer of Completion (coc)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" NOTE: need neovim 0.4.0 for floating windows
-
-
 " use <tab> for trigger completion and navigate to the next complete item
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -480,7 +476,7 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 
-let g:coc_global_extensions = ['coc-git', 'coc-emoji', 'coc-prettier', 'coc-tsserver', 'coc-tslint', 'coc-tslint-plugin', 'coc-css', 'coc-json', 'coc-yaml', 'coc-ccls'] ", 'coc-eslint'
+let g:coc_global_extensions = ['coc-git', 'coc-solargraph', 'coc-emoji', 'coc-prettier', 'coc-tsserver', 'coc-tslint', 'coc-tslint-plugin', 'coc-css', 'coc-json', 'coc-yaml', 'coc-ccls'] ", 'coc-eslint'
 
 " Smaller updatetime for CursorHold & CursorHoldI
 set updatetime=300
@@ -498,7 +494,7 @@ nmap <leader>f  <Plug>(coc-format-selected)
 augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  autocmd FileType typescript,json setl formatexpr=CocActionAsync('formatSelected')
   " Update signature help on jump placeholder
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
@@ -513,7 +509,7 @@ nmap <leader>ac  <Plug>(coc-codeaction)
 nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Use `:Autoformat` to format current buffer
-command! -nargs=0 Autoformat :call CocAction('format')
+command! -nargs=0 Autoformat :call CocActionAsync('format')
 
 " Using CocList
 " Show all diagnostics
