@@ -60,6 +60,7 @@ Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb'] }  " NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'amadeus/vim-jsx', { 'for': ['javascript.jsx'] }
+Plug 'peitalin/vim-jsx-typescript', { 'for': ['typescript.tsx'] }
 Plug 'sheerun/vim-polyglot'
 Plug 'reisub0/hot-reload.vim'
 Plug 'milch/vim-fastlane'
@@ -552,9 +553,10 @@ let g:python3_host_skip_check = 1
 let g:ruby_path = system('echo $HOME/.rbenv/shims')
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"JSX (react)
+"JSX & TSX (react)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:jsx_ext_required = 0
+let g:tsx_ext_required = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " editor config
