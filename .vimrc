@@ -65,6 +65,7 @@ Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'amadeus/vim-jsx', { 'for': ['javascript.jsx'] }
 Plug 'sheerun/vim-polyglot'
 Plug 'reisub0/hot-reload.vim'
+Plug 'milch/vim-fastlane'
 
 " Vim-scripts bundles
 Plug 'vim-scripts/scratch.vim', { 'on':  'Scratch' }

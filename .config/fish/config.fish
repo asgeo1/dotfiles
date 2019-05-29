@@ -39,9 +39,14 @@ set -x PATH "$HOME/.node/bin" $PATH
 set -x PATH "$HOME/.rbenv/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/Development/flutter/bin" $PATH
+set -x PATH "$HOME/.fastlane/bin" $PATH
 
 set -x ANDROID_HOME "$HOME/Development/Android/sdk"
 set -x JAVA_HOME "/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
 
 # for tmuxinator:
 set -x DISABLE_AUTO_TITLE true
+
+# for fastlane
+set -x LC_ALL en_AU.UTF-8
+set -x LANG en_AU.UTF-8
