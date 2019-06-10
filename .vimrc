@@ -28,7 +28,6 @@ Plug 'itchyny/lightline.vim'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'roxma/vim-paste-easy'
-Plug 'ryanoasis/vim-devicons'
 
 " Utilities
 Plug 'dyng/ctrlsf.vim'
