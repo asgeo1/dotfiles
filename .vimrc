@@ -31,23 +31,24 @@ Plug 'roxma/vim-paste-easy'
 Plug 'ryanoasis/vim-devicons'
 
 " Utilities
-Plug 'tpope/vim-dispatch'
-Plug 'tpope/vim-fugitive'
-Plug 'gregsexton/gitv', {'on': ['Gitv']}
 Plug 'dyng/ctrlsf.vim'
 Plug 'henrik/vim-indexed-search'
-Plug 'Lokaltog/vim-easymotion'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
+Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+
+" Seldom used plugins
+Plug 'easymotion/vim-easymotion'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-fugitive'
 Plug 'janko-m/vim-test'
 Plug 'szw/vim-tags'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
-Plug 'mbbill/undotree'
 Plug 'jeetsukumaran/vim-indentwise'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'mbbill/undotree'
 
 "Too slow for windows, seems fine on osx
 if !has("win32")
