@@ -52,6 +52,7 @@ Plug 'jeetsukumaran/vim-indentwise'
 
 "Too slow for windows, seems fine on osx
 if !has("win32")
+  Plug 'airblade/vim-gitgutter'
   Plug 'editorconfig/editorconfig-vim'
 endif
 
@@ -424,6 +425,18 @@ let NERDTreeIgnore=['\gen$', '^bin$', '\~$', '^node_modules$', '^bower_component
 let NERDTreeWinSize=50
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Git Gutter Plugin
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:gitgutter_eager = 0
+let g:gitgutter_realtime = 0
+let g:gitgutter_git_executable = 'git'
+
+" fix issue with background color of gitgutter signs
+highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
+highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
+highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:rooter_patterns = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
@@ -476,7 +489,10 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
 
 
-let g:coc_global_extensions = ['coc-git', 'coc-solargraph', 'coc-emoji', 'coc-prettier', 'coc-tsserver', 'coc-tslint', 'coc-tslint-plugin', 'coc-css', 'coc-json', 'coc-yaml', 'coc-ccls'] ", 'coc-eslint'
+let g:coc_global_extensions = ['coc-git', 'coc-emoji', 'coc-prettier', 'coc-tsserver', 'coc-tslint', 'coc-tslint-plugin', 'coc-css', 'coc-json', 'coc-yaml', 'coc-ccls']
+" coc-git - not using for gutter, because too slow
+" coc-eslint - uninstalled because it complains too much
+" coc-solargraph (ruby) - too slow
 
 " Smaller updatetime for CursorHold & CursorHoldI
 set updatetime=300
@@ -524,12 +540,6 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-
-" coc-git:
-" Create custom highlight groups for coc-git to use
-highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
-highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
-highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-json

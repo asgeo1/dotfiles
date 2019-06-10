@@ -1,5 +1,6 @@
 {
   "suggest.triggerAfterInsertEnter": true,
+  "git.enableGutters": false,
   "git.addedSign.hlGroup": "GitGutterAdd",
   "git.changedSign.hlGroup": "GitGutterChange",
   "git.removedSign.hlGroup": "GitGutterDelete",
