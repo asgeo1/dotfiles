@@ -67,7 +67,7 @@ Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
 Plug 'amadeus/vim-jsx', { 'for': ['javascript.jsx'] }
 Plug 'peitalin/vim-jsx-typescript', { 'for': ['typescript.tsx'] }
 Plug 'sheerun/vim-polyglot'
-Plug 'reisub0/hot-reload.vim'
+Plug 'reisub0/hot-reload.vim' "(flutter)
 Plug 'milch/vim-fastlane'
 
 " Vim-scripts bundles
