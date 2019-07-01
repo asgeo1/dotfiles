@@ -44,7 +44,7 @@ Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " Seldom used plugins
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
+Plug 'machakann/vim-sandwich'
 Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
 Plug 'janko-m/vim-test'
