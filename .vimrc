@@ -42,6 +42,7 @@ Plug 'airblade/vim-rooter'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 " Seldom used plugins
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'easymotion/vim-easymotion'
 Plug 'tpope/vim-repeat'
 Plug 'machakann/vim-sandwich'
