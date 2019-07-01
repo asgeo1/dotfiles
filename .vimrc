@@ -512,6 +512,7 @@ noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
 \   'javascript': ['xo'],
+\   'typescript': ['tslint', 'xo', 'prettier'],
 \}
 
 let g:ale_linters = {
@@ -673,10 +674,6 @@ function! JsonFormatter()
     :set filetype=json
 endfunction
 
-function! AutoFormatter()
-    :Autoformat
-endfunction
-
 " Sort tab pages
 func! s:SortTabs()
     for i in range(tabpagenr('$'),1,-1)
@@ -750,7 +747,7 @@ noremap <silent> <F12> :CursorLineColToggle<CR>:echo 'Toggled Column/Line'<CR>
 
 nmap <leader>db mz:execute DisableBackups()<CR>'z
 nmap <leader>jf mz:execute JsonFormatter()<CR>'z
-nmap <leader>af mz:execute AutoFormatter()<CR>'z
+nmap <leader>af :ALEFix<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
