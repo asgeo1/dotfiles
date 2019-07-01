@@ -519,6 +519,23 @@ let g:ale_linters = {
 \   'javascript': ['xo'],
 \}
 
+nmap <leader>af :ALEFix<CR>
+
+" Remap <C-]>, but only if a LSP exists. Using tags for <C-]> seems to work
+" better for Javascript
+function ALELSPMappings()
+	let l:lsp_found=0
+	for l:linter in ale#linter#Get(&filetype) | if !empty(l:linter.lsp) | let l:lsp_found=1 | endif | endfor
+	if (l:lsp_found)
+		nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
+		nnoremap <buffer> <C-^> :ALEFindReferences<CR>
+	else
+		silent! unmap <buffer> <C-]>
+		silent! unmap <buffer> <C-^>
+	endif
+endfunction
+autocmd BufRead,FileType * call ALELSPMappings()
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -747,7 +764,6 @@ noremap <silent> <F12> :CursorLineColToggle<CR>:echo 'Toggled Column/Line'<CR>
 
 nmap <leader>db mz:execute DisableBackups()<CR>'z
 nmap <leader>jf mz:execute JsonFormatter()<CR>'z
-nmap <leader>af :ALEFix<CR>
 
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
