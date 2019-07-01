@@ -28,6 +28,8 @@ Plug 'itchyny/lightline.vim'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'roxma/vim-paste-easy'
+Plug 'rhysd/git-messenger.vim'
+Plug 'rbong/vim-flog' "(git browser)
 
 " Utilities
 Plug 'dyng/ctrlsf.vim'
@@ -434,6 +436,15 @@ let g:gitgutter_git_executable = 'git'
 highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
 highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
 highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Flog
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" use `q` to quit, rather than `ZZ`
+augroup myfloggroup
+    autocmd FileType floggraph map <buffer> <silent> q <Plug>FlogQuit
+    autocmd FileType floggraph map <buffer> <silent> ZZ <Plug>FlogQuit
+augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim-rooter
