@@ -25,6 +25,7 @@ Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
+Plug 'maximbaz/lightline-ale'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'roxma/vim-paste-easy'
@@ -32,6 +33,7 @@ Plug 'rhysd/git-messenger.vim'
 Plug 'rbong/vim-flog' "(git browser)
 
 " Utilities
+Plug 'w0rp/ale'
 Plug 'dyng/ctrlsf.vim'
 Plug 'henrik/vim-indexed-search'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
@@ -401,6 +403,11 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Lightline Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:lightline#ale#indicator_checking = "\uf110"
+let g:lightline#ale#indicator_warnings = "\uf071 "
+let g:lightline#ale#indicator_errors = "\uf05e "
+let g:lightline#ale#indicator_ok = "\uf00c"
+
 "      \   'cocstatus': 'coc#status'
 " shows the relative path to the file, rather than just the filename
 let g:lightline = {
@@ -408,13 +415,30 @@ let g:lightline = {
       \   'filename': 'LightLineFilename',
       \ }
       \ }
+
+let g:lightline.component_expand = {
+      \  'linter_checking': 'lightline#ale#checking',
+      \  'linter_warnings': 'lightline#ale#warnings',
+      \  'linter_errors': 'lightline#ale#errors',
+      \  'linter_ok': 'lightline#ale#ok',
+      \ }
+
+let g:lightline.component_type = {
+      \     'linter_checking': 'left',
+      \     'linter_warnings': 'warning',
+      \     'linter_errors': 'error',
+      \     'linter_ok': 'left',
+      \ }
+
 "      \   [ 'cocstatus' ]
 let g:lightline.active = {
       \ 'right': [
       \   [ 'lineinfo' ],
       \   [ 'percent' ],
       \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ],
+      \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
       \ ] }
+
 function! LightLineFilename()
   return expand('%')
 endfunction
@@ -479,6 +503,18 @@ nmap <silent> <leader>tf :TestFile<CR>
 nmap <silent> <leader>ts :TestSuite<CR>
 nmap <silent> <leader>tl :TestLast<CR>
 nmap <silent> <leader>tv :TestVisit<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" ALE
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'javascript': ['xo'],
+\}
+
+let g:ale_linters = {
+\   'javascript': ['xo'],
+\}
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete
