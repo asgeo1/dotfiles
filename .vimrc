@@ -541,6 +541,11 @@ autocmd BufRead,FileType * call ALELSPMappings()
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:deoplete#enable_at_startup = 1
 
+" Use ALE LSP (tsserver) for typescript autocomplete
+call deoplete#custom#option('sources', {
+\ 'typescript': ['ale'],
+\})
+
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Conquer of Completion (coc)
 "
