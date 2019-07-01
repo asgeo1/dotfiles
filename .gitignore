@@ -7,3 +7,5 @@
 .vim/tmp/undo/*
 .vim/bundle
 .vim/plugged
+tags.lock
+tags.temp
