@@ -192,6 +192,7 @@ set timeout
 set timeoutlen=1000
 set ttimeout
 set ttimeoutlen=0                   " Fix slowness of changing from visual to normal mode in the terminal
+set noshowmode                      " Don't show `-- INSERT --`, as lightline is already showing this
 
 if ! &term =~ 'xterm'
     set wmh=0                       " The minimal height of a window, when it's not the current window
@@ -232,7 +233,7 @@ endif
 set fillchars=vert:\ ,stl:\ ,stlnc:\
 set define=function                     " Pattern to be used to find a macro definition.
 set tabpagemax=50                       " Maximum number of tab pages to open using -p switch or :tab ball (Default is 10)
-set showtabline=0                       " Don't show tab line by default
+set showtabline=2                       " Don't show tab line by default
 set switchbuf=usetab,useopen,split      " usetab  = jump to first tab that contains the specified buffer
                                         " useopen = Jump to the first open window that contains the specified buffer
                                         " split   = split window rather than using current window
@@ -389,6 +390,7 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 
 " shows the relative path to the file, rather than just the filename
 let g:lightline = {
+      \ 'colorscheme': 'gruvbox',
       \ 'component_function': {
       \   'filename': 'LightLineFilename',
       \   'cocstatus': 'coc#status'
@@ -417,6 +419,10 @@ let g:lightline.active = {
       \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ],
       \   [ 'cocstatus' ]
       \ ] }
+
+let g:lightline.tabline = {
+		    \ 'left': [ [ 'tabs' ] ],
+		    \ 'right': [ ] } " Removes the 'close' button from the right of the tab line
 
 function! LightLineFilename()
   return expand('%')
