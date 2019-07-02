@@ -233,7 +233,7 @@ endif
 set fillchars=vert:\ ,stl:\ ,stlnc:\
 set define=function                     " Pattern to be used to find a macro definition.
 set tabpagemax=50                       " Maximum number of tab pages to open using -p switch or :tab ball (Default is 10)
-set showtabline=2                       " Don't show tab line by default
+set showtabline=1                       " Only show the tab bar if there is more than one tab open
 set switchbuf=usetab,useopen,split      " usetab  = jump to first tab that contains the specified buffer
                                         " useopen = Jump to the first open window that contains the specified buffer
                                         " split   = split window rather than using current window
