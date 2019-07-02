@@ -298,8 +298,7 @@ set softtabstop=2   " Number of spaces that a <Tab> counts for while performing 
 set expandtab       " In Insert mode: Use the appropriate number of spaces to insert a <Tab>
 set nowrap          " Do not wrap lines
 set wrapmargin=0    " Turn off wrapping
-" Turn off splitting long text line
-set textwidth=0
+set textwidth=0     " Turn off splitting long text line
 
 " ensure utf-8 encoding
 set fileencoding=utf8
@@ -319,13 +318,6 @@ au Filetype java :set colorcolumn=100
 hi def link coffeeSpecialVar Identifier
 hi clear SignColumn
 
-" PL/SQL goodies
-au BufNewFile,BufReadPost *.bdy,*.spc,*.trg,*.fnc,*.prc,*.vw setl filetype=plsql listchars=tab:\ \ ,trail:\ ,extends:>,precedes:<
-au BufNewFile,BufReadPost *.bdy,*.spc,*.trg,*.fnc,*.prc,*.vw hi SpecialKey guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
-
-" Execute file
-noremap <leader>xp <Esc>ggVG:DBExecVisualSQL<cr>
-
 autocmd Filetype gitcommit :hi SpecialKey guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 autocmd Filetype gitconfig :hi SpecialKey guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 autocmd Filetype gitconfig :set noexpandtab
@@ -336,28 +328,14 @@ autocmd Filetype gitconfig :set noexpandtab
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " default off for most file types
 autocmd Filetype * :set nofoldenable
-" default on for php files
-"autocmd Filetype php :set foldenable
 set foldmethod=indent   " Make folding indent sensitive (for those file types which do not have folding algorithms built in)
 if has("win32")
     set foldlevelstart=1    " Start with this fold level (i.e. methods in PHP files are folded)
 endif
 set foldopen-=search    " Don't open folds when you search into them
 set foldopen-=undo      " Don't open folds when you undo stuff
-"turning off for now - changing from insert to normal mode is too slow on
-"large files
-"let php_folding = 1     " Fold PHP functions and classes and stuff between {} blocks
-"autocmd Filetype php :set foldlevel=1
 autocmd Filetype php :set foldlevelstart=1
 autocmd Filetype js  :set foldlevelstart=2
-
-" Don't screw up folds when inserting text that might affect them, until
-" leaving insert mode. Foldmethod is local to the window. Protect against
-" screwing up folding when switching between windows.
-if exists("php_folding") && (php_folding==1 || php_folding==2)
-    "autocmd Filetype php :autocmd InsertEnter * if !exists('w:last_fdm') | let w:last_fdm=&foldmethod | setlocal foldmethod=manual | endif
-    "autocmd Filetype php :autocmd InsertLeave,WinLeave * if exists('w:last_fdm') | let &l:foldmethod=w:last_fdm | unlet w:last_fdm | endif
-endif
 
 
 " Set a nicer foldtext function
@@ -482,11 +460,6 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:rooter_patterns = ['composer.json', 'Gemfile', 'Gruntfile.js', 'bower.json', 'package.json', 'project.properties', 'AndroidManifest.xml', '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/']
 let g:rooter_silent_chdir = 1
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vim-tags
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:vim_tags_use_vim_dispatch = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " ZoomWinTab
@@ -718,22 +691,6 @@ function! s:RemoveExtraneousWhitespace()
     :silent! %s/[ \t]*$//gg
 endfunction
 
-" Sort tab pages
-func! s:SortTabs()
-    for i in range(tabpagenr('$'),1,-1)
-        :tabr
-        for j in range(1,i-1)
-            let t1 = fnamemodify(bufname(winbufnr(tabpagewinnr(0))),':t')
-            :tabn
-            let t2 = fnamemodify(bufname(winbufnr(tabpagewinnr(0))),':t')
-            if t1 > t2
-                tabp
-                exec ":tabmove ".j
-            endif
-        endfor
-    endfor
-endfun
-
 " Toggle cursor line on/off
 let g:IsCursorLine=1
 let g:IsCursorCol=0
@@ -754,22 +711,6 @@ function! s:CursorLineColToggle()
     endif
 endfunction
 
-" virtual tabstops using spaces
-let my_tab=2
-" allow toggling between local and default mode
-function! TabToggle()
-  if &expandtab
-    set shiftwidth=2
-    set softtabstop=0
-    set noexpandtab
-  else
-    execute "set shiftwidth=".g:my_tab
-    execute "set softtabstop=".g:my_tab
-    set expandtab
-  endif
-endfunction
-nmap <leader>q mz:execute TabToggle()<CR>'z
-
 " Clear highlights
 noremap <leader>ch :let @/=''<CR> :echo 'Highlights Cleared'<CR>
 
@@ -780,10 +721,6 @@ noremap <silent> <F8> :ReplaceCarrotM<CR>:echo '^M Removed'<CR>
 " Remove extraneous whitespace at the end of lines
 command! -nargs=0 RemoveExtraneousWhitespace call s:RemoveExtraneousWhitespace()
 noremap <silent> <F9> :RemoveExtraneousWhitespace<CR>:echo 'Extraneous whitespace removed'<CR>
-
-" Sort tab pages
-command! -nargs=0 SortTabs call s:SortTabs()
-noremap <silent> <F10> :SortTabs<CR>:echo 'Tabs Sorted'<CR>
 
 " Toggle cursor line on/off
 command! -nargs=0 CursorLineColToggle call s:CursorLineColToggle()
