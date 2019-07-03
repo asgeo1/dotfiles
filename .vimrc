@@ -533,9 +533,14 @@ noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
 " NOTE: disabled for now, because it's a bit slow at times. Just using
 " Deoplete for now, with no LSP
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:coc_global_extensions = ['coc-tsserver', 'coc-ccls']
-" 'coc-tslint', 'coc-tslint-plugin', 'coc-css', 'coc-json', 'coc-yaml'
-" 'coc-git', 'coc-emoji', 'coc-prettier', 
+let g:coc_global_extensions = [
+      \ 'coc-tsserver',
+      \ 'coc-tslint-plugin',
+      \ 'coc-prettier',
+      \ 'coc-angular',
+      \ 'coc-ccls'
+      \ ]
+" 'coc-css', 'coc-json', 'coc-yaml', 'coc-git', 'coc-emoji'
 " coc-git - not using for gutter, because too slow
 " coc-eslint - uninstalled because it complains too much
 " coc-solargraph (ruby) - too slow
