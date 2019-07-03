@@ -46,13 +46,15 @@ Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 " Seldom used plugins
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'easymotion/vim-easymotion'
-Plug 'tpope/vim-repeat'
 Plug 'machakann/vim-sandwich'
-Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-fugitive'
+Plug 'terryma/vim-multiple-cursors'
+
+" Rarely used plugins
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-dispatch'
 Plug 'janko-m/vim-test'
 Plug 'jeetsukumaran/vim-indentwise'
-Plug 'terryma/vim-multiple-cursors'
 Plug 'mbbill/undotree'
 
 "Too slow for windows, seems fine on osx
