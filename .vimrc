@@ -801,3 +801,8 @@ vmap <M-k> :m'<-2<CR>gv=`>my`<mzgv`yo`z
 " directory
 """""""""""""""""""""
 nnoremap <leader>cD :lcd %:p:h<CR>:pwd<CR>
+
+" Scroll one line at a time, but keep cursor position relative to the window
+" rather than moving with the line
+noremap <C-j> j<C-e>
+noremap <C-k> k<C-y>
