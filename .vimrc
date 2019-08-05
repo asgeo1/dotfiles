@@ -28,7 +28,8 @@ Plug 'itchyny/lightline.vim'
 " Plug 'maximbaz/lightline-ale'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
-Plug 'roxma/vim-paste-easy'
+" Disabled for now, because it causes problems with coc
+" Plug 'roxma/vim-paste-easy'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rbong/vim-flog' "(git browser)
 
