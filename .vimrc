@@ -445,7 +445,7 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['^dist$', '^gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$', '^compile_commands.json$', '^build$', '^external$']
+let NERDTreeIgnore=['^tags.lock$', '^tags.temp$', '^tags$', '^dist$', '^gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$', '^compile_commands.json$', '^build$', '^external$']
 let NERDTreeWinSize=50
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
