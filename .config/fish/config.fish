@@ -50,3 +50,6 @@ set -x DISABLE_AUTO_TITLE true
 # for fastlane
 set -x LC_ALL en_AU.UTF-8
 set -x LANG en_AU.UTF-8
+
+# completions for kitty
+kitty + complete setup fish | source
