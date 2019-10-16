@@ -25,7 +25,6 @@ Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
 Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
-" Plug 'maximbaz/lightline-ale'
 Plug '/usr/local/opt/fzf'
 Plug 'junegunn/fzf.vim'
 " Disabled for now, because it causes problems with coc
@@ -34,7 +33,6 @@ Plug 'rhysd/git-messenger.vim'
 Plug 'rbong/vim-flog' "(git browser)
 
 " Utilities
-" Plug 'w0rp/ale'
 Plug 'dyng/ctrlsf.vim'
 Plug 'henrik/vim-indexed-search'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
@@ -391,11 +389,6 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Lightline Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" let g:lightline#ale#indicator_checking = "\uf110"
-" let g:lightline#ale#indicator_warnings = "\uf071 "
-" let g:lightline#ale#indicator_errors = "\uf05e "
-" let g:lightline#ale#indicator_ok = "\uf00c"
-
 " shows the relative path to the file, rather than just the filename
 let g:lightline = {
       \ 'colorscheme': 'gruvbox',
@@ -405,21 +398,6 @@ let g:lightline = {
       \ }
       \ }
 
-" let g:lightline.component_expand = {
-"       \  'linter_checking': 'lightline#ale#checking',
-"       \  'linter_warnings': 'lightline#ale#warnings',
-"       \  'linter_errors': 'lightline#ale#errors',
-"       \  'linter_ok': 'lightline#ale#ok',
-"       \ }
-" 
-" let g:lightline.component_type = {
-"       \     'linter_checking': 'left',
-"       \     'linter_warnings': 'warning',
-"       \     'linter_errors': 'error',
-"       \     'linter_ok': 'left',
-"       \ }
-
-" \   [ 'linter_checking', 'linter_errors', 'linter_warnings', 'linter_ok' ]
 let g:lightline.active = {
       \ 'right': [
       \   [ 'lineinfo' ],
@@ -493,36 +471,6 @@ noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
 " nmap <silent> <leader>ts :TestSuite<CR>
 " nmap <silent> <leader>tl :TestLast<CR>
 " nmap <silent> <leader>tv :TestVisit<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" ALE
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" let g:ale_fixers = {
-" \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-" \   'javascript': ['xo'],
-" \   'typescript': ['tslint', 'xo', 'prettier'],
-" \}
-" 
-" let g:ale_linters = {
-" \   'javascript': ['xo'],
-" \}
-
-" nmap <leader>af :ALEFix<CR>
-
-" Remap <C-]>, but only if a LSP exists. Using tags for <C-]> seems to work
-" better for Javascript
-" function ALELSPMappings()
-" 	let l:lsp_found=0
-" 	for l:linter in ale#linter#Get(&filetype) | if !empty(l:linter.lsp) | let l:lsp_found=1 | endif | endfor
-" 	if (l:lsp_found)
-" 		nnoremap <buffer> <C-]> :ALEGoToDefinition<CR>
-" 		nnoremap <buffer> <C-^> :ALEFindReferences<CR>
-" 	else
-" 		silent! unmap <buffer> <C-]>
-" 		silent! unmap <buffer> <C-^>
-" 	endif
-" endfunction
-" autocmd BufRead,FileType * call ALELSPMappings()
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete
