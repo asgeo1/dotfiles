@@ -38,9 +38,7 @@ Plug 'henrik/vim-indexed-search'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
-" NOTE: too slow for now
 Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
-" Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 " Seldom used plugins
 Plug 'ludovicchabant/vim-gutentags'
@@ -473,20 +471,7 @@ noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
 " nmap <silent> <leader>tv :TestVisit<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Deoplete
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" let g:deoplete#enable_at_startup = 1
-" 
-" " Use ALE LSP (tsserver) for typescript autocomplete
-" call deoplete#custom#option('sources', {
-" \ 'typescript': ['ale'],
-" \})
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Conquer of Completion (coc)
-"
-" NOTE: disabled for now, because it's a bit slow at times. Just using
-" Deoplete for now, with no LSP
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:coc_global_extensions = [
       \ 'coc-tsserver',
