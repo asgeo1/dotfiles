@@ -43,7 +43,8 @@ Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
 " Seldom used plugins
 Plug 'ludovicchabant/vim-gutentags'
 Plug 'easymotion/vim-easymotion'
-Plug 'machakann/vim-sandwich'
+" Plug 'machakann/vim-sandwich' " Disabled for now, as the `s` mapping is
+" slowing down opening files into splits via NERDTree
 Plug 'tpope/vim-fugitive'
 Plug 'terryma/vim-multiple-cursors'
 
@@ -541,8 +542,8 @@ function! s:show_documentation()
   endif
 endfunction
 
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
+" Highlight symbol under cursor on CursorHold     DISABLED - TOO SLOW
+" autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
