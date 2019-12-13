@@ -4,6 +4,7 @@ status --is-interactive; and theme_gruvbox "dark"
 alias vim="nvim"
 
 status --is-interactive; and source (rbenv init -|psub)
+status --is-interactive; and source (nodenv init -|psub)
 
 # Suppress fish welcome message. Use a blank space, as iterm tabs cover it for a
 # few seconds
@@ -37,6 +38,7 @@ set -x PATH "$HOME/Development/Android/sdk/platform-tools" $PATH
 set -x PATH "$HOME/Development/Android/ndk" $PATH
 set -x PATH "$HOME/.node/bin" $PATH
 set -x PATH "$HOME/.rbenv/bin" $PATH
+set -x PATH "$HOME/.nodenv/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/Development/flutter/bin" $PATH
 set -x PATH "$HOME/.fastlane/bin" $PATH
