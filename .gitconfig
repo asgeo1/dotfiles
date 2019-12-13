@@ -1,8 +1,4 @@
-[merge]
-	tool = vimdiff
-	prompt = false
 [core]
-	editor = /usr/bin/vim
 	excludesfile = ~/.gitignore_global
 
 	# Checkout Windows-style, commit Unix-style (core.autocrlf = true)
@@ -13,9 +9,16 @@
 	# Have diff and other tools not see CR characters as a difference. I.e. no
 	# more ^M characters in diffs
 	whitespace = cr-at-eol
+[merge]
+	tool = vimdiff
+	prompt = false
+[mergetool "vimdiff"]
+	cmd = nvim -d $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 [diff]
 	tool = vimdiff
 	prompt = false
+[difftool "vimdiff"]
+	cmd = nvim -d $LOCAL $REMOTE -c '$wincmd w' -c 'wincmd J'
 [format]
 	pretty = %C(yellow)%h%x09%Creset%Cgreen(%cr)%x09%C(blue)<%an>%x09%Creset%Creset %Cred%d%Creset %s
 [alias]

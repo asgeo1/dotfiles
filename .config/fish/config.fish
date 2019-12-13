@@ -10,7 +10,8 @@ status --is-interactive; and source (nodenv init -|psub)
 # few seconds
 set fish_greeting " "
 
-set -x EDITOR vim
+set -x VISUAL nvim
+set -x EDITOR $VISUAL
 
 # configures fzf with vim
 set -x FZF_DEFAULT_COMMAND 'ag --nocolor -g ""'
