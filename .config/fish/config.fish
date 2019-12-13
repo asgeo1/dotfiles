@@ -32,6 +32,10 @@ set -g fish_user_paths "/usr/local/opt/postgresql@10/bin" $fish_user_paths
 # mysql 5.7 needed for fieldfolio
 set -g fish_user_paths "/usr/local/opt/mysql@5.7/bin" $fish_user_paths
 
+set -x GOPATH "$HOME/Development/go"
+set -x GOBIN "$GOPATH/bin"
+set -x GOROOT "/usr/local/Cellar/go/1.13.4/libexec"
+
 # customise the path
 set -x PATH "$HOME/Projects/dotfiles/bin" $PATH
 set -x PATH "$HOME/Development/Android/sdk/tools" $PATH
@@ -43,6 +47,7 @@ set -x PATH "$HOME/.nodenv/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/Development/flutter/bin" $PATH
 set -x PATH "$HOME/.fastlane/bin" $PATH
+set -x PATH "$GOBIN" $PATH
 
 set -x ANDROID_HOME "$HOME/Development/Android/sdk"
 set -x JAVA_HOME "/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
@@ -66,3 +71,6 @@ kitty + complete setup fish | source
 # tabtab source for slss package
 # uninstall by removing these lines or running `tabtab uninstall slss`
 [ -f /Users/asgeo1/.node/lib/node_modules/serverless/node_modules/tabtab/.completions/slss.fish ]; and . /Users/asgeo1/.node/lib/node_modules/serverless/node_modules/tabtab/.completions/slss.fish
+
+set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
+set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_paths
