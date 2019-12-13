@@ -306,9 +306,6 @@ set fileencoding=utf8
 set fileencodings=ucs-bom,utf8,prc
 set encoding=utf-8
 
-" Set what is counted as a keyword in PHP
-au Filetype php :set iskeyword=@,48-57,_,128-167,224-235,$
-
 " Coffeescript, use indentation for folding
 au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
 
@@ -638,6 +635,11 @@ let g:tsx_ext_required = 0
 " cpp syntax extended
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:cpp_class_scope_highlight = 1
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PHP
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:php_var_selector_is_identifier = 1
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Custom Functions
