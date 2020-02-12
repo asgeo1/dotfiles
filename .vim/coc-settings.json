@@ -22,5 +22,6 @@
       "rootPatterns": ["go.mod", ".vim/", ".git/", ".hg/"],
       "filetypes": ["go"]
     }
-  }
+  },
+  "typescript.format.enabled": false
 }
