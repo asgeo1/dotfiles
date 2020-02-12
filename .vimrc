@@ -479,6 +479,11 @@ let g:go_def_mapping_enabled = 0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Conquer of Completion (coc)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"
+" 'coc-tsserver' - Auto completion
+" 'coc-tslint-plugin' - Language linting rules
+" 'coc-prettier' - Formatting
+
 let g:coc_global_extensions = [
       \ 'coc-tsserver',
       \ 'coc-tslint-plugin',
