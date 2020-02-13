@@ -38,7 +38,7 @@ Plug 'henrik/vim-indexed-search'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 
 " Seldom used plugins
 Plug 'ludovicchabant/vim-gutentags'
