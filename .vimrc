@@ -455,7 +455,8 @@ let g:rooter_silent_chdir = 1
 " ZoomWinTab
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " declare the mapping, so vim-plug will load on-demand
-noremap <C-w>o <Esc>:ZoomWinTabToggle<CR>
+noremap <C-w>O <Esc>:ZoomWinTabToggle<CR>
+let g:zoomwintab_hidetabbar = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vim-test
