@@ -55,6 +55,10 @@ Plug 'janko-m/vim-test'
 Plug 'jeetsukumaran/vim-indentwise'
 Plug 'mbbill/undotree'
 
+" Documentation
+Plug 'asgeo1/vim-doc'
+
+
 "Too slow for windows, seems fine on osx
 if !has("win32")
   Plug 'airblade/vim-gitgutter'
