@@ -29,5 +29,9 @@
       "filetypes": ["go"]
     }
   },
-  "typescript.format.enabled": false
+  "typescript.format.enabled": false,
+  "html.enable": true,
+  "json.enable": true,
+  "css.enable": true,
+  "tsserver.enable": true
 }
