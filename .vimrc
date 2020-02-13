@@ -585,7 +585,9 @@ nmap <leader>ac  <Plug>(coc-codeaction)
 nmap <leader>qf  <Plug>(coc-fix-current)
 
 " Format current buffer
-nmap <leader>af  <Plug>(coc-format)
+nmap <leader>aF  <Plug>(coc-format)
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+nmap <leader>af  <Esc>:Prettier<CR>
 
 autocmd User CocStatusChange,CocDiagnosticChange call lightline#update()
 
