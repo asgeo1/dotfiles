@@ -490,9 +490,13 @@ let g:coc_global_extensions = [
       \ 'coc-tslint-plugin',
       \ 'coc-prettier',
       \ 'coc-angular',
-      \ 'coc-ccls'
+      \ 'coc-ccls',
+      \ 'coc-css',
+      \ 'coc-html',
+      \ 'coc-json'
       \ ]
-" 'coc-css', 'coc-json', 'coc-yaml', 'coc-git', 'coc-emoji'
+" Other coc extensions that I'm not using:
+" 'coc-yaml', 'coc-emoji'
 " coc-git - not using for gutter, because too slow
 " coc-eslint - uninstalled because it complains too much
 " coc-solargraph (ruby) - too slow
