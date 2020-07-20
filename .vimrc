@@ -498,6 +498,8 @@ let g:coc_global_extensions = [
 " coc-eslint - uninstalled because it complains too much
 " coc-solargraph (ruby) - too slow
 
+let g:coc_node_path = '~/.nodenv/shims/node'
+
 " Some servers have issues with backup files, see #649
 set nobackup
 set nowritebackup
