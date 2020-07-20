@@ -39,6 +39,7 @@ set -x PATH "$HOME/Projects/dotfiles/bin" $PATH
 set -x PATH "$HOME/Development/Android/sdk/tools" $PATH
 set -x PATH "$HOME/Development/Android/sdk/platform-tools" $PATH
 set -x PATH "$HOME/Development/Android/ndk" $PATH
+set -x PATH "$HOME/Development/Android/bundletool" $PATH
 set -x PATH "$HOME/.node/bin" $PATH
 set -x PATH "$HOME/.rbenv/bin" $PATH
 set -x PATH "$HOME/.phpenv/bin" $PATH
@@ -50,6 +51,8 @@ set -x PATH "$GOBIN" $PATH
 
 set -x ANDROID_HOME "$HOME/Development/Android/sdk"
 set -x JAVA_HOME "/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
+
+set -x PATH "$JAVA_HOME/bin" $PATH
 
 # for tmuxinator:
 set -x DISABLE_AUTO_TITLE true
