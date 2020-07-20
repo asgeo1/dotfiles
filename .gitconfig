@@ -34,3 +34,7 @@
 [user]
 	name = Adam George
 	email = github@adamgeorge.com
+[credential]
+  helper = osxkeychain
+[credential "https://github.com"]
+  username = asgeo1
