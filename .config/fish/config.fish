@@ -41,6 +41,7 @@ set -x PATH "$HOME/Development/Android/sdk/platform-tools" $PATH
 set -x PATH "$HOME/Development/Android/ndk" $PATH
 set -x PATH "$HOME/.node/bin" $PATH
 set -x PATH "$HOME/.rbenv/bin" $PATH
+set -x PATH "$HOME/.phpenv/bin" $PATH
 set -x PATH "$HOME/.nodenv/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/Development/flutter/bin" $PATH
@@ -74,4 +75,5 @@ set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
 set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_paths
 
 status --is-interactive; and source (rbenv init -|psub)
+status --is-interactive; and source (phpenv init -|psub)
 status --is-interactive; and source (nodenv init -|psub)
