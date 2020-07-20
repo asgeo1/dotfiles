@@ -80,3 +80,5 @@ set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_paths
 status --is-interactive; and source (rbenv init -|psub)
 status --is-interactive; and source (phpenv init -|psub)
 status --is-interactive; and source (nodenv init -|psub)
+
+set -g fish_user_paths "/usr/local/opt/python@3.8/bin" $fish_user_paths
