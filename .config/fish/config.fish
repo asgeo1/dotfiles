@@ -2,6 +2,7 @@ status --is-interactive; and theme_gruvbox "dark"
 
 # use neovim
 alias vim="nvim"
+alias python="/usr/local/bin/python3"
 
 # Suppress fish welcome message. Use a blank space, as iterm tabs cover it for a
 # few seconds
