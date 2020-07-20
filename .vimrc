@@ -74,7 +74,6 @@ Plug 'peitalin/vim-jsx-typescript', { 'for': ['typescript.tsx'] }
 Plug 'sheerun/vim-polyglot'
 Plug 'reisub0/hot-reload.vim' "(flutter)
 Plug 'milch/vim-fastlane'
-Plug 'fatih/vim-go'
 Plug 'stephpy/vim-yaml'
 
 " Vim-scripts bundles
@@ -474,12 +473,6 @@ let g:zoomwintab_hidetabbar = 0
 " nmap <silent> <leader>ts :TestSuite<CR>
 " nmap <silent> <leader>tl :TestLast<CR>
 " nmap <silent> <leader>tv :TestVisit<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Vim-Go
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" disable vim-go :GoDef short cut (gd), this is handled by LanguageClient [LC]
-let g:go_def_mapping_enabled = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Conquer of Completion (coc)
