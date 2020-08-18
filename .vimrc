@@ -424,7 +424,21 @@ au Filetype nerdtree setlocal nolist
 let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=['^tags.lock$', '^tags.temp$', '^tags$', '^dist$', '^gen$', '^bin$', '\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$', '^packs$', '^packs-test$', '^www$', '^platforms$', '^plugins$', '^compile_commands.json$', '^build$', '^external$']
+let NERDTreeIgnore=[
+      \'^tags.lock$', '^tags.temp$', '^tags$', '^dist$', '^gen$',
+      \'\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$',
+      \'^packs$', '^packs-test$', '^compile_commands.json$', '^build$',
+      \ '^external$'
+      \]
+
+if filereadable("Gemfile")
+  let NERDTreeIgnore = NERDTreeIgnore + ['^bin$']
+endif
+
+if filereadable("config.xml")
+  let NERDTreeIgnore = NERDTreeIgnore + ['^www$', '^platforms$', '^plugins$']
+endif
+
 let NERDTreeWinSize=50
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
