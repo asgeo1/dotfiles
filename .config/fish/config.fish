@@ -61,9 +61,6 @@ set -x DISABLE_AUTO_TITLE true
 set -x LC_ALL en_AU.UTF-8
 set -x LANG en_AU.UTF-8
 
-# completions for kitty
-kitty + complete setup fish | source
-
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
 [ -f /Users/asgeo1/.node/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /Users/asgeo1/.node/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
