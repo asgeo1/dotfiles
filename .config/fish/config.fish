@@ -4,6 +4,21 @@ status --is-interactive; and theme_gruvbox "dark"
 alias vim="nvim"
 alias python="/usr/local/bin/python3"
 
+################################################################################
+# NNN
+alias nnn="nnn -e -a -H"
+
+# context colors, each context a different color
+set -x NNN_COLORS '4231'
+
+# set -x NNN_PLUG "f:fzcd;o:fzopen;z:fzz;d:diffs;t:treeview;p:preview-tui"
+set -x NNN_PLUG "x:_chmod +x $nnn;p:preview-tui;f:fzcd"
+
+# Not working :-(
+# source ~/.local/share/icons-in-terminal/icons.fish
+
+################################################################################
+
 # Suppress fish welcome message. Use a blank space, as iterm tabs cover it for a
 # few seconds
 set fish_greeting " "
