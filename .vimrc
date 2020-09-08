@@ -19,10 +19,9 @@ call plug#begin('~/.vim/plugged')
 
 " UI
 Plug 'morhetz/gruvbox'
-Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
-Plug 'asgeo1/nerdtree_hacks', { 'on':  'NERDTreeToggle' }
-Plug 'EvanDotPro/nerdtree-chmod', { 'on': 'NERDTreeToggle' }
-Plug 'Xuyuanp/nerdtree-git-plugin', { 'on': 'NERDTreeToggle' }
+
+Plug 'mcchrish/nnn.vim'
+
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
 Plug '/usr/local/opt/fzf'
@@ -415,31 +414,26 @@ function! LightLineFilename()
   return expand('%')
 endfunction
 
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" NERDTree Plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-noremap <leader>nt <Esc>:NERDTreeToggle<CR>
-noremap <leader>nf <Esc>:NERDTreeFind<CR>
-au Filetype nerdtree setlocal nolist
-let NERDTreeMinimalUI = 1
-let NERDTreeDirArrows = 1
-let NERDTreeUseExistingWindows = 1
-let NERDTreeIgnore=[
-      \'^tags.lock$', '^tags.temp$', '^tags$', '^dist$', '^gen$',
-      \'\~$', '^node_modules$', '^bower_components$', '^tmp$', '^log$',
-      \'^packs$', '^packs-test$', '^compile_commands.json$', '^build$',
-      \ '^external$'
-      \]
+" NNN
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Disable default mappings
+let g:nnn#set_default_mappings = 0
 
-if filereadable("Gemfile")
-  let NERDTreeIgnore = NERDTreeIgnore + ['^bin$']
-endif
+" specify `TERM` to ensure colors are used
+let g:nnn#command = 'TERM=xterm-kitty nnn'
 
-if filereadable("config.xml")
-  let NERDTreeIgnore = NERDTreeIgnore + ['^www$', '^platforms$', '^plugins$']
-endif
+let g:nnn#replace_netrw = 1
 
-let NERDTreeWinSize=50
+let g:nnn#layout = { 'window': { 'width': 0.9, 'height': 0.6, 'highlight': 'Debug' } }
+
+let g:nnn#action = {
+      \ '<c-t>': 'tab split',
+      \ '<c-s>': 'split',
+      \ '<c-v>': 'vsplit' }
+
+nnoremap <silent> <leader>nt :NnnPicker<CR>
+nnoremap <silent> <leader>nf :NnnPicker %:p:h<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Git Gutter Plugin
