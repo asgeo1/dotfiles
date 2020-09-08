@@ -381,7 +381,7 @@ nmap <leader>T :Tags<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF Plugin
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'bin', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external']
+let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external']
 let g:ctrlsf_auto_close = 0
 nmap <leader>fw <Plug>CtrlSFCwordPath
 nmap <leader>fp <Plug>CtrlSFPrompt
