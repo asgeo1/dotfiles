@@ -572,6 +572,10 @@ endfunction
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
 
+" Rename the current file (doesn't seem to work :-(
+command! -nargs=0 RenameCurrentFile :CocCommand workspace.renameCurrentFile
+nmap <leader>rf  <Esc>:RenameCurrentFile<CR>
+
 " Remap for format selected region (seems to clash a bit with CtrlSF)
 xmap <leader>fs  <Plug>(coc-format-selected)
 nmap <leader>fs  <Plug>(coc-format-selected)
