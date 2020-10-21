@@ -30,7 +30,7 @@
                 "name": "Text Variable",
                 "scope": "source.sql text.variable",
                 "settings": {
-                    "foreground": "#89b482"
+                    "foreground": "#7daea3"
                 }
             }
         ]
