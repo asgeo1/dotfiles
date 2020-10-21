@@ -372,8 +372,8 @@ nnoremap <silent> <Leader>db :Bclose<CR>
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " fzf plugin
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>p :GFiles<CR>
-nmap <leader>P :Files<CR>
+nmap <leader>P :GFiles<CR>
+nmap <leader>p :Files<CR>
 nmap <leader>b :Buffers<CR>
 nmap <leader>B :History<CR>
 nmap <leader>t :BTags<CR>
