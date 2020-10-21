@@ -50,6 +50,7 @@ Plug 'terryma/vim-multiple-cursors'
 " Rarely used plugins
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-surround'
 Plug 'janko-m/vim-test'
 Plug 'jeetsukumaran/vim-indentwise'
 Plug 'mbbill/undotree'
