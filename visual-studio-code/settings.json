@@ -1,0 +1,38 @@
+{
+    "mssql.connections": [
+        {
+            "server": "localhost",
+            "database": "master",
+            "authenticationType": "SqlLogin",
+            "user": "sa",
+            "password": "",
+            "emptyPasswordInput": false,
+            "savePassword": true,
+            "profileName": "Dynamyx Docker"
+        }
+    ],
+    "editor.minimap.enabled": false,
+    "editor.renderWhitespace": "none",
+    "editor.renderControlCharacters": false,
+    "editor.renderIndentGuides": false,
+    "editor.highlightActiveIndentGuide": false,
+    "editor.tabSize": 2,
+    "remove-tabs-on-save.ignoreFileExtensions": [
+        "*.go"
+    ],
+    "workbench.colorTheme": "Gruvbox Material Dark",
+    "mssql.format.datatypeCasing": "lowercase",
+    "mssql.format.keywordCasing": "lowercase",
+    "editor.fontSize": 14,
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "name": "Text Variable",
+                "scope": "source.sql text.variable",
+                "settings": {
+                    "foreground": "#89b482"
+                }
+            }
+        ]
+    }
+}
