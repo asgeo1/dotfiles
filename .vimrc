@@ -434,7 +434,7 @@ let g:nnn#action = {
       \ '<c-v>': 'vsplit' }
 
 nnoremap <silent> <leader>nt :NnnPicker<CR>
-nnoremap <silent> <leader>nf :NnnPicker %:p:h<CR>
+nnoremap <silent> <leader>nf :NnnPicker %:p<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Git Gutter Plugin
