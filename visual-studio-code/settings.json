@@ -1,16 +1,5 @@
 {
-    "mssql.connections": [
-        {
-            "server": "localhost",
-            "database": "master",
-            "authenticationType": "SqlLogin",
-            "user": "sa",
-            "password": "",
-            "emptyPasswordInput": false,
-            "savePassword": true,
-            "profileName": "Dynamyx Docker"
-        }
-    ],
+    "mssql.connections": [],
     "editor.minimap.enabled": false,
     "editor.renderWhitespace": "none",
     "editor.renderControlCharacters": false,
