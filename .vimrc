@@ -5,7 +5,10 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Language Packs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:polyglot_disabled = ['jsx'] "disabling because using a fork below
+" - disabling jsx because using a fork below
+" - vim-sensible is automatically enabled by polygot, turn off as prefer using
+"   my settings which seem faster
+let g:polyglot_disabled = ['jsx', 'sensible']
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundle
