@@ -66,7 +66,10 @@ set -x PATH "$GOBIN" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Development/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Development/Android/sdk" # deprecated
-set -x JAVA_HOME "/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
+
+# set -x JAVA_HOME "/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
+# Use jdk bundled by Android Studio, has less issues
+set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jre/jdk/Contents/Home"
 
 set -x PATH "$JAVA_HOME/bin" $PATH
 
