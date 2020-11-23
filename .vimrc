@@ -67,7 +67,7 @@ Plug 'mbbill/undotree'
 Plug 'asgeo1/vim-doc'
 
 
-"Too slow for windows, seems fine on osx
+""Too slow for windows, seems fine on osx
 if !has("win32")
   Plug 'airblade/vim-gitgutter'
   Plug 'editorconfig/editorconfig-vim'
