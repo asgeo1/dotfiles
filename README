@@ -3,3 +3,11 @@ These are the configuration files for my mac. Copy to ~
 Run .osx like this:
 
     ./.osx
+
+
+
+### COLORS:
+
+ - Kitty: `.config/kitty/theme.conf`
+ - Fish: `.config/fish/conf.d/dracula.fish` (fisher plugin)
+ - Vim: `~/.config/nvim/plugged/dracula`

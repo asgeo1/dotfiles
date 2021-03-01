@@ -1,5 +1,3 @@
-status --is-interactive; and theme_gruvbox "dark"
-
 # use neovim
 alias vim="nvim"
 alias python="/usr/local/bin/python3"

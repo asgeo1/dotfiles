@@ -26,7 +26,7 @@ endif
 call plug#begin('~/.vim/plugged')
 
 " UI
-Plug 'morhetz/gruvbox'
+Plug 'asgeo1/dracula-pro-vim', { 'as': 'dracula' }
 
 Plug 'mcchrish/nnn.vim'
 
@@ -128,7 +128,8 @@ if !has("gui_running")
     end
 endif
 
-silent! colorscheme gruvbox
+let g:dracula_colorterm = 1 " Include background fill colors
+silent! colorscheme dracula_pro
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
@@ -394,7 +395,7 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " shows the relative path to the file, rather than just the filename
 let g:lightline = {
-      \ 'colorscheme': 'gruvbox',
+      \ 'colorscheme': 'dracula_pro',
       \ 'component_function': {
       \   'filename': 'LightLineFilename',
       \   'cocstatus': 'coc#status'
