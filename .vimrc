@@ -5,10 +5,10 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Language Packs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" - disabling jsx because using a fork below
 " - vim-sensible is automatically enabled by polygot, turn off as prefer using
 "   my settings which seem faster
-let g:polyglot_disabled = ['jsx', 'sensible']
+let g:polyglot_disabled = ['sensible']
+let g:yats_host_keyword = 0
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundle
@@ -77,8 +77,6 @@ endif
 Plug 'AndrewRadev/vim-eco', { 'for': 'eco' }
 Plug 'tpope/vim-rails', { 'for': ['ruby', 'erb', 'yml'] }  " NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
 Plug 'octol/vim-cpp-enhanced-highlight', { 'for': ['cpp', 'c'] }
-Plug 'amadeus/vim-jsx', { 'for': ['javascript.jsx'] }
-Plug 'peitalin/vim-jsx-typescript', { 'for': ['typescript.tsx'] }
 Plug 'sheerun/vim-polyglot'
 Plug 'milch/vim-fastlane'
 Plug 'stephpy/vim-yaml'
@@ -108,6 +106,7 @@ let mapleader = ","     " Slash (\) to cumbersome to type as the leader characte
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if &t_Co > 2 || has("gui_running")
     syntax on                   " Switch syntax highlighting on, when the terminal has colors
+    set regexpengine=0          " Use newer (faster) regexp engine, for faster syntax highlighting
 endif
 
 if has("win32")
