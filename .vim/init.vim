@@ -1,1 +1,0 @@
-/Users/asgeo1/.vimrc
