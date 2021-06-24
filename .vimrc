@@ -43,6 +43,7 @@ Plug 'airblade/vim-rooter'
 " LSP & autocomplete
 Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/nvim-compe'
+Plug 'nvim-lua/lsp-status.nvim'
 
 " Tree-sitter - highlighting & indentation 
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
@@ -395,7 +396,8 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 let g:lightline = {
       \ 'colorscheme': 'dracula_pro',
       \ 'component_function': {
-      \   'filename': 'LightLineFilename'
+      \   'filename': 'LightLineFilename',
+      \   'lspstatus': 'LspStatus'
       \ }
       \ }
 
@@ -403,7 +405,8 @@ let g:lightline.active = {
       \ 'right': [
       \   [ 'lineinfo' ],
       \   [ 'percent' ],
-      \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ]
+      \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ],
+      \   [ 'lspstatus' ]
       \ ] }
 
 let g:lightline.tabline = {
@@ -412,6 +415,14 @@ let g:lightline.tabline = {
 
 function! LightLineFilename()
   return expand('%')
+endfunction
+
+function! LspStatus() abort
+  if luaeval('#vim.lsp.buf_get_clients() > 0')
+    return luaeval("require('lsp-status').status()")
+  endif
+
+  return ''
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
