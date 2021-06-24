@@ -41,6 +41,10 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
 
 " LSP & autocomplete
+" dependencies
+Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
+Plug 'mattn/efm-langserver'
+" lspconfig
 Plug 'neovim/nvim-lspconfig'
 Plug 'hrsh7th/nvim-compe'
 Plug 'nvim-lua/lsp-status.nvim'
@@ -531,30 +535,67 @@ EOF
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " nvim-lspconfig
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-lua << EOF
--- require'lspconfig'.angularls.setup{}
-require'lspconfig'.bashls.setup{}
-require'lspconfig'.dockerls.setup{}
-require'lspconfig'.html.setup{}
-require'lspconfig'.jsonls.setup{}
-require'lspconfig'.pyls.setup{}
-require'lspconfig'.phpactor.setup{}
-require'lspconfig'.solargraph.setup{}
-require'lspconfig'.sqlls.setup{}
-require'lspconfig'.tsserver.setup{}
-require'lspconfig'.vimls.setup{}
-require'lspconfig'.yamlls.setup{}
-EOF
 
-" not working:
-" require'lspconfig'.perlls.setup{}
+"lua << EOF
+"local format_options_prettier = {
+"  semi = false,
+"  singleQuote = false,
+"  trailingComma = "all",
+"  bracketSpacing = false,
+"  configPrecedence = "prefer-file"
+"}
+"
+"vim.g.format_options_typescript = format_options_prettier
+"vim.g.format_options_javascript = format_options_prettier
+"vim.g.format_options_typescriptreact = format_options_prettier
+"vim.g.format_options_javascriptreact = format_options_prettier
+"vim.g.format_options_json = format_options_prettier
+"vim.g.format_options_css = format_options_prettier
+"vim.g.format_options_scss = format_options_prettier
+"vim.g.format_options_html = format_options_prettier
+"vim.g.format_options_yaml = format_options_prettier
+"vim.g.format_options_markdown = format_options_prettier
+"
+"_G.formatting = function()
+"  if not vim.g[string.format("format_disabled_%s", vim.bo.filetype)] then
+"    vim.lsp.buf.formatting(vim.g[string.format("format_options_%s", vim.bo.filetype)] or {})
+"  end
+"end
+"EOF
 
 lua << EOF
 local nvim_lsp = require('lspconfig')
+local lsp_status = require("lsp-status")
 
 -- Use an on_attach function to only map the following keys 
 -- after the language server attaches to the current buffer
-local on_attach = function(client, bufnr)
+local custom_attach = function(client, bufnr)
+  lsp_status.register_progress()
+  lsp_status.config(
+    {
+      status_symbol = "LSP ",
+      indicator_errors = "E",
+      indicator_warnings = "W",
+      indicator_info = "I",
+      indicator_hint = "H",
+      indicator_ok = "ok"
+    }
+  )
+
+
+  -- -- define prettier signs
+  -- vim.fn.sign_define("LspDiagnosticsSignError", {text="", texthl="LspDiagnosticsError"})
+  -- vim.fn.sign_define("LspDiagnosticsSignWarning", {text="", texthl="LspDiagnosticsWarning"})
+  -- vim.fn.sign_define("LspDiagnosticsSignInformation", {text="", texthl="LspDiagnosticsInformation"})
+  -- vim.fn.sign_define("LspDiagnosticsSignHint", {text="", texthl="LspDiagnosticsHint"})
+
+  -- if client.resolved_capabilities.document_formatting then
+  --   vim.cmd [[augroup Format]]
+  --   vim.cmd [[autocmd! * <buffer>]]
+  --   vim.cmd [[autocmd BufWritePost <buffer> lua formatting()]]
+  --   vim.cmd [[augroup END]]
+  -- end
+
   local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
   local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
@@ -584,12 +625,108 @@ local on_attach = function(client, bufnr)
   buf_set_keymap("n", "<leader>aF", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
 end
 
--- Use a loop to conveniently call 'setup' on multiple servers and
--- map buffer local keybindings when the language server attaches
-local servers = { "bashls", "dockerls", "html", "jsonls", "pyls", "solargraph", "sqlls", "tsserver", "vimls", "yamlls" }
-for _, lsp in ipairs(servers) do
-  nvim_lsp[lsp].setup { on_attach = on_attach }
+local custom_init = function(client)
+  print('Language Server Protocol started!')
+
+  if client.config.flags then
+    client.config.flags.allow_incremental_sync = true
+  end
 end
+
+-- TODO: perlls, angularls
+
+nvim_lsp.bashls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.dockerls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.html.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.jsonls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.phpactor.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.pyls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.solargraph.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.sqlls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.vimls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+nvim_lsp.yamlls.setup {
+  on_attach = custom_attach,
+  capabilities = lsp_status.capabilities
+}
+
+nvim_lsp.tsserver.setup({
+  on_attach = function(client)
+    client.resolved_capabilities.document_formatting = false
+    require "nvim-lsp-ts-utils".setup {}
+    custom_attach(client)
+  end,
+  capabilities = lsp_status.capabilities
+})
+
+-- formatting
+local prettier = {
+  formatCommand = (
+    function()
+      if not vim.fn.empty(vim.fn.glob(vim.loop.cwd() .. '/.prettierrc')) then
+        return "prettier --config ./.prettierrc"
+      else
+        return "prettier --config ~/.config/nvim/.prettierrc"
+      end
+    end
+  )()
+}
+
+-- linting
+local eslint = {
+  lintCommand = "eslint_d -f unix --stdin --stdin-filename ${INPUT}",
+  lintIgnoreExitCode = true,
+  lintStdin = true,
+  lintFormats = { "%f:%l:%c: %m" },
+}
+
+nvim_lsp.efm.setup {
+  on_attach = custom_attach,
+  init_options = {documentFormatting = true},
+  root_dir = vim.loop.cwd,
+  settings = {
+        rootMarkers = {".git/"},
+        languages = {
+            typescript = {prettier, eslint},
+            javascript = {prettier, eslint},
+            typescriptreact = {prettier, eslint},
+            javascriptreact = {prettier, eslint},
+            json = {prettier},
+            html = {prettier},
+            scss = {prettier},
+            css = {prettier},
+            markdown = {prettier},
+        }
+    }
+}
+
+
 EOF
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -644,6 +781,7 @@ _G.tab_complete = function()
     return vim.fn['compe#complete']()
   end
 end
+
 _G.s_tab_complete = function()
   if vim.fn.pumvisible() == 1 then
     return t "<C-p>"
