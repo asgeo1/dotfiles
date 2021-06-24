@@ -27,15 +27,9 @@ call plug#begin('~/.vim/plugged')
 
 " UI
 Plug 'asgeo1/dracula-pro-vim', { 'as': 'dracula' }
-
 Plug 'mcchrish/nnn.vim'
-
 Plug 'troydm/zoomwintab.vim', { 'on': ['ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'] }
 Plug 'itchyny/lightline.vim'
-Plug '/usr/local/opt/fzf'
-Plug 'junegunn/fzf.vim'
-" Disabled for now, because it causes problems with coc
-" Plug 'roxma/vim-paste-easy'
 Plug 'rhysd/git-messenger.vim'
 Plug 'rbong/vim-flog' "(git browser)
 
@@ -45,7 +39,22 @@ Plug 'henrik/vim-indexed-search'
 Plug 'rbgrouleff/bclose.vim', { 'on': 'Bclose' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'airblade/vim-rooter'
-Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+
+" LSP & autocomplete
+Plug 'neovim/nvim-lspconfig'
+Plug 'hrsh7th/nvim-compe'
+
+" Tree-sitter - highlighting & indentation 
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/playground'
+
+" Telescope - fuzzy finder and navigation
+" dependencies
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+" telescope
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-symbols.nvim'
 
 " Seldom used plugins
 Plug 'ludovicchabant/vim-gutentags'
@@ -65,7 +74,6 @@ Plug 'mbbill/undotree'
 
 " Documentation
 Plug 'asgeo1/vim-doc'
-
 
 ""Too slow for windows, seems fine on osx
 if !has("win32")
@@ -158,7 +166,6 @@ else
 endif
 
 set autoread                            " When a file has been detected to have been changed outside of Vim and it has not been changed inside of Vim, automatically read it again. When the file has been deleted this is not done.
-
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -337,7 +344,9 @@ autocmd Filetype gitconfig :set noexpandtab
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " default off for most file types
 autocmd Filetype * :set nofoldenable
-set foldmethod=indent   " Make folding indent sensitive (for those file types which do not have folding algorithms built in)
+" set foldmethod=indent   " Make folding indent sensitive (for those file types which do not have folding algorithms built in)
+set foldmethod=expr   " Use tree-sitter
+set foldexpr=nvim_treesitter#foldexpr()
 if has("win32")
     set foldlevelstart=1    " Start with this fold level (i.e. methods in PHP files are folded)
 endif
@@ -372,16 +381,6 @@ let g:bclose_no_plugin_maps = 1
 nnoremap <silent> <Leader>db :Bclose<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" fzf plugin
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-nmap <leader>P :GFiles<CR>
-nmap <leader>p :Files<CR>
-nmap <leader>b :Buffers<CR>
-nmap <leader>B :History<CR>
-nmap <leader>t :BTags<CR>
-nmap <leader>T :Tags<CR>
-
-"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlSF Plugin
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let g:ctrlsf_ignore_dir = ['bower_components', 'node_modules', '.gems', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external']
@@ -396,8 +395,7 @@ nmap <leader>fp <Plug>CtrlSFPrompt
 let g:lightline = {
       \ 'colorscheme': 'dracula_pro',
       \ 'component_function': {
-      \   'filename': 'LightLineFilename',
-      \   'cocstatus': 'coc#status'
+      \   'filename': 'LightLineFilename'
       \ }
       \ }
 
@@ -405,8 +403,7 @@ let g:lightline.active = {
       \ 'right': [
       \   [ 'lineinfo' ],
       \   [ 'percent' ],
-      \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ],
-      \   [ 'cocstatus' ]
+      \   [ 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' ]
       \ ] }
 
 let g:lightline.tabline = {
@@ -486,139 +483,190 @@ let g:zoomwintab_hidetabbar = 0
 " nmap <silent> <leader>tv :TestVisit<CR>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Conquer of Completion (coc)
+" nvim-treesitter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-"
-" 'coc-tsserver' - Auto completion
-" 'coc-tslint-plugin' - Language linting rules
-" 'coc-prettier' - Formatting
+lua << EOF
+require "nvim-treesitter.configs".setup {
+  ensure_installed = { "bash", "css", "dockerfile", "fish", "html", "java", "javascript", "json", "jsonc", "lua", "php", "python", "ruby", "scss", "toml", "tsx", "typescript", "yaml" }, -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ignore_install = {}, -- List of parsers to ignore installing
+  highlight = {
+    enable = true, -- false will disable the whole extension
+    disable = {},  -- list of language that will be disabled
+  },
+  indent = {
+    enable = true
+  },
+  playground = {
+    enable = true,
+    disable = {},
+    updatetime = 25, -- Debounced time for highlighting nodes in the playground from source code
+    persist_queries = false, -- Whether the query persists across vim sessions
+    keybindings = {
+      toggle_query_editor = 'o',
+      toggle_hl_groups = 'i',
+      toggle_injected_languages = 't',
+      toggle_anonymous_nodes = 'a',
+      toggle_language_display = 'I',
+      focus_language = 'f',
+      unfocus_language = 'F',
+      update = 'R',
+      goto_node = '<cr>',
+      show_help = '?',
+    },
+  }
+}
+EOF
 
-let g:coc_global_extensions = [
-      \ 'coc-tsserver',
-      \ 'coc-tslint-plugin',
-      \ 'coc-prettier',
-      \ 'coc-angular',
-      \ 'coc-ccls',
-      \ 'coc-css',
-      \ 'coc-html',
-      \ 'coc-json'
-      \ ]
-" Other coc extensions that I'm not using:
-" 'coc-yaml', 'coc-emoji'
-" coc-git - not using for gutter, because too slow
-" coc-eslint - uninstalled because it complains too much
-" coc-solargraph (ruby) - too slow
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" nvim-lspconfig
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lua << EOF
+-- require'lspconfig'.angularls.setup{}
+require'lspconfig'.bashls.setup{}
+require'lspconfig'.dockerls.setup{}
+require'lspconfig'.html.setup{}
+require'lspconfig'.jsonls.setup{}
+require'lspconfig'.pyls.setup{}
+require'lspconfig'.solargraph.setup{}
+require'lspconfig'.sqlls.setup{}
+require'lspconfig'.tsserver.setup{}
+require'lspconfig'.vimls.setup{}
+require'lspconfig'.yamlls.setup{}
+EOF
 
-" Disabled for now, causing issues
-" let g:coc_node_path = '~/.nodenv/shims/node'
+" not working:
+" require'lspconfig'.perlls.setup{}
+" require'lspconfig'.phpactor.setup{}
 
-" Some servers have issues with backup files, see #649
-set nobackup
-set nowritebackup
+lua << EOF
+local nvim_lsp = require('lspconfig')
 
-" You will have bad experience for diagnostic messages when it's default 4000.
-set updatetime=300
+-- Use an on_attach function to only map the following keys 
+-- after the language server attaches to the current buffer
+local on_attach = function(client, bufnr)
+  local function buf_set_keymap(...) vim.api.nvim_buf_set_keymap(bufnr, ...) end
+  local function buf_set_option(...) vim.api.nvim_buf_set_option(bufnr, ...) end
 
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
+  --Enable completion triggered by <c-x><c-o>
+  buf_set_option('omnifunc', 'v:lua.vim.lsp.omnifunc')
 
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+  -- Mappings.
+  local opts = { noremap=true, silent=true }
 
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
+  -- See `:help vim.lsp.*` for documentation on any of the below functions
+  buf_set_keymap('n', 'gD', '<Cmd>lua vim.lsp.buf.declaration()<CR>', opts)
+  buf_set_keymap('n', 'gd', '<Cmd>lua vim.lsp.buf.definition()<CR>', opts)
+  buf_set_keymap('n', 'K', '<Cmd>lua vim.lsp.buf.hover()<CR>', opts)
+  buf_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', opts)
+  buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
+  buf_set_keymap('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>', opts)
+  buf_set_keymap('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
+  buf_set_keymap('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>', opts)
+  buf_set_keymap('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', opts)
+  buf_set_keymap('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>', opts)
+  buf_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', opts)
+  buf_set_keymap('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>', opts)
+  buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
+  buf_set_keymap('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
+  buf_set_keymap('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
+  buf_set_keymap("n", "<leader>aF", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+end
 
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
+-- Use a loop to conveniently call 'setup' on multiple servers and
+-- map buffer local keybindings when the language server attaches
+local servers = { "bashls", "dockerls", "html", "jsonls", "pyls", "solargraph", "sqlls", "tsserver", "vimls", "yamlls" }
+for _, lsp in ipairs(servers) do
+  nvim_lsp[lsp].setup { on_attach = on_attach }
+end
+EOF
 
-" " Close preview window when completion is done.
-" autocmd! CompleteDone * if pumvisible() == 0 | pclose | endif
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" nvim-compe
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lua << EOF
+-- Compe setup
+require'compe'.setup {
+  enabled = true;
+  autocomplete = true;
+  debug = false;
+  min_length = 1;
+  preselect = 'enable';
+  throttle_time = 80;
+  source_timeout = 200;
+  incomplete_delay = 400;
+  max_abbr_width = 100;
+  max_kind_width = 100;
+  max_menu_width = 100;
+  documentation = true;
 
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+  source = {
+    path = true;
+    nvim_lsp = true;
+    nvim_lua = true;
+    buffer = true;
+  };
+}
 
-" NOTE: doesn't seem to be working well
-"
-" Use `[c` and `]c` to navigate diagnostics
-" nmap <silent> [c <Plug>(coc-diagnostic-prev)
-" nmap <silent> ]c <Plug>(coc-diagnostic-next)
+local t = function(str)
+  return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
 
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
+local check_back_space = function()
+  local col = vim.fn.col('.') - 1
+  if col == 0 or vim.fn.getline('.'):sub(col, col):match('%s') then
+    return true
   else
-    call CocAction('doHover')
-  endif
-endfunction
+    return false
+  end
+end
 
-" Highlight symbol under cursor on CursorHold     DISABLED - TOO SLOW
-" autocmd CursorHold * silent call CocActionAsync('highlight')
+-- Use (s-)tab to:
+--- move to prev/next item in completion menuone
+--- jump to prev/next snippet's placeholder
+_G.tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-n>"
+  elseif check_back_space() then
+    return t "<Tab>"
+  else
+    return vim.fn['compe#complete']()
+  end
+end
+_G.s_tab_complete = function()
+  if vim.fn.pumvisible() == 1 then
+    return t "<C-p>"
+  else
+    return t "<S-Tab>"
+  end
+end
 
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
+vim.api.nvim_set_keymap("i", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<Tab>", "v:lua.tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("i", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", {expr = true})
+EOF
 
-" Rename the current file (doesn't seem to work :-(
-command! -nargs=0 RenameCurrentFile :CocCommand workspace.renameCurrentFile
-nmap <leader>rf  <Esc>:RenameCurrentFile<CR>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Telescope
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+lua << EOF
+local actions = require('telescope.actions')
+require "telescope".setup {
+  defaults = {
+    file_ignore_patterns = { 'bower_components', 'node_modules', '.gems', 'gen/', 'dist/', 'packs/', 'packs-test/', 'build/', 'external/' }
+  }
+}
+EOF
 
-" Remap for format selected region (seems to clash a bit with CtrlSF)
-xmap <leader>fs  <Plug>(coc-format-selected)
-nmap <leader>fs  <Plug>(coc-format-selected)
-
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocActionAsync('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Format current buffer
-nmap <leader>aF  <Plug>(coc-format)
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-nmap <leader>af  <Esc>:Prettier<CR>
-
-autocmd User CocStatusChange,CocDiagnosticChange call lightline#update()
-
-" Using CocList
-" Show all diagnostics
-nnoremap <silent> <space>d  :<C-u>CocList diagnostics<cr>
-" Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+nnoremap <leader>tf <cmd>lua require('telescope.builtin').find_files()<cr>
+nnoremap <leader>tF <cmd>lua require('telescope.builtin').git_files()<cr>
+nnoremap <leader>tg <cmd>lua require('telescope.builtin').live_grep()<cr>
+nnoremap <leader>ts <cmd>lua require('telescope.builtin').grep_string()<cr>
+nnoremap <leader>tS <cmd>lua require('telescope.builtin').symbols()<cr>
+nnoremap <leader>tb <cmd>lua require('telescope.builtin').buffers()<cr>
+nnoremap <leader>tB <cmd>lua require('telescope.builtin').builtin()<cr>
+nnoremap <leader>tr <cmd>lua require('telescope.builtin').lsp_references()<cr>
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Multiple cursors
