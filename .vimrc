@@ -538,6 +538,7 @@ require'lspconfig'.dockerls.setup{}
 require'lspconfig'.html.setup{}
 require'lspconfig'.jsonls.setup{}
 require'lspconfig'.pyls.setup{}
+require'lspconfig'.phpactor.setup{}
 require'lspconfig'.solargraph.setup{}
 require'lspconfig'.sqlls.setup{}
 require'lspconfig'.tsserver.setup{}
@@ -547,7 +548,6 @@ EOF
 
 " not working:
 " require'lspconfig'.perlls.setup{}
-" require'lspconfig'.phpactor.setup{}
 
 lua << EOF
 local nvim_lsp = require('lspconfig')
