@@ -11,11 +11,13 @@ vim.cmd [[augroup Autogroup]]
 
 -- vim.cmd [[autocmd FileChangedShellPost,Syntax,TextChanged,InsertLeave,WinScrolled * lua require('markdown').headlines()]]
 
-vim.cmd [[autocmd BufWritePost plugins.lua PackerCompile]]
-
--- vim.cmd [[autocmd User PackerComplete,PackerCompileDone lua require("indent_blankline.utils").reset_highlights()]]
-
 -- vim.cmd [[autocmd BufEnter * lua require("defx").hijak()]]
+
+-- Packer
+--
+-- Automatically run PackerCompile when plugins.lua is modified
+-- vim.cmd [[autocmd BufWritePost plugins.lua PackerCompile]]
+-- vim.cmd [[autocmd User PackerComplete,PackerCompileDone lua require("indent_blankline.utils").reset_highlights()]]
 
 vim.cmd [[augroup END]]
 

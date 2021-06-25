@@ -1,3 +1,8 @@
+-- vim-sensible is automatically enabled by polygot, turn off as prefer using
+-- my settings which seem faster
+vim.g.polyglot_disabled = {'sensible'}
+vim.g.yats_host_keyword = 0
+
 vim.cmd [[syntax enable]]
 vim.cmd [[filetype plugin indent on]]
 
@@ -56,26 +61,28 @@ vim.o.splitright = true
 vim.o.termguicolors = true
 vim.o.timeoutlen = 500
 vim.o.undodir = vim.fn.expand("~/.config/nvim/tmp/undo")
-vim.o.updatetime = 0 -- If this many milliseconds nothing is typed the swap file will be written to disk
+vim.o.updatetime = 4000 -- If this many milliseconds nothing is typed the swap file will be written to disk
 vim.o.viewoptions = "" -- folds,options,cursor,curdir
 vim.o.virtualedit = ""
 vim.o.whichwrap = "b,h,l" -- original: b,s,<,>,h,l
 vim.o.wildmode = "longest,full" -- original: full
 vim.o.wildoptions = "pum" -- original: pum,tagfile
 
+-- default folding, override once treesitter loads
 vim.wo.foldenable = false
 vim.wo.foldlevel = 2
-vim.wo.foldmethod = "expr"
-vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
+vim.wo.foldmethod = "indent"
+vim.wo.foldexpr = '0'
+
 vim.wo.colorcolumn = '80' -- Put the "color column" at col 80
 vim.wo.signcolumn = "yes:1" -- original: yes   Always show the sign column
-vim.wo.conceallevel = 2 -- Concealed text is completely hidden unless it has a custom replacement character defined
+vim.wo.conceallevel = 0 -- '2' would be nice, but concealing text is slow, especially for `u` (undo)
 vim.wo.concealcursor = "n"
 vim.wo.breakindent = true -- Every wrapped line will continue visually indented (same amount of space as the beginning of that line), thus preserving horizontal blocks of text
 vim.wo.linebreak = true -- If on, Vim will wrap long lines at a character in 'breakat' rather than at the last character that fits on the screen.
 vim.wo.number = true
-vim.wo.relativenumber = true
-vim.wo.cursorline = true
+vim.wo.relativenumber = false -- Turning this on, makes 'x' and 'u' slow
+vim.wo.cursorline = false -- Turning this on, makes 'x' and 'u' slow
 vim.wo.winhighlight = "NormalNC:WinNormalNC"
 vim.wo.list = true
 vim.wo.listchars =

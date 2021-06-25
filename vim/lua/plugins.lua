@@ -1,15 +1,48 @@
 vim.g.loaded_netrwPlugin = false
 vim.cmd [[packadd cfilter]]
 
-require("packer").startup(
+local packer = require'packer'
+
+packer.init({
+  compile_on_sync = false -- Don't generate .vim/plugin/packer_compiled.vim, as this is very slow for 'x' and 'u' commands, and seems to break treesitter highlighting
+})
+
+packer.startup(
     function()
         use "wbthomason/packer.nvim"
 
         use "neovim/nvim-lspconfig"
         use {
             "hrsh7th/nvim-compe",
-            config = function()
-            end
+            setup = require("compe").setup {
+            -- enabled = true,
+            -- debug = false,
+            -- autocomplete = false,
+            -- min_length = 1,
+            -- preselect = "disable",
+            -- allow_prefix_unmatch = false,
+            enabled = true,
+            autocomplete = true,
+            debug = false,
+            min_length = 1,
+            preselect = 'enable',
+            throttle_time = 80,
+            source_timeout = 200,
+            incomplete_delay = 400,
+            max_abbr_width = 100,
+            max_kind_width = 100,
+            max_menu_width = 100,
+            documentation = true,
+            source = {
+              path = true,
+              buffer = true,
+              nvim_lsp = true,
+              nvim_lua = true,
+              calc = true,
+              emoji = true,
+              treesitter = true
+            }
+          }
         }
         use "jose-elias-alvarez/nvim-lsp-ts-utils"
 
@@ -17,6 +50,8 @@ require("packer").startup(
             "nvim-treesitter/nvim-treesitter",
             run = ":TSUpdate",
             config = function()
+              vim.wo.foldmethod = "expr"
+              vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
             end
         }
         use "nvim-treesitter/playground"
@@ -43,8 +78,9 @@ require("packer").startup(
 
         use {
             "kyazdani42/nvim-web-devicons",
-            config = function()
-            end
+            setup = require("nvim-web-devicons").setup {
+              default = true
+            }
         }
 
         use "tpope/vim-commentary" -- comments
@@ -53,26 +89,26 @@ require("packer").startup(
         use "tpope/vim-sleuth" -- indentation
 
         use {
-            "airblade/vim-gitgutter",
-            config = function()
-                vim.g.gitgutter_map_keys = false
-                vim.g.gitgutter_sign_added = "│"
-                vim.g.gitgutter_sign_modified = "│"
-                vim.g.gitgutter_sign_removed = "│"
-                vim.g.gitgutter_sign_removed_first_line = "│"
-                vim.g.gitgutter_sign_removed_above_and_below = "│"
-                vim.g.gitgutter_sign_modified_removed = "│"
+          "airblade/vim-gitgutter",
+          config = function()
+            vim.g.gitgutter_map_keys = false
+            vim.g.gitgutter_sign_added = "│"
+            vim.g.gitgutter_sign_modified = "│"
+            vim.g.gitgutter_sign_removed = "│"
+            vim.g.gitgutter_sign_removed_first_line = "│"
+            vim.g.gitgutter_sign_removed_above_and_below = "│"
+            vim.g.gitgutter_sign_modified_removed = "│"
 
-                -- my settings
-                vim.g.gitgutter_eager = false
-                vim.g.gitgutter_realtime = false
-                vim.g.gitgutter_git_executable = 'git'
+            -- my settings
+            vim.g.gitgutter_eager = false
+            vim.g.gitgutter_realtime = false
+            vim.g.gitgutter_git_executable = 'git'
 
-                -- fix issue with background color of gitgutter signs
-                -- vim.highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
-                -- vim.highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
-                -- vim.highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
-            end
+            -- fix issue with background color of gitgutter signs
+            -- vim.highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
+            -- vim.highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
+            -- vim.highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
+          end
         }
 
         use "nvim-lua/plenary.nvim"
@@ -211,10 +247,10 @@ require("packer").startup(
           config = function()
             vim.g.lightline = {
               colorscheme = 'dracula_pro',
-              component_function = {
-                -- filename = 'LightLineFilename',
-                -- lspstatus = 'LspStatus'
-              }
+              -- component_function = {
+              --   filename = 'LightLineFilename',
+              --   lspstatus = 'LspStatus'
+              -- }
             }
 
             vim.g.lightline.active = {
@@ -228,7 +264,7 @@ require("packer").startup(
 
             vim.g.lightline.tabline = {
               left = { { 'tabs' } },
-              right = { }
+              -- right = { }
             } -- Removes the 'close' button from the right of the tab line
 
             -- TODO:
@@ -249,13 +285,32 @@ require("packer").startup(
 
         use {
           'mcchrish/nnn.vim',
-          config = function()
-          end
+          setup = require("nnn").setup {
+            -- Disable default mappings
+            set_default_mappings = false,
+
+            -- specify `TERM` to ensure colors are used
+            command = "TERM=xterm-kitty nnn",
+
+            layout = {
+              window = {
+                width = 0.9,
+                height = 0.6,
+                highlight = 'Debug'
+              }
+            },
+
+            action = {
+              ['<c-t>'] = 'tab split',
+              ['<c-s>'] = 'split',
+              ['<c-v>'] = 'vsplit'
+            }
+          }
         }
 
         use {
           'troydm/zoomwintab.vim',
-          event = {'ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'},
+          -- event = {'ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'}, -- No such event?
           config = function()
             vim.g.zoomwintab_hidetabbar = false
           end
@@ -275,7 +330,7 @@ require("packer").startup(
 
         use {
           'rbgrouleff/bclose.vim',
-          event = 'Bclose',
+          -- event = 'Bclose', -- No such event?
           config = function()
             vim.g.bclose_no_plugin_maps = true
           end
@@ -335,103 +390,47 @@ require("packer").startup(
 
         use {
           'vim-scripts/scratch.vim',
-          event = 'Scratch'
+          -- event = 'Scratch' -- No such event?
         }
     end
 )
 
-require "nvim-treesitter.configs".setup {
-    ensure_installed = "all",
-    ignore_install = { "haskell" }, -- keeps failing to install
-    highlight = {
-        enable = true,
-        language_tree = true
-    },
-    indent = {
-        enable = true
-    },
-    refactor = {
-        highlight_definitions = {
-            enable = true
-        }
-    },
-    autotag = {
-        enable = true
-    },
-    context_commentstring = {
-        enable = true
-    },
-    textobjects = {
-        select = {
-            enable = true,
-            keymaps = {
-                ["af"] = "@function.outer",
-                ["if"] = "@function.inner",
-                ["ac"] = "@class.outer",
-                ["ic"] = "@class.inner"
-            }
-        }
-    }
-}
-
-require "nnn".setup {
-  -- Disable default mappings
-  set_default_mappings = false,
-
-  -- specify `TERM` to ensure colors are used
-  command = "TERM=xterm-kitty nnn",
-
-  layout = {
-    window = {
-      width = 0.9,
-      height = 0.6,
-      highlight = 'Debug'
+require("nvim-treesitter.configs").setup {
+  ensure_installed = "all",
+  ignore_install = { "haskell" }, -- keeps failing to install
+  highlight = {
+    enable = true,
+    language_tree = true
+  },
+  indent = {
+    enable = true
+  },
+  refactor = {
+    highlight_definitions = {
+      enable = true
     }
   },
-
-  action = {
-    ['<c-t>'] = 'tab split',
-    ['<c-s>'] = 'split',
-    ['<c-v>'] = 'vsplit'
-  }
-}
-
-require "nvim-web-devicons".setup {
-  default = true
-}
-
-require "compe".setup {
-  -- enabled = true,
-  -- debug = false,
-  -- autocomplete = false,
-  -- min_length = 1,
-  -- preselect = "disable",
-  -- allow_prefix_unmatch = false,
-  enabled = true,
-  autocomplete = true,
-  debug = false,
-  min_length = 1,
-  preselect = 'enable',
-  throttle_time = 80,
-  source_timeout = 200,
-  incomplete_delay = 400,
-  max_abbr_width = 100,
-  max_kind_width = 100,
-  max_menu_width = 100,
-  documentation = true,
-  source = {
-    path = true,
-    buffer = true,
-    nvim_lsp = true,
-    nvim_lua = true,
-    calc = true,
-    emoji = true,
-    treesitter = true
+  autotag = {
+    enable = true
+  },
+  context_commentstring = {
+    enable = true
+  },
+  textobjects = {
+    select = {
+      enable = true,
+      keymaps = {
+        ["af"] = "@function.outer",
+        ["if"] = "@function.inner",
+        ["ac"] = "@class.outer",
+        ["ic"] = "@class.inner"
+      }
+    }
   }
 }
 
 local actions = require('telescope.actions')
-require "telescope".setup {
+require("telescope").setup {
   defaults = {
     file_ignore_patterns = { 'bower_components', 'node_modules', '.gems', 'gen/', 'dist/', 'packs/', 'packs-test/', 'build/', 'external/' },
     mappings = {

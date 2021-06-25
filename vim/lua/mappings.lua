@@ -6,8 +6,16 @@ map("n", leader .. "nf", ":NnnPicker %:p<CR>", {silent = true})
 
 map("n", "<C-w>O", "<Esc>:ZoomWinTabToggle<CR>")
 
-map("n", leader .. "fw", "<Plug>CtrlSFCwordPath")
--- map("n", leader .. "fp", "<Plug>CtrlSFPrompt")  <Plug> not working with lua :-(
+-- TODO:
+-- u (undo)
+-- x (delete) are slow!
+--
+-- add my other mappings in
+
+-- <Plug> not working with lua :-(
+-- map("n", leader .. "fw", "<Plug>CtrlSFCwordPath")
+-- map("n", leader .. "fp", "<Plug>CtrlSFPrompt")
+
 map("n", leader .. "fp", ":CtrlSF ")
 
 map("n", leader .. "db", ":Bclose<CR>", {silent = true})
@@ -80,6 +88,22 @@ map("n", leader .. "tr", "<cmd>lua require('telescope.builtin').lsp_references()
 
 vim.cmd [[cabbrev nw noautocmd write]]
 
+
+-- Clear highlights
+map("n", leader .. "ch", ":let @/=''<CR> :echo 'Highlights Cleared'<CR>")
+
+-- indentation
+map("n", "<Tab>", ">>")
+map("n", "<S-Tab>", "<<")
+map("v", "<", "<gv")
+map("v", ">", ">gv")
+map("v", "<S-Tab>", "<gv")
+map("v", "<Tab>", ">gv")
+
+-- adding blank lines
+map("n", "BL", "cc<ESC>")
+map("n", "BU", "mzO<ESC>`z")
+map("n", "BB", "mzo<ESC>`z")
 
 -- map("n", leader .. leader, ":<C-u>exe v:count ? v:count . 'b' : 'b' . (bufloaded(0) ? '#' : 'n')<CR>")
 -- 
