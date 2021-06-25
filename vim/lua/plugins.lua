@@ -63,13 +63,11 @@ packer.startup(
         use "JoosepAlviste/nvim-ts-context-commentstring"
         use "windwp/nvim-ts-autotag"
 
-        -- use {
-        --     "navarasu/onedark.nvim",
-        --     --"monsonjeremy/onedark.nvim",
-        --     config = function()
-        --       require "onedark".setup {}
-        --     end
-        -- }
+        use {
+          "navarasu/onedark.nvim",
+          --"monsonjeremy/onedark.nvim",
+          setup = require("onedark").setup {}
+        }
 
         use {
           'asgeo1/dracula-pro-vim',
@@ -244,47 +242,7 @@ packer.startup(
             end
         }
 
-        -- use "glepnir/galaxyline.nvim"
-        use {
-          'itchyny/lightline.vim',
-          config = function()
-            vim.g.lightline = {
-              colorscheme = 'dracula_pro',
-              -- component_function = {
-              --   filename = 'LightLineFilename',
-              --   lspstatus = 'LspStatus'
-              -- }
-            }
-
-            vim.g.lightline.active = {
-              right = {
-                { 'lineinfo' },
-                { 'percent' },
-                { 'fileformat', 'fileencoding', 'filetype', 'charvaluehex' },
-                -- { 'lspstatus' }
-              }
-            }
-
-            vim.g.lightline.tabline = {
-              left = { { 'tabs' } },
-              -- right = { }
-            } -- Removes the 'close' button from the right of the tab line
-
-            -- TODO:
-            --
-            -- function! LightLineFilename()
-            --   return expand('%')
-            -- endfunction
-
-            -- function! LspStatus() abort
-            --   if luaeval('#vim.lsp.buf_get_clients() > 0')
-            --     return luaeval("require('lsp-status').status()")
-            --   endif
-
-            --   return ''
-            -- endfunction
-          end
-        }
+        use "glepnir/galaxyline.nvim"
 
         use {
           'mcchrish/nnn.vim',
@@ -447,3 +405,4 @@ require("telescope").setup {
 }
 
 vim.cmd [[colorscheme dracula_pro]]
+-- vim.cmd [[colorscheme onedark]]
