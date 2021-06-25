@@ -246,6 +246,7 @@ lspconfig.efm.setup {
     on_attach = on_attach,
     init_options = {documentFormatting = true},
     root_dir = vim.loop.cwd,
+    filetypes = {'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'yaml', 'json', 'html', 'scss', 'css', 'markdown'},
     settings = {
         rootMarkers = {".git/"},
         languages = {
