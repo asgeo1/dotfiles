@@ -224,6 +224,14 @@ lspconfig.bashls.setup {on_attach = on_attach}
 -- https://github.com/rcjsuen/dockerfile-language-server-nodejs
 lspconfig.dockerls.setup {on_attach = on_attach}
 
+-- NOTE: paid alternative is https://intelephense.com/
+--
+-- https://solargraph.org/
+lspconfig.solargraph.setup {on_attach = on_attach}
+
+-- https://github.com/phpactor/phpactor
+lspconfig.phpactor.setup {on_attach = on_attach}
+
 -- https://github.com/hashicorp/terraform-ls
 lspconfig.terraformls.setup {
     on_attach = on_attach,
