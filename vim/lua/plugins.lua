@@ -1,6 +1,9 @@
 vim.g.loaded_netrwPlugin = false
 vim.cmd [[packadd cfilter]]
 
+
+-- TODO: opening ruby files takes ~= 1300ms for some reason, need to work out if there is a way to speed this up
+
 local packer = require'packer'
 
 packer.init({
@@ -382,6 +385,7 @@ packer.startup(
           ft = { 'cpp', 'c' }
         }
 
+        -- Seems slow for ruby
         use 'sheerun/vim-polyglot'
 
         use 'milch/vim-fastlane'

@@ -1,4 +1,4 @@
--- vim-sensible is automatically enabled by polygot, turn off as prefer using
+-- vim-sensible is automatically enabled by polyglot, turn off as prefer using
 -- my settings which seem faster
 vim.g.polyglot_disabled = {'sensible'}
 vim.g.yats_host_keyword = 0
@@ -124,3 +124,6 @@ vim.g.no_man_maps = true
 vim.g.vim_json_syntax_conceal = false
 vim.g.vim_json_conceal = false
 vim.g.mapleader = ","
+
+
+-- vim.g.ruby_path = vim.fn.expand("~/.rbenv/shims")
