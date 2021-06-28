@@ -96,11 +96,13 @@ vim.cmd [[cabbrev nw noautocmd write]]
 map("n", leader .. "ch", ":let @/=''<CR> :echo 'Highlights Cleared'<CR>")
 
 -- Don't use vim syntax regexs - use perl/python syntax
-map("n", "/", "/\v")
-map("v", "/", "/\v")
+-- (not working)
+-- map("n", "/", "/\v")
+-- map("v", "/", "/\v")
 
 -- Don't move on *
-map("n", "*", "*<c-o>")
+-- (not working)
+-- map("n", "*", "*<c-o>")
 
 -- Substitute
 map("n", leader .. "s", ":%s//<left>")
