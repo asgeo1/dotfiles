@@ -18,44 +18,40 @@ packer.startup(
         use {
             "hrsh7th/nvim-compe",
             setup = require("compe").setup {
-            -- enabled = true,
-            -- debug = false,
-            -- autocomplete = false,
-            -- min_length = 1,
-            -- preselect = "disable",
-            -- allow_prefix_unmatch = false,
-            enabled = true,
-            autocomplete = true,
-            debug = false,
-            min_length = 1,
-            preselect = 'enable',
-            throttle_time = 80,
-            source_timeout = 200,
-            incomplete_delay = 400,
-            max_abbr_width = 100,
-            max_kind_width = 100,
-            max_menu_width = 100,
-            documentation = true,
-            source = {
-              path = true,
-              buffer = true,
-              nvim_lsp = true,
-              nvim_lua = true,
-              calc = true,
-              emoji = true,
-              treesitter = true
+              -- enabled = true,
+              -- debug = false,
+              -- autocomplete = false,
+              -- min_length = 1,
+              -- preselect = "disable",
+              -- allow_prefix_unmatch = false,
+              enabled = true,
+              autocomplete = true,
+              debug = false,
+              min_length = 1,
+              preselect = 'enable',
+              throttle_time = 80,
+              source_timeout = 200,
+              incomplete_delay = 400,
+              max_abbr_width = 100,
+              max_kind_width = 100,
+              max_menu_width = 100,
+              documentation = true,
+              source = {
+                path = true,
+                buffer = true,
+                nvim_lsp = true,
+                nvim_lua = true,
+                calc = true,
+                emoji = true,
+                treesitter = true
+              }
             }
-          }
         }
         use "jose-elias-alvarez/nvim-lsp-ts-utils"
 
         use {
             "nvim-treesitter/nvim-treesitter",
-            run = ":TSUpdate",
-            config = function()
-              vim.wo.foldmethod = "expr"
-              vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
-            end
+            run = ":TSUpdate"
         }
         use "nvim-treesitter/playground"
         use "nvim-treesitter/nvim-treesitter-refactor"
@@ -70,10 +66,7 @@ packer.startup(
 
         use {
           'asgeo1/dracula-pro-vim',
-          as = 'dracula',
-          config = function()
-            vim.g.dracula_colorterm = true -- Include background fill colors
-          end
+          as = 'dracula'
         }
 
         use {
@@ -87,51 +80,16 @@ packer.startup(
         use "tpope/vim-repeat" -- mappings for repeating keystrokes
         use "tpope/vim-sleuth" -- indentation
 
-        use {
-          "airblade/vim-gitgutter",
-          config = function()
-            vim.g.gitgutter_map_keys = false
-            vim.g.gitgutter_sign_added = "│"
-            vim.g.gitgutter_sign_modified = "│"
-            vim.g.gitgutter_sign_removed = "│"
-            vim.g.gitgutter_sign_removed_first_line = "│"
-            vim.g.gitgutter_sign_removed_above_and_below = "│"
-            vim.g.gitgutter_sign_modified_removed = "│"
-
-            -- my settings
-            vim.g.gitgutter_eager = false
-            vim.g.gitgutter_realtime = false
-            vim.g.gitgutter_git_executable = 'git'
-
-            -- fix issue with background color of gitgutter signs
-            -- vim.highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
-            -- vim.highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
-            -- vim.highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
-          end
-        }
+        use "airblade/vim-gitgutter"
 
         use "nvim-lua/plenary.nvim"
         use "nvim-lua/popup.nvim"
         use "nvim-telescope/telescope.nvim"
 
-        use {
-            "rhysd/git-messenger.vim",
-            config = function()
-                vim.g.git_messenger_floating_win_opts = {border = vim.g.floating_window_border_dark}
-            end
-        }
-
+        use "rhysd/git-messenger.vim"
         use "michaeljsmith/vim-indent-object"
         use "machakann/vim-sandwich"
-
-        use {
-            "AndrewRadev/splitjoin.vim",
-            config = function()
-                vim.g.conjoin_map_J = "gJ"
-                vim.g.conjoin_map_gJ = "<con-nope>"
-            end
-        }
-
+        use "AndrewRadev/splitjoin.vim"
         use "glepnir/galaxyline.nvim"
 
         use {
@@ -168,54 +126,18 @@ packer.startup(
         }
 
         use 'rbong/vim-flog' -- (git browser)
-
-        use {
-          'dyng/ctrlsf.vim',
-          config = function()
-            vim.g.ctrlsf_ignore_dir = {'bower_components', 'node_modules', '.gems', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external'}
-            vim.g.ctrlsf_auto_close = false
-          end
-        }
-
+        use 'dyng/ctrlsf.vim'
         use 'henrik/vim-indexed-search'
 
         use {
           'rbgrouleff/bclose.vim',
           -- event = 'Bclose', -- No such event?
-          config = function()
-            vim.g.bclose_no_plugin_maps = true
-          end
         }
 
         use 'scrooloose/nerdcommenter'
-
-        use {
-          'airblade/vim-rooter',
-          config = function()
-            vim.g.rooter_patterns = {'.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/'}
-            vim.g.rooter_silent_chdir = true
-          end
-        }
-
+        use 'airblade/vim-rooter'
         use 'easymotion/vim-easymotion'
-
-        use {
-          'terryma/vim-multiple-cursors',
-          config = function()
-            vim.g.multi_cursor_use_default_mapping = false
-
-            -- Default mapping
-            vim.g.multi_cursor_start_word_key      = '<C-n>'
-            vim.g.multi_cursor_select_all_word_key = '<C-a>'
-            vim.g.multi_cursor_start_key           = 'g<C-n>'
-            vim.g.multi_cursor_select_all_key      = 'g<C-a>'
-            vim.g.multi_cursor_next_key            = '<C-n>'
-            vim.g.multi_cursor_prev_key            = '<C-p>'
-            vim.g.multi_cursor_skip_key            = '<C-x>'
-            vim.g.multi_cursor_quit_key            = '<Esc>'
-          end
-        }
-
+        use 'terryma/vim-multiple-cursors'
         use 'editorconfig/editorconfig-vim'
 
         use {
@@ -246,6 +168,9 @@ packer.startup(
         }
 
         use 'axelf4/vim-strip-trailing-whitespace'
+
+        -- Neat, but has performance issue
+        -- use 'jeffkreeftmeijer/vim-numbertoggle'
     end
 )
 

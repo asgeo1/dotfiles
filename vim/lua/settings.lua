@@ -59,8 +59,8 @@ vim.o.hlsearch = true -- Highlight searched for phrases
 vim.o.incsearch = true -- Highlight as you type you search phrase
 vim.o.showmatch = true -- Show matching brackets
 vim.o.smarttab = true
-vim.o.splitbelow = true
-vim.o.splitright = true
+vim.o.splitbelow = false
+vim.o.splitright = false
 vim.o.termguicolors = true
 vim.o.timeoutlen = 500
 vim.o.undodir = vim.fn.expand("~/.config/nvim/tmp/undo")
@@ -142,4 +142,72 @@ vim.g.cpp_class_scope_highlight = true
 -- PHP
 vim.g.php_var_selector_is_identifier = 1
 
+-- Ruby
 -- vim.g.ruby_path = vim.fn.expand("~/.rbenv/shims")
+
+-- CtrlSF
+vim.g.ctrlsf_auto_close = {
+  normal = false,
+  compact = false
+}
+
+vim.g.ctrlsf_auto_focus = {
+  at = "done",
+  duration_less_than = 1000
+}
+
+vim.g.ctrlsf_search_mode = 'async'
+vim.g.ctrlsf_ignore_dir = {'bower_components', 'node_modules', '.gems', 'gen', 'dist', 'packs', 'packs-test', 'build', 'external'}
+
+-- nvim-treesitter
+vim.wo.foldmethod = "expr"
+vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
+
+-- dracula-pro
+vim.g.dracula_colorterm = true -- Include background fill colors
+
+-- GitGutter
+vim.g.gitgutter_map_keys = false
+vim.g.gitgutter_sign_added = "│"
+vim.g.gitgutter_sign_modified = "│"
+vim.g.gitgutter_sign_removed = "│"
+vim.g.gitgutter_sign_removed_first_line = "│"
+vim.g.gitgutter_sign_removed_above_and_below = "│"
+vim.g.gitgutter_sign_modified_removed = "│"
+
+-- my settings
+vim.g.gitgutter_eager = false
+vim.g.gitgutter_realtime = false
+vim.g.gitgutter_git_executable = 'git'
+
+-- fix issue with background color of gitgutter signs
+-- vim.highlight GitGutterAdd          guifg=#009900 guibg=NONE ctermfg=2 ctermbg=0
+-- vim.highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
+-- vim.highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
+
+-- Git Messenger
+vim.g.git_messenger_floating_win_opts = {border = vim.g.floating_window_border_dark}
+
+-- SplitJoin
+vim.g.conjoin_map_J = "gJ"
+vim.g.conjoin_map_gJ = "<con-nope>"
+
+-- Bclose
+vim.g.bclose_no_plugin_maps = true
+
+-- Vim-rooter
+vim.g.rooter_patterns = {'.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/'}
+vim.g.rooter_silent_chdir = true
+
+-- Multiple Cursors
+vim.g.multi_cursor_use_default_mapping = false
+
+-- Default mapping
+vim.g.multi_cursor_start_word_key      = '<C-n>'
+vim.g.multi_cursor_select_all_word_key = '<C-a>'
+vim.g.multi_cursor_start_key           = 'g<C-n>'
+vim.g.multi_cursor_select_all_key      = 'g<C-a>'
+vim.g.multi_cursor_next_key            = '<C-n>'
+vim.g.multi_cursor_prev_key            = '<C-p>'
+vim.g.multi_cursor_skip_key            = '<C-x>'
+vim.g.multi_cursor_quit_key            = '<Esc>'
