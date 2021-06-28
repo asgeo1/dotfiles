@@ -270,9 +270,6 @@ endfunction
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Searching
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Don't use vim syntax regexs - use perl/python syntax
-nnoremap / /\v
-vnoremap / /\v
 set ignorecase                      " Easier to ignore case for searching     \c   and \C   toggle on and off
 set smartcase                       " All lowercase string - case insensitive - all uppercase case sensitive
 set gdefault                        " Global substitutions on by default

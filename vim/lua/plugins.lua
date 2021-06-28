@@ -181,15 +181,15 @@ packer.startup(
 
         use "vim-scripts/UnconditionalPaste"
 
-        use {
-            "haya14busa/incsearch.vim",
-            config = function()
-                vim.g["incsearch#auto_nohlsearch"] = true
-                vim.g["incsearch#magic"] = "\\v"
-                vim.g["incsearch#consistent_n_direction"] = true
-                vim.g["incsearch#do_not_save_error_message_history"] = true
-            end
-        }
+        -- use {
+        --     "haya14busa/incsearch.vim",
+        --     config = function()
+        --         vim.g["incsearch#auto_nohlsearch"] = true
+        --         vim.g["incsearch#magic"] = "\\v"
+        --         vim.g["incsearch#consistent_n_direction"] = true
+        --         vim.g["incsearch#do_not_save_error_message_history"] = true
+        --     end
+        -- }
 
         -- use {
         --     "mileszs/ack.vim",
@@ -354,6 +354,8 @@ packer.startup(
           'vim-scripts/scratch.vim',
           -- event = 'Scratch' -- No such event?
         }
+
+        use 'axelf4/vim-strip-trailing-whitespace'
     end
 )
 

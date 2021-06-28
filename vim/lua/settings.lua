@@ -55,6 +55,9 @@ vim.o.showtabline = 1 -- Only show the tab bar if there is more than one tab ope
 vim.o.sidescroll = 5 -- The minimal number of columns to scroll horizontally
 vim.o.sidescrolloff = 15 -- The minimal number of screen columns to keep to the left and to the ight of the cursor if 'nowrap' is set
 vim.o.smartcase = true -- All lowercase string - case insensitive - all uppercase case sensitive
+vim.o.hlsearch = true -- Highlight searched for phrases
+vim.o.incsearch = true -- Highlight as you type you search phrase
+vim.o.showmatch = true -- Show matching brackets
 vim.o.smarttab = true
 vim.o.splitbelow = true
 vim.o.splitright = true
@@ -125,5 +128,18 @@ vim.g.vim_json_syntax_conceal = false
 vim.g.vim_json_conceal = false
 vim.g.mapleader = ","
 
+-- skip checking if python is available at vim startup - improves vim startup time
+vim.g.python_host_skip_check = true
+vim.g.python3_host_skip_check = true
+
+-- JSX & TSX (react)
+vim.g.jsx_ext_required = false
+vim.g.tsx_ext_required = false
+
+-- cpp syntax extended
+vim.g.cpp_class_scope_highlight = true
+
+-- PHP
+vim.g.php_var_selector_is_identifier = 1
 
 -- vim.g.ruby_path = vim.fn.expand("~/.rbenv/shims")

@@ -92,6 +92,18 @@ vim.cmd [[cabbrev nw noautocmd write]]
 -- Clear highlights
 map("n", leader .. "ch", ":let @/=''<CR> :echo 'Highlights Cleared'<CR>")
 
+-- Don't use vim syntax regexs - use perl/python syntax
+map("n", "/", "/\v")
+map("v", "/", "/\v")
+
+-- Don't move on *
+map("n", "*", "*<c-o>")
+
+-- Substitute
+map("n", leader .. "s", ":%s//<left>")
+
+
+
 -- indentation
 map("n", "<Tab>", ">>")
 map("n", "<S-Tab>", "<<")
@@ -104,6 +116,16 @@ map("v", "<Tab>", ">gv")
 map("n", "BL", "cc<ESC>")
 map("n", "BU", "mzO<ESC>`z")
 map("n", "BB", "mzo<ESC>`z")
+
+-- remove extraneous / trailing whitespace
+map("m", "<F9>", ":StripTrailingWhitespace<CR>:echo 'Extraneous whitespace removed'<CR>", {silent = true})
+
+
+
+-- Scroll one line at a time, but keep cursor position relative to the window
+-- rather than moving with the line
+map("n", "<C-j>", "j<C-e>")
+map("n", "<C-k>", "k<C-y>")
 
 -- map("n", leader .. leader, ":<C-u>exe v:count ? v:count . 'b' : 'b' . (bufloaded(0) ? '#' : 'n')<CR>")
 -- 
