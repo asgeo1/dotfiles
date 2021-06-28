@@ -227,7 +227,20 @@ lspconfig.dockerls.setup {on_attach = on_attach}
 -- NOTE: paid alternative is https://intelephense.com/
 --
 -- https://solargraph.org/
-lspconfig.solargraph.setup {on_attach = on_attach}
+lspconfig.solargraph.setup {
+  on_attach = on_attach,
+  settings = {
+    solargraph = {
+      -- TODO: formatting not working
+      formatting = true,
+      diagnostics = true
+    }
+  },
+  init_options = {
+    documentFormatting = true,
+    provideFormatter = true
+  }
+}
 
 -- https://github.com/phpactor/phpactor
 lspconfig.phpactor.setup {on_attach = on_attach}
