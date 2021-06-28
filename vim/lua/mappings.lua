@@ -132,3 +132,8 @@ map("n", "<F9>", ":StripTrailingWhitespace<CR>:echo 'Extraneous whitespace remov
 -- rather than moving with the line
 map("n", "<C-j>", "j<C-e>")
 map("n", "<C-k>", "k<C-y>")
+
+
+-- up/down movement now works on wrapped lines
+map("n", "j", "gj")
+map("n", "k", "gk")
