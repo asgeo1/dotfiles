@@ -61,7 +61,6 @@ packer.startup(
         use "nvim-treesitter/nvim-treesitter-refactor"
         use "nvim-treesitter/nvim-treesitter-textobjects"
         use "JoosepAlviste/nvim-ts-context-commentstring"
-        use "windwp/nvim-ts-autotag"
 
         use {
           "navarasu/onedark.nvim",
@@ -84,7 +83,6 @@ packer.startup(
             }
         }
 
-        use "tpope/vim-commentary" -- comments
         use "tpope/vim-fugitive" -- git integration
         use "tpope/vim-repeat" -- mappings for repeating keystrokes
         use "tpope/vim-sleuth" -- indentation
@@ -123,116 +121,8 @@ packer.startup(
             end
         }
 
-        -- use {
-        --     "Shougo/defx.nvim",
-        --     run = ":UpdateRemotePlugins",
-        --     requires = {
-        --         {"kristijanhusak/defx-git"},
-        --         {"kristijanhusak/defx-icons"}
-        --     },
-        --     config = function()
-        --         vim.g.defx_icons_root_opened_tree_icon = "├"
-        --         vim.g.defx_icons_nested_opened_tree_icon = "├"
-        --         vim.g.defx_icons_nested_closed_tree_icon = "│"
-        --         vim.g.defx_icons_directory_icon = "│"
-        --         vim.g.defx_icons_parent_icon = "├"
-
-        --         vim.fn["defx#custom#column"](
-        --             "mark",
-        --             {
-        --                 ["readonly_icon"] = "◆",
-        --                 ["selected_icon"] = "■"
-        --             }
-        --         )
-
-        --         vim.fn["defx#custom#column"](
-        --             "indent",
-        --             {
-        --                 ["indent"] = "    "
-        --             }
-        --         )
-
-        --         vim.fn["defx#custom#option"](
-        --             "_",
-        --             {
-        --                 ["columns"] = "indent:mark:icons:git:filename"
-        --             }
-        --         )
-
-        --         vim.fn["defx#custom#column"](
-        --             "git",
-        --             "indicators",
-        --             {
-        --                 ["Modified"] = "◉",
-        --                 ["Staged"] = "✚",
-        --                 ["Untracked"] = "◈",
-        --                 ["Renamed"] = "➜",
-        --                 ["Unmerged"] = "═",
-        --                 ["Ignored"] = "▨",
-        --                 ["Deleted"] = "✖",
-        --                 ["Unknown"] = "?"
-        --             }
-        --         )
-        --     end
-        -- }
-
         use "michaeljsmith/vim-indent-object"
-        use "wellle/targets.vim"
-
-        use "vim-scripts/UnconditionalPaste"
-
-        -- use {
-        --     "haya14busa/incsearch.vim",
-        --     config = function()
-        --         vim.g["incsearch#auto_nohlsearch"] = true
-        --         vim.g["incsearch#magic"] = "\\v"
-        --         vim.g["incsearch#consistent_n_direction"] = true
-        --         vim.g["incsearch#do_not_save_error_message_history"] = true
-        --     end
-        -- }
-
-        -- use {
-        --     "mileszs/ack.vim",
-        --     config = function()
-        --         vim.g.ackprg = "rg --vimgrep --no-heading --hidden --smart-case"
-        --     end
-        -- }
-
         use "machakann/vim-sandwich"
-
-        -- use {
-        --     "vimwiki/vimwiki",
-        --     branch = "dev",
-        --     requires = {{"inkarkat/vim-SyntaxRange"}},
-        --     config = function()
-        --         vim.g.vimwiki_list = {
-        --             {
-        --                 path = "~/vimwiki/",
-        --                 auto_tags = 1,
-        --                 auto_generate_links = 1,
-        --                 auto_generate_tags = 1,
-        --                 links_space_char = "-"
-        --             }
-        --         }
-        --         vim.g.vimwiki_folding = "custom"
-        --         vim.g.vimwiki_use_calendar = 0
-        --         vim.g.vimwiki_global_ext = 0
-        --         vim.g.vimwiki_valid_html_tags = "b,i,s,u,sub,sup,kbd,br,hr,span"
-
-        --         vim.g.vimwiki_key_mappings = {
-        --             all_maps = 1,
-        --             global = 0,
-        --             headers = 0,
-        --             text_objs = 1,
-        --             table_format = 0,
-        --             table_mappings = 1,
-        --             lists = 1,
-        --             links = 0,
-        --             html = 0,
-        --             mouse = 1
-        --         }
-        --     end
-        -- }
 
         use {
             "AndrewRadev/splitjoin.vim",
@@ -373,9 +263,6 @@ require("nvim-treesitter.configs").setup {
     highlight_definitions = {
       enable = true
     }
-  },
-  autotag = {
-    enable = true
   },
   context_commentstring = {
     enable = true

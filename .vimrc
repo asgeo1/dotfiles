@@ -462,10 +462,10 @@ highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Flog
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" use `q` to quit, rather than `ZZ`
+" use `q` to quit, rather than `gq`
 augroup myfloggroup
     autocmd FileType floggraph map <buffer> <silent> q <Plug>FlogQuit
-    autocmd FileType floggraph map <buffer> <silent> ZZ <Plug>FlogQuit
+    autocmd FileType floggraph map <buffer> <silent> gq <Plug>FlogQuit
 augroup END
 
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
