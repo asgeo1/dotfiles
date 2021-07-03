@@ -36,8 +36,8 @@ vim.o.completeopt = "menuone,noinsert,noselect" -- original: menu,preview
 vim.o.confirm = true
 vim.o.diffopt = "internal,filler,closeoff,foldcolumn:0,hiddenoff" -- orig: internal,filler,closeoff
 vim.o.emoji = false
-vim.o.foldclose = "all"
-vim.o.foldopen = "all"
+vim.o.foldclose = "" -- default
+vim.o.foldopen = "block,hor,mark,percent,quickfix,tag" -- remove 'search' & 'undo'
 vim.o.hidden = true -- You can change buffers without saving
 vim.o.history = 10000 -- Keep 10000 lines of command line history
 vim.o.ignorecase = true -- Easier to ignore case for searching     \c   and \C   toggle on and off
@@ -71,7 +71,7 @@ vim.o.whichwrap = "b,h,l" -- original: b,s,<,>,h,l
 vim.o.wildmode = "longest,full" -- original: full
 vim.o.wildoptions = "pum" -- original: pum,tagfile
 
--- default folding, override once treesitter loads
+--- default folding, override once treesitter loads
 vim.wo.foldenable = false
 vim.wo.foldlevel = 2
 vim.wo.foldmethod = "indent"
