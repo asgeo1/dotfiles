@@ -9,10 +9,16 @@ local format_options_var = function()
 end
 
 local format_options_prettier = {
-    tabWidth = 2,
-    singleQuote = true,
-    trailingComma = "all",
-    configPrecedence = "prefer-file"
+  -- global defaults:
+  --
+  -- it's confusing to set these here. Just use whatever settings are in the
+  -- project's `.prettierrc`
+  --
+  -- tabWidth = 2,
+  -- tabs = false,
+  -- singleQuote = true,
+
+  configPrecedence = "prefer-file"
 }
 vim.g.format_options_typescript = format_options_prettier
 vim.g.format_options_javascript = format_options_prettier
