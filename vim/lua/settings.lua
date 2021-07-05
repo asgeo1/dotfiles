@@ -3,7 +3,8 @@
 vim.g.polyglot_disabled = {'sensible'}
 vim.g.yats_host_keyword = 0
 
-vim.cmd [[syntax enable]]
+-- disabled, as causes problems with loading treesitter syntax
+-- vim.cmd [[syntax enable]]
 vim.cmd [[filetype plugin indent on]]
 
 local opt =
