@@ -1,1 +1,1 @@
---start-as fullscreen
+--start-as fullscreen --listen-on unix:/tmp/mykitty --single-instance

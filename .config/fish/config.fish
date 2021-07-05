@@ -4,13 +4,21 @@ alias python="/usr/local/bin/python3"
 
 ################################################################################
 # NNN
+#
+# -e = text in $VISUAL/$EDITOR/vi
+# -a = auto NNN_FIFO
+# -H = show hidden files
 alias nnn="nnn -e -a -H"
 
 # context colors, each context a different color
 set -x NNN_COLORS '4231'
 
 # set -x NNN_PLUG "f:fzcd;o:fzopen;z:fzz;d:diffs;t:treeview;p:preview-tui"
-set -x NNN_PLUG "x:_chmod +x $nnn;p:preview-tui;f:fzcd"
+set -x NNN_PLUG "x:_chmod +x $nnn;p:preview-tui;f:fzcd;i:imgview"
+
+# for preview-tui
+# NOTE: the actual socket is defined in `.config/kitty/macos-launch-services-cmdline`
+set -x KITTY_LISTEN_ON "unix:/tmp/mykitty"
 
 # Not working :-(
 # source ~/.local/share/icons-in-terminal/icons.fish
