@@ -285,7 +285,6 @@ lspconfig.efm.setup {
     settings = {
         rootMarkers = {".git/"},
         languages = {
-            ["="] = {misspell},
             typescript = {prettier, eslint},
             javascript = {prettier, eslint},
             typescriptreact = {prettier, eslint},
