@@ -18,6 +18,7 @@ local opt =
     }
 )
 
+-- Not using a dictionary
 -- opt.dict = "~/dotfiles/lib/10k.txt"
 opt.expandtab = true -- In Insert mode: Use the appropriate number of spaces to insert a <Tab>
 opt.formatoptions = "crqnbj" -- original: jtcroql
