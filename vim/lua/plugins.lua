@@ -58,7 +58,37 @@ packer.startup(
 
    use {
      "nvim-treesitter/nvim-treesitter",
-     run = ":TSUpdate"
+     run = ":TSUpdate",
+     setup = require("nvim-treesitter.configs").setup {
+       ensure_installed = "all",
+       ignore_install = { "haskell" }, -- keeps failing to install
+       highlight = {
+         enable = true,
+         language_tree = true
+       },
+       indent = {
+         enable = true
+       },
+       refactor = {
+         highlight_definitions = {
+           enable = true
+         }
+       },
+       context_commentstring = {
+         enable = true
+       },
+       textobjects = {
+         select = {
+           enable = true,
+           keymaps = {
+             ["af"] = "@function.outer",
+             ["if"] = "@function.inner",
+             ["ac"] = "@class.outer",
+             ["ic"] = "@class.inner"
+           }
+         }
+       }
+     }
    }
    use "nvim-treesitter/playground"
    use "nvim-treesitter/nvim-treesitter-refactor"
@@ -71,10 +101,11 @@ packer.startup(
      setup = require("onedark").setup {}
    }
 
-   use {
-     'asgeo1/dracula-pro-vim',
-     as = 'dracula'
-   }
+   -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
+   -- use {
+   --   'asgeo1/dracula-pro-vim',
+   --   as = 'dracula'
+   -- }
 
    use {
      "kyazdani42/nvim-web-devicons",
@@ -195,39 +226,6 @@ packer.startup(
  end
 )
 
-if IsModuleAvailable("nvim-treesitter.configs") then
-  require("nvim-treesitter.configs").setup {
-    ensure_installed = "all",
-    ignore_install = { "haskell" }, -- keeps failing to install
-    highlight = {
-      enable = true,
-      language_tree = true
-    },
-    indent = {
-      enable = true
-    },
-    refactor = {
-      highlight_definitions = {
-        enable = true
-      }
-    },
-    context_commentstring = {
-      enable = true
-    },
-    textobjects = {
-      select = {
-        enable = true,
-        keymaps = {
-          ["af"] = "@function.outer",
-          ["if"] = "@function.inner",
-          ["ac"] = "@class.outer",
-          ["ic"] = "@class.inner"
-        }
-      }
-    }
-  }
-end
-
 if IsModuleAvailable("telescope.actions") then
   local actions = require('telescope.actions')
   require("telescope").setup {
@@ -243,5 +241,7 @@ if IsModuleAvailable("telescope.actions") then
   }
 end
 
-vim.cmd [[colorscheme dracula_pro]]
--- vim.cmd [[colorscheme onedark]]
+-- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
+-- vim.cmd [[colorscheme dracula_pro]]
+
+vim.cmd [[colorscheme onedark]]

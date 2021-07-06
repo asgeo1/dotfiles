@@ -168,6 +168,14 @@ vim.wo.foldexpr = "nvim_treesitter#foldexpr()"
 -- dracula-pro
 vim.g.dracula_colorterm = true -- Include background fill colors
 
+-- one-dark
+-- vim.g.onedark_style = 'dark'
+-- vim.g.onedark_style = 'darker'
+-- vim.g.onedark_style = 'cool'
+vim.g.onedark_style = 'deep'
+-- vim.g.onedark_style = 'warm'
+-- vim.g.onedark_style = 'warmer'
+
 -- GitGutter
 vim.g.gitgutter_map_keys = false
 vim.g.gitgutter_sign_added = "│"
