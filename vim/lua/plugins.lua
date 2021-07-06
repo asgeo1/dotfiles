@@ -195,49 +195,53 @@ packer.startup(
  end
 )
 
-require("nvim-treesitter.configs").setup {
-  ensure_installed = "all",
-  ignore_install = { "haskell" }, -- keeps failing to install
-  highlight = {
-    enable = true,
-    language_tree = true
-  },
-  indent = {
-    enable = true
-  },
-  refactor = {
-    highlight_definitions = {
-      enable = true
-    }
-  },
-  context_commentstring = {
-    enable = true
-  },
-  textobjects = {
-    select = {
+if IsModuleAvailable("nvim-treesitter.configs") then
+  require("nvim-treesitter.configs").setup {
+    ensure_installed = "all",
+    ignore_install = { "haskell" }, -- keeps failing to install
+    highlight = {
       enable = true,
-      keymaps = {
-        ["af"] = "@function.outer",
-        ["if"] = "@function.inner",
-        ["ac"] = "@class.outer",
-        ["ic"] = "@class.inner"
+      language_tree = true
+    },
+    indent = {
+      enable = true
+    },
+    refactor = {
+      highlight_definitions = {
+        enable = true
+      }
+    },
+    context_commentstring = {
+      enable = true
+    },
+    textobjects = {
+      select = {
+        enable = true,
+        keymaps = {
+          ["af"] = "@function.outer",
+          ["if"] = "@function.inner",
+          ["ac"] = "@class.outer",
+          ["ic"] = "@class.inner"
+        }
       }
     }
   }
-}
+end
 
-local actions = require('telescope.actions')
-require("telescope").setup {
-  defaults = {
-    file_ignore_patterns = { 'bower_components', 'node_modules', '.gems', 'gen/', 'dist/', 'packs/', 'packs-test/', 'build/', 'external/' },
-    mappings = {
-      i = {
-        ["<C-j>"] = actions.move_selection_next,
-        ["<C-k>"] = actions.move_selection_previous
+if IsModuleAvailable("telescope.actions") then
+  local actions = require('telescope.actions')
+  require("telescope").setup {
+    defaults = {
+      file_ignore_patterns = { 'bower_components', 'node_modules', '.gems', 'gen/', 'dist/', 'packs/', 'packs-test/', 'build/', 'external/' },
+      mappings = {
+        i = {
+          ["<C-j>"] = actions.move_selection_next,
+          ["<C-k>"] = actions.move_selection_previous
+        }
       }
     }
   }
-}
+end
 
 vim.cmd [[colorscheme dracula_pro]]
 -- vim.cmd [[colorscheme onedark]]
