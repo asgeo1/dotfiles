@@ -92,6 +92,9 @@ local on_attach = function(client)
     end
 
     utils.map("n", "<Space><CR>", "<cmd>lua require'lsp.diagnostics'.line_diagnostics()<CR>", {buffer = true})
+
+    -- disabled for now, because of performance issues with `O`, `x`, `u` etc
+    -- require "lsp_signature".on_attach()
 end
 
 function _G.activeLSP()

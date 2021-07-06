@@ -189,6 +189,9 @@ packer.startup(
 
         -- Neat, but has performance issue
         -- use 'jeffkreeftmeijer/vim-numbertoggle'
+
+        -- performance issues, disabled:
+        -- use 'ray-x/lsp_signature.nvim'
     end
 )
 
