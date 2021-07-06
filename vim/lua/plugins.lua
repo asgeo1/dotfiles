@@ -2,6 +2,13 @@ vim.g.loaded_netrwPlugin = false
 vim.cmd [[packadd cfilter]]
 
 
+-- NOTES:
+--
+-- Packer plugins are installed into ~/.local/share/nvim/site/pack/packer
+-- Packer logfile is here: ~/.cache/nvim/packer.nvim.log
+-- packer_compiled.lua is here: ~/.vim/plugin/packer_compiled.vim
+
+
 -- TODO: opening ruby files takes ~= 1300ms for some reason, need to work out if there is a way to speed this up
 
 local packer = require'packer'
