@@ -225,7 +225,30 @@ packer.startup(
      end
    }
 
+   use {
+     "folke/trouble.nvim",
+     requires = "kyazdani42/nvim-web-devicons",
+     config = function()
+       require("trouble").setup {
+         -- your configuration comes here
+         -- or leave it empty to use the default settings
+         -- refer to the configuration section below
+       }
+     end
+   }
+
+   use {
+     "folke/todo-comments.nvim",
+     requires = "nvim-lua/plenary.nvim",
+     config = function()
+     end
+   }
+
+   use {'gennaro-tedesco/nvim-jqx', branch = 'unsort'}
+
+   use {"npxbr/glow.nvim", run = ":GlowInstall"}
    use 'windwp/nvim-spectre'
+   use 'kevinhwang91/nvim-bqf'
 
    -- Neat, but has performance issue
    -- use 'jeffkreeftmeijer/vim-numbertoggle'
@@ -250,8 +273,22 @@ if IsModuleAvailable("telescope.actions") then
   }
 end
 
+
+if IsModuleAvailable("todo-comments") then
+  require("todo-comments").setup {
+    -- your configuration comes here
+    -- or leave it empty to use the default settings
+    -- refer to the configuration section below
+  }
+end
+
+
 if IsModuleAvailable("gitsigns") then
   require('gitsigns').setup()
+end
+
+if IsModuleAvailable("nvim-jqx.config") then
+  require('nvim-jqx.config').sort = false
 end
 
 -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
