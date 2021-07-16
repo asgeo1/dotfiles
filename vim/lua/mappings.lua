@@ -7,16 +7,13 @@ map("n", leader .. "nf", ":NnnPicker %:p<CR>", {silent = true})
 map("n", "<C-w>O", "<Esc>:ZoomWinTabToggle<CR>")
 
 -- TODO:
+--
 -- u (undo)
 -- x (delete) are slow!
---
--- add my other mappings in
 
--- <Plug> not working with lua :-(
--- map("n", leader .. "fw", "<Plug>CtrlSFCwordPath")
--- map("n", leader .. "fp", "<Plug>CtrlSFPrompt")
-
-map("n", leader .. "fp", ":CtrlSF ")
+map("n", leader .. "fp", "<cmd>lua require('spectre').open()<CR>i")
+map("n", leader .. "fw", "viw:lua require('spectre').open_visual()<CR>")
+map("v", leader .. "fw", "<cmd>lua require('spectre').open_visual()<CR>")
 
 map("n", leader .. "db", ":Bclose<CR>", {silent = true})
 

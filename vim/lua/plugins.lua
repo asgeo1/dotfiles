@@ -218,6 +218,8 @@ packer.startup(
      end
    }
 
+   use 'windwp/nvim-spectre'
+
    -- Neat, but has performance issue
    -- use 'jeffkreeftmeijer/vim-numbertoggle'
 
