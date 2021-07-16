@@ -8,7 +8,8 @@ vim.lsp.handlers["textDocument/formatting"] = function(err, _, result, _, bufnr)
         vim.fn.winrestview(view)
         if bufnr == vim.api.nvim_get_current_buf() then
             vim.cmd [[noautocmd :update]]
-            vim.cmd [[GitGutter]]
+            -- TODO: should this refresh gitsigns?
+            -- vim.cmd [[GitGutter]]
         end
     end
 end
