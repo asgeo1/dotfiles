@@ -147,6 +147,7 @@ lspconfig.pyright.setup {on_attach = on_attach}
 -- https://github.com/theia-ide/typescript-language-server
 lspconfig.tsserver.setup {
     on_attach = function(client)
+        -- disable formatting, as this is being handled by prettier
         client.resolved_capabilities.document_formatting = false
         require "nvim-lsp-ts-utils".setup {}
         on_attach(client)
