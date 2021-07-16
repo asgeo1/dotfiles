@@ -118,8 +118,6 @@ packer.startup(
    use "tpope/vim-repeat" -- mappings for repeating keystrokes
    use "tpope/vim-sleuth" -- indentation
 
-   use "airblade/vim-gitgutter"
-
    use "nvim-lua/plenary.nvim"
    use "nvim-lua/popup.nvim"
    use "nvim-telescope/telescope.nvim"
@@ -129,6 +127,15 @@ packer.startup(
    use "machakann/vim-sandwich"
    use "AndrewRadev/splitjoin.vim"
    use "glepnir/galaxyline.nvim"
+
+   use {
+     'lewis6991/gitsigns.nvim',
+     requires = {
+       'nvim-lua/plenary.nvim'
+     },
+     config = function()
+     end
+   }
 
    use {
      'mcchrish/nnn.vim',
@@ -241,6 +248,10 @@ if IsModuleAvailable("telescope.actions") then
       }
     }
   }
+end
+
+if IsModuleAvailable("gitsigns") then
+  require('gitsigns').setup()
 end
 
 -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
