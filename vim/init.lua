@@ -6,4 +6,5 @@ require "galaxyline.evilline"
 require "mappings"
 
 require "git".setup()
+require "lists".setup()
 require "autocmds"
