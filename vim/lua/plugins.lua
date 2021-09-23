@@ -127,7 +127,9 @@ packer.startup(
    use "michaeljsmith/vim-indent-object"
    use "machakann/vim-sandwich"
    use "AndrewRadev/splitjoin.vim"
-   use "glepnir/galaxyline.nvim"
+
+   -- use fork until https://github.com/glepnir/galaxyline.nvim/pull/154 is merged
+   use "eruizc-dev/galaxyline.nvim"
 
    use {
      'lewis6991/gitsigns.nvim',
