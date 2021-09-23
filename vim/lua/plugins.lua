@@ -253,6 +253,8 @@ packer.startup(
    use 'windwp/nvim-spectre'
    use 'kevinhwang91/nvim-bqf'
 
+   use 'mechatroner/rainbow_csv'
+
    -- Neat, but has performance issue
    -- use 'jeffkreeftmeijer/vim-numbertoggle'
 
