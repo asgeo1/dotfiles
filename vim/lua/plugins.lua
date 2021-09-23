@@ -67,7 +67,8 @@ packer.startup(
          language_tree = true
        },
        indent = {
-         enable = true
+         -- Disabled treesitter indentation, as it's super anoying and doesn't seem to work properly
+         enable = false
        },
        refactor = {
          highlight_definitions = {
