@@ -271,7 +271,8 @@ if IsModuleAvailable("telescope.actions") then
       mappings = {
         i = {
           ["<C-j>"] = actions.move_selection_next,
-          ["<C-k>"] = actions.move_selection_previous
+          ["<C-k>"] = actions.move_selection_previous,
+          ["<C-d>"] = actions.delete_buffer
         }
       }
     }
