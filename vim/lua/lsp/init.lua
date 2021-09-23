@@ -264,7 +264,7 @@ lspconfig.solargraph.setup {
     solargraph = {
       -- TODO: formatting not working
       formatting = true,
-      diagnostics = false -- for now, turn off diagnostics, too anoying unless there is a way to bulk-correct issues easily
+      diagnostics = true
     }
   },
   init_options = {
