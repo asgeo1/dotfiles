@@ -247,7 +247,7 @@ packer.startup(
      end
    }
 
-   use {'gennaro-tedesco/nvim-jqx', branch = 'unsort'}
+   use {'gennaro-tedesco/nvim-jqx'}
 
    use {"npxbr/glow.nvim", run = ":GlowInstall"}
    use 'windwp/nvim-spectre'
