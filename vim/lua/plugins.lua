@@ -23,36 +23,19 @@ packer.startup(
 
    use "neovim/nvim-lspconfig"
    use {
-     "hrsh7th/nvim-compe",
-     setup = require("compe").setup {
-       -- enabled = true,
-       -- debug = false,
-       -- autocomplete = false,
-       -- min_length = 1,
-       -- preselect = "disable",
-       -- allow_prefix_unmatch = false,
-       enabled = true,
-       autocomplete = true,
-       debug = false,
-       min_length = 1,
-       preselect = 'enable',
-       throttle_time = 80,
-       source_timeout = 200,
-       incomplete_delay = 400,
-       max_abbr_width = 100,
-       max_kind_width = 100,
-       max_menu_width = 100,
-       documentation = true,
-       source = {
-         path = true,
-         buffer = true,
-         nvim_lsp = true,
-         nvim_lua = true,
-         calc = true,
-         emoji = true,
-         treesitter = true
-       }
-     }
+     "hrsh7th/nvim-cmp",
+     requires = {
+       'hrsh7th/vim-vsnip',
+       'rafamadriz/friendly-snippets',
+       'hrsh7th/cmp-vsnip',
+       'hrsh7th/cmp-nvim-lsp',
+       'hrsh7th/cmp-nvim-lua',
+       'hrsh7th/cmp-buffer',
+       'hrsh7th/cmp-path',
+       'hrsh7th/cmp-calc',
+       'hrsh7th/cmp-emoji',
+       'ray-x/cmp-treesitter'
+     },
    }
    use "jose-elias-alvarez/nvim-lsp-ts-utils"
 
