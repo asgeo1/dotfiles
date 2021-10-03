@@ -73,10 +73,10 @@ cmp.setup {
     end, { "i", "s" }),
   },
   sources = {
-    { name = 'path' },
-    { name = 'buffer' },
-    { name = 'vsnip' },
     { name = 'nvim_lsp' },
+    { name = 'buffer' },
+    { name = 'path' },
+    { name = 'vsnip' },
     { name = 'nvim_lua' },
     { name = 'calc' },
     { name = 'emoji' },
