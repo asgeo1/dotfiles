@@ -198,7 +198,17 @@ packer.startup(
      -- event = 'Scratch' -- No such event?
    }
 
-   use 'axelf4/vim-strip-trailing-whitespace'
+   use {
+     'ntpeters/vim-better-whitespace',
+     config = function()
+       vim.g.strip_whitespace_on_save = 1
+       vim.g.better_whitespace_filetypes_blacklist = {'spectre_panel', 'diff', 'git', 'gitcommit', 'unite', 'qf', 'help', 'markdown', 'fugitive'}
+       vim.g.strip_whitespace_confirm = 0
+       vim.g.show_spaces_that_precede_tabs = 1
+       vim.g.better_whitespace_operator = '_s'
+       vim.g.strip_only_modified_lines = 1
+     end
+   }
 
    use {
      "folke/which-key.nvim",
@@ -233,9 +243,14 @@ packer.startup(
    use {'gennaro-tedesco/nvim-jqx'}
 
    use {"npxbr/glow.nvim", run = ":GlowInstall"}
-   use 'windwp/nvim-spectre'
+   use {
+     'windwp/nvim-spectre',
+     requires = {
+       'nvim-lua/plenary.nvim'
+     },
+   }
    use 'kevinhwang91/nvim-bqf'
-
+ 
    use 'mechatroner/rainbow_csv'
 
    -- Neat, but has performance issue
