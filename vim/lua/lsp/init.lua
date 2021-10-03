@@ -102,6 +102,8 @@ local on_attach = function(client)
     -- require "lsp_signature".on_attach()
 end
 
+local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
 function _G.activeLSP()
     local servers = {}
     for _, lsp in pairs(vim.lsp.get_active_clients()) do
@@ -119,6 +121,7 @@ end
 
 -- https://github.com/golang/tools/tree/master/gopls
 lspconfig.gopls.setup {
+    capabilities = capabilities,
     on_attach = function(client)
         client.resolved_capabilities.document_formatting = false
         on_attach(client)
@@ -142,10 +145,14 @@ lspconfig.gopls.setup {
 --     }
 -- }
 
-lspconfig.pyright.setup {on_attach = on_attach}
+lspconfig.pyright.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/theia-ide/typescript-language-server
 lspconfig.tsserver.setup {
+    capabilities = capabilities,
     on_attach = function(client)
         -- disable formatting, as this is being handled by prettier
         client.resolved_capabilities.document_formatting = false
@@ -185,6 +192,7 @@ local sumneko_root_path = vim.fn.expand("~/Projects/tools/lua-language-server")
 local sumneko_binary = sumneko_root_path.."/bin/"..system_name.."/lua-language-server"
 
 lspconfig.sumneko_lua.setup {
+    capabilities = capabilities,
     on_attach = on_attach,
     --cmd = {"lua-language-server"},
     cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"},
@@ -226,10 +234,14 @@ lspconfig.sumneko_lua.setup {
 }
 
 -- https://github.com/iamcco/vim-language-server
-lspconfig.vimls.setup {on_attach = on_attach}
+lspconfig.vimls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/vscode-langservers/vscode-json-languageserver
 lspconfig.jsonls.setup {
+    capabilities = capabilities,
     on_attach = function(client)
         client.resolved_capabilities.document_formatting = false
         on_attach(client)
@@ -238,27 +250,46 @@ lspconfig.jsonls.setup {
 }
 
 -- https://github.com/redhat-developer/yaml-language-server
-lspconfig.yamlls.setup {on_attach = on_attach}
+lspconfig.yamlls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/joe-re/sql-language-server
-lspconfig.sqlls.setup {on_attach = on_attach}
+lspconfig.sqlls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
-lspconfig.cssls.setup {on_attach = on_attach}
+lspconfig.cssls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
-lspconfig.html.setup {on_attach = on_attach}
+lspconfig.html.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/bash-lsp/bash-language-server
-lspconfig.bashls.setup {on_attach = on_attach}
+lspconfig.bashls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/rcjsuen/dockerfile-language-server-nodejs
-lspconfig.dockerls.setup {on_attach = on_attach}
+lspconfig.dockerls.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- NOTE: paid alternative is https://intelephense.com/
 --
 -- https://solargraph.org/
 lspconfig.solargraph.setup {
+  capabilities = capabilities,
   on_attach = on_attach,
   settings = {
     solargraph = {
@@ -274,10 +305,14 @@ lspconfig.solargraph.setup {
 }
 
 -- https://github.com/phpactor/phpactor
-lspconfig.phpactor.setup {on_attach = on_attach}
+lspconfig.phpactor.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 -- https://github.com/hashicorp/terraform-ls
 lspconfig.terraformls.setup {
+    capabilities = capabilities,
     on_attach = on_attach,
     cmd = {"terraform-ls", "serve"},
     filetypes = {"tf"}
@@ -287,6 +322,7 @@ local prettier = require "efm/prettier"
 local eslint = require "efm/eslint"
 -- https://github.com/mattn/efm-langserver
 lspconfig.efm.setup {
+    capabilities = capabilities,
     on_attach = on_attach,
     init_options = {documentFormatting = true},
     root_dir = vim.loop.cwd,
@@ -308,6 +344,9 @@ lspconfig.efm.setup {
     }
 }
 
-lspconfig.clangd.setup {on_attach = on_attach}
+lspconfig.clangd.setup {
+  capabilities = capabilities,
+  on_attach = on_attach
+}
 
 return M
