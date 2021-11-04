@@ -67,11 +67,11 @@ local on_attach = function(client)
     if client.resolved_capabilities.document_formatting then
         vim.cmd [[augroup Format]]
         vim.cmd [[autocmd! * <buffer>]]
-        vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format()]]
+        vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format_async()]]
         vim.cmd [[augroup END]]
 
-        -- not working
-        -- utils.map("n", "<leader>af", "<cmd>lua vim.lsp.buf.formatting()<CR>", {buffer = true})
+        -- Only syncronous formatting seems to work for unsaved buffers, not sure why...
+        utils.map("n", "<leader>af", "<cmd>lua require'lsp.formatting'.format_sync()<CR>", {buffer = true})
     end
     if client.resolved_capabilities.goto_definition then
         utils.map("n", "<C-]>", "<cmd>lua vim.lsp.buf.definition()<CR>", {buffer = true})
@@ -92,6 +92,8 @@ local on_attach = function(client)
     end
 
     utils.map("n", "<Space><CR>", "<cmd>lua require'lsp.diagnostics'.line_diagnostics()<CR>", {buffer = true})
+    utils.map("n", "<Space>sh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", {buffer = true})
+    utils.map("n", "<Space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", {buffer = true})
 
     -- Next/Prev diagnostic issue
     utils.map("n", "<Space>n", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {buffer = true})
@@ -242,10 +244,7 @@ lspconfig.vimls.setup {
 -- https://github.com/vscode-langservers/vscode-json-languageserver
 lspconfig.jsonls.setup {
     capabilities = capabilities,
-    on_attach = function(client)
-        client.resolved_capabilities.document_formatting = false
-        on_attach(client)
-    end,
+    on_attach = on_attach,
     cmd = {"vscode-json-language-server", "--stdio"}
 }
 
@@ -293,7 +292,6 @@ lspconfig.solargraph.setup {
   on_attach = on_attach,
   settings = {
     solargraph = {
-      -- TODO: formatting not working
       formatting = true,
       diagnostics = true
     }
@@ -320,13 +318,19 @@ lspconfig.terraformls.setup {
 
 local prettier = require "efm/prettier"
 local eslint = require "efm/eslint"
+local jq = require "efm/jq"
 -- https://github.com/mattn/efm-langserver
 lspconfig.efm.setup {
+    -- custom cmd, for debugging:
+    cmd = {'efm-langserver', '-logfile', '/tmp/efm.log', '-loglevel', '10'},
+
     capabilities = capabilities,
     on_attach = on_attach,
     init_options = {documentFormatting = true},
     root_dir = vim.loop.cwd,
-    filetypes = {'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'yaml', 'json', 'html', 'scss', 'css', 'markdown'},
+    filetypes = {'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'yaml',
+    'json',
+    'html', 'scss', 'css', 'markdown'},
     settings = {
         rootMarkers = {".git/"},
         languages = {
@@ -335,7 +339,10 @@ lspconfig.efm.setup {
             typescriptreact = {prettier, eslint},
             javascriptreact = {prettier, eslint},
             yaml = {prettier},
-            json = {prettier},
+            -- formatting with prettier from stdin not working for json. Use jq in meantime as this supports this.
+            -- doesn't make sense, as html is working :-/
+            json = {jq},
+            -- json = {prettier},
             html = {prettier},
             scss = {prettier},
             css = {prettier},
