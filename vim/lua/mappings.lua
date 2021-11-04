@@ -122,12 +122,13 @@ map("n", leader .. "s", ":%s//<left>")
 
 -- =============================================================================
 -- indentation
-map("n", "<Tab>", ">>")
-map("n", "<S-Tab>", "<<")
+-- NOTE: don't use <Tab> for indentation anymore, as this breaks "jump forward", i.e. <CTRL+i>, because in a terminal <CTRL+i> is the same as <Tab>
+-- map("n", "<Tab>", ">>")
+-- map("n", "<S-Tab>", "<<")
+-- map("v", "<S-Tab>", "<gv")
+-- map("v", "<Tab>", ">gv")
 map("v", "<", "<gv")
 map("v", ">", ">gv")
-map("v", "<S-Tab>", "<gv")
-map("v", "<Tab>", ">gv")
 
 -- adding blank lines
 map("n", "BL", "cc<ESC>")
