@@ -242,7 +242,7 @@ packer.startup(
 
    use {'gennaro-tedesco/nvim-jqx'}
 
-   use {"npxbr/glow.nvim", run = ":GlowInstall"}
+   use {"ellisonleao/glow.nvim", run = ":GlowInstall"}
    use {
      'windwp/nvim-spectre',
      requires = {
@@ -250,7 +250,7 @@ packer.startup(
      },
    }
    use 'kevinhwang91/nvim-bqf'
- 
+
    use 'mechatroner/rainbow_csv'
 
    -- Neat, but has performance issue
