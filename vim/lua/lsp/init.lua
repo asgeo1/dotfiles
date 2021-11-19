@@ -254,11 +254,20 @@ lspconfig.yamlls.setup {
   on_attach = on_attach
 }
 
--- https://github.com/joe-re/sql-language-server
-lspconfig.sqlls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach
-}
+-- NOT WORKING due to error
+--
+-- ERROR: sqlls: config.cmd error, ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: cmd: expected list, got nil
+-- stack traceback:
+-- ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: in function <...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:177>
+-- [C]: in function 'pcall'
+-- ...ack/packer/start/nvim-lspconfig/lua/lspconfig/health.lua:11: in function 'check'
+-- [string ":lua"]:1: in main chunk
+--
+-- -- https://github.com/joe-re/sql-language-server
+-- lspconfig.sqlls.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach
+-- }
 
 -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
 lspconfig.cssls.setup {
@@ -302,11 +311,13 @@ lspconfig.solargraph.setup {
   }
 }
 
+-- DISABLED for now, as can't install/compile PHP on arm64 for some reason
+--
 -- https://github.com/phpactor/phpactor
-lspconfig.phpactor.setup {
-  capabilities = capabilities,
-  on_attach = on_attach
-}
+-- lspconfig.phpactor.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach
+-- }
 
 -- https://github.com/hashicorp/terraform-ls
 lspconfig.terraformls.setup {
