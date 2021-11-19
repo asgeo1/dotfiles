@@ -64,15 +64,17 @@ vim.fn.sign_define("LspDiagnosticsSignInformation", {text = "", numhl = "LspDiag
 vim.fn.sign_define("LspDiagnosticsSignHint", {text = "", numhl = "LspDiagnosticsDefaultHint"})
 
 local on_attach = function(client)
-    if client.resolved_capabilities.document_formatting then
-        vim.cmd [[augroup Format]]
-        vim.cmd [[autocmd! * <buffer>]]
-        vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format_async()]]
-        vim.cmd [[augroup END]]
+    -- if client.resolved_capabilities.document_formatting then
+        -- formatting throwing errors, disable for now
+        --
+        -- vim.cmd [[augroup Format]]
+        -- vim.cmd [[autocmd! * <buffer>]]
+        -- vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format_async()]]
+        -- vim.cmd [[augroup END]]
 
-        -- Only syncronous formatting seems to work for unsaved buffers, not sure why...
-        utils.map("n", "<leader>af", "<cmd>lua require'lsp.formatting'.format_sync()<CR>", {buffer = true})
-    end
+        -- -- Only syncronous formatting seems to work for unsaved buffers, not sure why...
+        -- utils.map("n", "<leader>af", "<cmd>lua require'lsp.formatting'.format_sync()<CR>", {buffer = true})
+    -- end
     if client.resolved_capabilities.goto_definition then
         utils.map("n", "<C-]>", "<cmd>lua vim.lsp.buf.definition()<CR>", {buffer = true})
     end
