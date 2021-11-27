@@ -1,15 +1,16 @@
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin
+export PATH=/opt/homebrew/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/X11/bin
 export PATH="$HOME/Projects/dotfiles/bin:$PATH"
-export PATH="$HOME/Development/Android/sdk/tools:$PATH"
-export PATH="$HOME/Development/Android/sdk/platform-tools:$PATH"
-export PATH="$HOME/Development/Android/ndk:$PATH"
 export PATH="$HOME/.node/bin:$PATH"
 export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.rbenv/bin:$PATH"
+export PATH="$HOME/.phpenv/bin:$PATH"
+export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="./node_modules/.bin:$PATH"
-export ANDROID_HOME="$HOME/Development/Android/sdk"
-export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home"
-export QCAR="$HOME/Development/Android/vuforia-sdk-android-2-8-8/build/java/vuforia/Vuforia.jar"
-export QCAR_SDK_ROOT="$HOME/Development/Android/vuforia-sdk-android-2-8-8"
+export PATH="$HOME/Library/Android/sdk/tools:$PATH"
+export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
+export PATH="$HOME/Library/Android/sdk/cmdline-tools/latest/bin:$PATH"
+export ANDROID_HOME="$HOME/Library/Android/sdk" # deprecated
+export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk" # new
 
 export EDITOR=vim
 export OPENSSL_ROOT_DIR="/usr/local/Cellar/openssl/1.0.2l"
@@ -22,3 +23,6 @@ export DISABLE_AUTO_TITLE=true
 
 # adding this, as `UseKeychain` in .ssh/config not working for some reason
 # ssh-add -K 2>/dev/null;
+export GOENV_ROOT="$HOME/.goenv"
+export PATH="$GOENV_ROOT/bin:$PATH"
+eval "$(goenv init -)"
