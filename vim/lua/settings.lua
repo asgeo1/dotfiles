@@ -8,14 +8,14 @@ vim.g.yats_host_keyword = 0
 vim.cmd [[filetype plugin indent on]]
 
 local opt =
-    setmetatable(
-    {},
-    {
-        __newindex = function(_, key, value)
-            vim.o[key] = value
-            vim.bo[key] = value
-        end
-    }
+  setmetatable(
+  {},
+  {
+    __newindex = function(_, key, value)
+      vim.o[key] = value
+      vim.bo[key] = value
+    end
+  }
 )
 
 -- Not using a dictionary
@@ -92,39 +92,39 @@ vim.wo.cursorline = false -- Turning this on, makes 'x' and 'u' slow
 vim.wo.winhighlight = "NormalNC:WinNormalNC"
 vim.wo.list = true
 vim.wo.listchars =
-    table.concat(
-    {
-        "tab:│⋅",
-        "trail:•",
-        "extends:❯",
-        "precedes:❮",
-        "nbsp:_"
-    },
-    ","
+  table.concat(
+  {
+    "tab:│⋅",
+    "trail:•",
+    "extends:❯",
+    "precedes:❮",
+    "nbsp:_"
+  },
+  ","
 )
 
 vim.g.floating_window_border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}
 vim.g.floating_window_border_dark = {
-    {"╭", "FloatBorderDark"},
-    {"─", "FloatBorderDark"},
-    {"╮", "FloatBorderDark"},
-    {"│", "FloatBorderDark"},
-    {"╯", "FloatBorderDark"},
-    {"─", "FloatBorderDark"},
-    {"╰", "FloatBorderDark"},
-    {"│", "FloatBorderDark"}
+  {"╭", "FloatBorderDark"},
+  {"─", "FloatBorderDark"},
+  {"╮", "FloatBorderDark"},
+  {"│", "FloatBorderDark"},
+  {"╯", "FloatBorderDark"},
+  {"─", "FloatBorderDark"},
+  {"╰", "FloatBorderDark"},
+  {"│", "FloatBorderDark"}
 }
 vim.g.markdown_fenced_languages = {
-    "vim",
-    "python",
-    "lua",
-    "bash=sh",
-    "javascript",
-    "typescript",
-    "yaml",
-    "json",
-    "gql=graphql",
-    "graphql"
+  "vim",
+  "python",
+  "lua",
+  "bash=sh",
+  "javascript",
+  "typescript",
+  "yaml",
+  "json",
+  "gql=graphql",
+  "graphql"
 }
 vim.g.no_man_maps = true
 vim.g.vim_json_syntax_conceal = false

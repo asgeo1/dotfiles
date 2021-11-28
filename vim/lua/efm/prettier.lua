@@ -1,18 +1,18 @@
 -- TODO: make prettier work with unsaved buffers / stdin
 return {
-    formatCommand = ([[
-        prettier
-        ${--config-precedence:configPrecedence}
-        ${--parser:parser}
-        ${--tab-width:tabWidth}
-        ${--single-quote:singleQuote}
-        ${--trailing-comma:trailingComma}
-        --stdin-filepath ${INPUT}
-    ]]):gsub(
-        "\n",
-        ""
-    ),
-    formatStdin = true
+  formatCommand = ([[
+    prettier
+    ${--config-precedence:configPrecedence}
+    ${--parser:parser}
+    ${--tab-width:tabWidth}
+    ${--single-quote:singleQuote}
+    ${--trailing-comma:trailingComma}
+    --stdin-filepath ${INPUT}
+  ]]):gsub(
+    "\n",
+    ""
+  ),
+  formatStdin = true
 }
 
 -- return {
