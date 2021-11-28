@@ -9,3 +9,4 @@ vim/bundle
 vim/plugged
 tags.lock
 tags.temp
+packer_compiled.lua
