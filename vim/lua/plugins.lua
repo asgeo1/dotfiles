@@ -25,6 +25,9 @@ packer.startup(
   function()
     use "wbthomason/packer.nvim"
 
+    use "nvim-lua/plenary.nvim"
+    use "nvim-lua/popup.nvim"
+
     use "neovim/nvim-lspconfig"
     use {
       "hrsh7th/nvim-cmp",
@@ -41,7 +44,14 @@ packer.startup(
         'ray-x/cmp-treesitter'
       },
     }
-    use "jose-elias-alvarez/nvim-lsp-ts-utils"
+
+    use {
+      "jose-elias-alvarez/nvim-lsp-ts-utils",
+      requires = {
+        "nvim-lua/plenary.nvim",
+        "neovim/nvim-lspconfig"
+      }
+    }
 
     use {
       "nvim-treesitter/nvim-treesitter",
@@ -86,23 +96,6 @@ packer.startup(
     use "JoosepAlviste/nvim-ts-context-commentstring"
 
     use {
-      "navarasu/onedark.nvim",
-      config = function()
-        require("onedark").setup {}
-        vim.cmd [[colorscheme onedark]]
-      end
-    }
-
-    -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
-    -- use {
-    --   'asgeo1/dracula-pro-vim',
-    --   as = 'dracula',
-    --   config = function()
-    --     vim.cmd [[colorscheme dracula_pro]]
-    --   end
-    -- }
-
-    use {
       "kyazdani42/nvim-web-devicons",
       config = function()
         require("nvim-web-devicons").setup {
@@ -115,10 +108,13 @@ packer.startup(
     use "tpope/vim-repeat" -- mappings for repeating keystrokes
     use "tpope/vim-sleuth" -- indentation
 
-    use "nvim-lua/plenary.nvim"
-    use "nvim-lua/popup.nvim"
     use {
       "nvim-telescope/telescope.nvim",
+      requires = {
+        "nvim-lua/plenary.nvim",
+        "kyazdani42/nvim-web-devicons",
+        "nvim-treesitter/nvim-treesitter"
+      },
       config = function()
         local actions = require('telescope.actions')
         require("telescope").setup {
@@ -290,6 +286,7 @@ packer.startup(
       -- run this manually for now, after install
       -- run = ":GlowInstall"
     }
+
     use {
       'windwp/nvim-spectre',
       requires = {
@@ -317,6 +314,7 @@ packer.startup(
         }
       end
     }
+
     use 'kevinhwang91/nvim-bqf'
 
     use 'mechatroner/rainbow_csv'
@@ -326,5 +324,22 @@ packer.startup(
 
     -- performance issues, disabled:
     -- use 'ray-x/lsp_signature.nvim'
+
+    use {
+      "navarasu/onedark.nvim",
+      config = function()
+        require("onedark").setup {}
+        vim.cmd [[colorscheme onedark]]
+      end
+    }
+
+    -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
+    -- use {
+    --   'asgeo1/dracula-pro-vim',
+    --   as = 'dracula',
+    --   config = function()
+    --     vim.cmd [[colorscheme dracula_pro]]
+    --   end
+    -- }
   end
 )
