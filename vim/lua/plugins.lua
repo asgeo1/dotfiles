@@ -17,10 +17,6 @@ vim.cmd [[packadd cfilter]]
 
 local packer = require'packer'
 
-packer.init({
-  compile_on_sync = false -- Don't generate .vim/plugin/packer_compiled.vim, as this is very slow for 'x' and 'u' commands, and seems to break treesitter highlighting
-})
-
 packer.startup(
   function()
     use "wbthomason/packer.nvim"
