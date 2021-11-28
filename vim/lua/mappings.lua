@@ -19,15 +19,6 @@ map("n", leader .. "db", ":Bclose<CR>", {silent = true})
 
 
 -- =============================================================================
--- formatting
-
--- map("n", "<leader>af", "<cmd>lua vim.lsp.buf.formatting()<CR>")
-
--- work around, so it can format unsaved buffers. Doesn't seem to work exactly the same as the format-on-save option
-map("n", "<leader>af", "<cmd>lua vim.lsp.buf.range_formatting({},{0,0},{vim.fn.line(\"$\")+1,0})<CR>")
--- map("n", "<leader>af", "<cmd>lua require'lsp.formatting'.format()<CR>")
-
--- =============================================================================
 -- autocomplete
 
 local has_words_before = function()
