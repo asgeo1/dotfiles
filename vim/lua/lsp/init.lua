@@ -113,6 +113,9 @@ local on_attach = function(client)
   utils.map("n", "<Space>n", "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {buffer = true})
   utils.map("n", "<Space>p", "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", {buffer = true})
 
+  -- Send errors to the location list
+  utils.map("n", "<Space>ll", "<cmd>lua vim.lsp.diagnostic.set_loclist({ open_loclist = false })<CR>", {buffer = true})
+
   -- disabled for now, because of performance issues with `O`, `x`, `u` etc
   -- require "lsp_signature".on_attach()
 end
