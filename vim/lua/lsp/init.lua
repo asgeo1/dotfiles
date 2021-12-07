@@ -360,6 +360,10 @@ lspconfig.terraformls.setup {
   filetypes = {"tf"}
 }
 
+
+
+-- TODO: move from efm to null-ls. Null-ls is in lua, whereas efm is in go
+
 local prettier = require "efm/prettier"
 local eslint = require "efm/eslint"
 local jq = require "efm/jq"
