@@ -262,13 +262,21 @@ lspconfig.vimls.setup {
 lspconfig.jsonls.setup {
   capabilities = capabilities,
   on_attach = on_attach,
-  cmd = {"vscode-json-language-server", "--stdio"}
+  cmd = {"vscode-json-language-server", "--stdio"},
+  init_options = {
+    -- Formatting is done by efm & prettier
+    provideFormatter = false
+  }
 }
 
 -- https://github.com/redhat-developer/yaml-language-server
 lspconfig.yamlls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
+  init_options = {
+    -- Formatting is done by efm & prettier
+    provideFormatter = false
+  }
 }
 
 -- NOT WORKING due to error
@@ -289,13 +297,21 @@ lspconfig.yamlls.setup {
 -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
 lspconfig.cssls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
+  init_options = {
+    -- Formatting is done by efm & prettier
+    provideFormatter = false
+  }
 }
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
 lspconfig.html.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
+  init_options = {
+    -- Formatting is done by efm & prettier
+    provideFormatter = false
+  }
 }
 
 -- https://github.com/bash-lsp/bash-language-server
