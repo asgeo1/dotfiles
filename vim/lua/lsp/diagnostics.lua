@@ -12,6 +12,14 @@ local function source_string(source)
   return string.format("  [%s]", source)
 end
 
+-- This is a custom function to help present the diagnostic errors in a nice
+-- popup.
+--
+-- This can be handy, because the default 'virtual_text' can have wrapping and
+-- is then hard to read.
+--
+-- Currently this is mapped to <leader><CR>
+
 M.line_diagnostics = function()
   local width = 70
   local bufnr, lnum = unpack(vim.fn.getcurpos())
