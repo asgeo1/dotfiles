@@ -49,6 +49,14 @@ packer.startup(
       }
     }
 
+    -- general purpose language server, useful for hooking up prettier/eslint
+    use { "jose-elias-alvarez/null-ls.nvim",
+      requires = {
+        "nvim-lua/plenary.nvim",
+        "neovim/nvim-lspconfig"
+      }
+    }
+
     use {
       "nvim-treesitter/nvim-treesitter",
       config = function()

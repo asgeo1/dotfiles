@@ -361,40 +361,53 @@ lspconfig.terraformls.setup {
 }
 
 
+local null_ls = require("null-ls")
+
+-- register any number of sources simultaneously
+local sources = {
+  null_ls.builtins.formatting.prettierd,
+  null_ls.builtins.formatting.stylua,
+  null_ls.builtins.formatting.sqlformat,
+  -- null_ls.builtins.code_actions.eslint_d,
+  -- null_ls.builtins.diagnostics.eslint_d
+}
+
+null_ls.config({ sources = sources })
+
+-- general purpose language server, useful for hooking up prettier/eslint
+lspconfig["null-ls"].setup {
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+
+
+-- May work better with mono-repos
+--
+-- https://github.com/hrsh7th/vscode-langservers-extracted
+-- lspconfig.eslint.setup {
+--   capabilities = capabilities,
+--   on_attach = on_attach,
+-- }
+
 
 -- TODO: move from efm to null-ls. Null-ls is in lua, whereas efm is in go
-
-local prettier = require "efm/prettier"
-local eslint = require "efm/eslint"
-local jq = require "efm/jq"
--- https://github.com/mattn/efm-langserver
+ local eslint = require "efm/eslint"
 lspconfig.efm.setup {
   -- custom cmd, for debugging:
   cmd = {'efm-langserver', '-logfile', '/tmp/efm.log', '-loglevel', '10'},
 
   capabilities = capabilities,
   on_attach = on_attach,
-  init_options = {documentFormatting = true},
+  init_options = {documentFormatting = false},
   root_dir = vim.loop.cwd,
-  filetypes = {'typescript', 'javascript', 'typescriptreact', 'javascriptreact', 'yaml',
-  'json',
-  'html', 'scss', 'css', 'markdown'},
+  filetypes = {'typescript', 'javascript', 'typescriptreact', 'javascriptreact'},
   settings = {
     rootMarkers = {".git/"},
     languages = {
-      typescript = {prettier, eslint},
-      javascript = {prettier, eslint},
-      typescriptreact = {prettier, eslint},
-      javascriptreact = {prettier, eslint},
-      yaml = {prettier},
-      -- formatting with prettier from stdin not working for json. Use jq in meantime as this supports this.
-      -- doesn't make sense, as html is working :-/
-      json = {jq},
-      -- json = {prettier},
-      html = {prettier},
-      scss = {prettier},
-      css = {prettier},
-      markdown = {prettier}
+      typescript = {eslint},
+      javascript = {eslint},
+      typescriptreact = {eslint},
+      javascriptreact = {eslint}
     }
   }
 }
