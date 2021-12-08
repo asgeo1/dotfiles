@@ -52,6 +52,7 @@ set -x PATH "$HOME/.phpenv/bin" $PATH
 set -x PATH "$HOME/.nodenv/bin" $PATH
 set -x PATH "$HOME/.pyenv/bin" $PATH
 set -x PATH "$HOME/.goenv/bin" $PATH
+set -x PATH "$HOME/.cargo/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new

@@ -26,3 +26,4 @@ export DISABLE_AUTO_TITLE=true
 export GOENV_ROOT="$HOME/.goenv"
 export PATH="$GOENV_ROOT/bin:$PATH"
 eval "$(goenv init -)"
+. "$HOME/.cargo/env"
