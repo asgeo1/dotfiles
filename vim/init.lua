@@ -21,7 +21,6 @@ require "autocmds"
 -- npm i -g bash-language-server
 -- npm install -g dockerfile-language-server-nodejs
 -- gem install solargraph
--- brew install efm-langserver
 -- yarn global add yaml-language-server
 -- brew install hashicorp/tap/terraform-ls
 -- sudo npm install -g pyright
