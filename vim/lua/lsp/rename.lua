@@ -2,6 +2,8 @@ local M = {}
 local utils = require 'utils'
 local rename_prompt = 'Rename -> '
 
+-- Custom function to improve the look of the default rename floating window
+
 M.rename = function()
   local current_name = vim.fn.expand '<cword>'
   local bufnr = vim.api.nvim_create_buf(false, true)
