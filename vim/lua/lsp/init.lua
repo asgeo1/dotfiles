@@ -1,78 +1,74 @@
-require "lsp.handlers"
-require "lsp.formatting"
-local lspconfig = require "lspconfig"
-local utils = require "utils"
+require 'lsp.handlers'
+require 'lsp.formatting'
+local lspconfig = require 'lspconfig'
+local utils = require 'utils'
 local M = {}
 
 vim.lsp.protocol.CompletionItemKind = {
-  " [text]",
-  " [method]",
-  " [function]",
-  " [constructor]",
-  "ﰠ [field]",
-  " [variable]",
-  " [class]",
-  " [interface]",
-  " [module]",
-  " [property]",
-  " [unit]",
-  " [value]",
-  " [enum]",
-  " [key]",
-  "﬌ [snippet]",
-  " [color]",
-  " [file]",
-  " [reference]",
-  " [folder]",
-  " [enum member]",
-  " [constant]",
-  " [struct]",
-  "⌘ [event]",
-  " [operator]",
-  " [type]"
+  ' [text]',
+  ' [method]',
+  ' [function]',
+  ' [constructor]',
+  'ﰠ [field]',
+  ' [variable]',
+  ' [class]',
+  ' [interface]',
+  ' [module]',
+  ' [property]',
+  ' [unit]',
+  ' [value]',
+  ' [enum]',
+  ' [key]',
+  '﬌ [snippet]',
+  ' [color]',
+  ' [file]',
+  ' [reference]',
+  ' [folder]',
+  ' [enum member]',
+  ' [constant]',
+  ' [struct]',
+  '⌘ [event]',
+  ' [operator]',
+  ' [type]',
 }
 
 M.symbol_kind_icons = {
-  Function = "",
-  Method = "",
-  Variable = "",
-  Constant = "",
-  Interface = "",
-  Field = "ﰠ",
-  Property = "",
-  Struct = "",
-  Enum = "",
-  Class = ""
+  Function = '',
+  Method = '',
+  Variable = '',
+  Constant = '',
+  Interface = '',
+  Field = 'ﰠ',
+  Property = '',
+  Struct = '',
+  Enum = '',
+  Class = '',
 }
 
 M.symbol_kind_colors = {
-  Function = "green",
-  Method = "green",
-  Variable = "blue",
-  Constant = "red",
-  Interface = "cyan",
-  Field = "blue",
-  Property = "blue",
-  Struct = "cyan",
-  Enum = "yellow",
-  Class = "red"
+  Function = 'green',
+  Method = 'green',
+  Variable = 'blue',
+  Constant = 'red',
+  Interface = 'cyan',
+  Field = 'blue',
+  Property = 'blue',
+  Struct = 'cyan',
+  Enum = 'yellow',
+  Class = 'red',
 }
 
-
-
 local signs = {
-  Error = " ",
-  Warning = " ",
-  Hint = " ",
-  Information = " "
+  Error = ' ',
+  Warning = ' ',
+  Hint = ' ',
+  Information = ' ',
 }
 
 for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, {text = icon, texthl = hl, numhl = hl})
+  local hl = 'DiagnosticSign' .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
 end
-
-
 
 local on_attach = function(client)
   if client.resolved_capabilities.document_formatting then
@@ -81,51 +77,98 @@ local on_attach = function(client)
     vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format_async()]]
     vim.cmd [[augroup END]]
 
-    utils.map("n", "<leader>af", "<cmd>lua require'lsp.formatting'.format_async()<CR>", {buffer = true})
+    utils.map(
+      'n',
+      '<leader>af',
+      "<cmd>lua require'lsp.formatting'.format_async()<CR>",
+      { buffer = true }
+    )
   end
 
   if client.resolved_capabilities.goto_definition then
-    utils.map("n", "<C-]>", "<cmd>lua vim.lsp.buf.definition()<CR>", {buffer = true})
+    utils.map(
+      'n',
+      '<C-]>',
+      '<cmd>lua vim.lsp.buf.definition()<CR>',
+      { buffer = true }
+    )
   end
 
   if client.resolved_capabilities.hover then
-    utils.map("n", "K", "<cmd>lua vim.lsp.buf.hover()<CR>", {buffer = true})
+    utils.map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { buffer = true })
   end
 
   if client.resolved_capabilities.find_references then
     utils.map(
-      "n",
-      "<Space>*",
+      'n',
+      '<Space>*',
       ":lua require('lists').change_active('Quickfix')<CR>:lua vim.lsp.buf.references()<CR>",
-      {buffer = true}
+      { buffer = true }
     )
   end
 
   if client.resolved_capabilities.rename then
-    utils.map("n", "<Space>rn", "<cmd>lua require'lsp.rename'.rename()<CR>", {silent = true, buffer = true})
+    utils.map(
+      'n',
+      '<Space>rn',
+      "<cmd>lua require'lsp.rename'.rename()<CR>",
+      { silent = true, buffer = true }
+    )
   end
 
-  utils.map("n", "<Space><CR>", "<cmd>lua require'lsp.diagnostics'.line_diagnostics()<CR>", {buffer = true})
-  utils.map("n", "<Space>sh", "<cmd>lua vim.lsp.buf.signature_help()<CR>", {buffer = true})
-  utils.map("n", "<Space>ca", "<cmd>lua vim.lsp.buf.code_action()<CR>", {buffer = true})
+  utils.map(
+    'n',
+    '<Space><CR>',
+    "<cmd>lua require'lsp.diagnostics'.line_diagnostics()<CR>",
+    { buffer = true }
+  )
+  utils.map(
+    'n',
+    '<Space>sh',
+    '<cmd>lua vim.lsp.buf.signature_help()<CR>',
+    { buffer = true }
+  )
+  utils.map(
+    'n',
+    '<Space>ca',
+    '<cmd>lua vim.lsp.buf.code_action()<CR>',
+    { buffer = true }
+  )
 
   -- Next/Prev diagnostic issue
-  utils.map("n", "<Space>n", "<cmd>lua vim.diagnostic.goto_next()<CR>", {buffer = true})
-  utils.map("n", "<Space>p", "<cmd>lua vim.diagnostic.goto_prev()<CR>", {buffer = true})
+  utils.map(
+    'n',
+    '<Space>n',
+    '<cmd>lua vim.diagnostic.goto_next()<CR>',
+    { buffer = true }
+  )
+  utils.map(
+    'n',
+    '<Space>p',
+    '<cmd>lua vim.diagnostic.goto_prev()<CR>',
+    { buffer = true }
+  )
 
   -- Send errors to the location list
-  utils.map("n", "<Space>ll", "<cmd>lua vim.lsp.diagnostic.set_loclist({ open_loclist = false })<CR>", {buffer = true})
+  utils.map(
+    'n',
+    '<Space>ll',
+    '<cmd>lua vim.lsp.diagnostic.set_loclist({ open_loclist = false })<CR>',
+    { buffer = true }
+  )
 
   -- disabled for now, because of performance issues with `O`, `x`, `u` etc
   -- require "lsp_signature".on_attach()
 end
 
-local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require('cmp_nvim_lsp').update_capabilities(
+  vim.lsp.protocol.make_client_capabilities()
+)
 
 function _G.activeLSP()
   local servers = {}
   for _, lsp in pairs(vim.lsp.get_active_clients()) do
-      table.insert(servers, {name = lsp.name, id = lsp.id})
+    table.insert(servers, { name = lsp.name, id = lsp.id })
   end
   _G.P(servers)
 end
@@ -133,7 +176,7 @@ end
 function _G.bufferActiveLSP()
   local servers = {}
   for _, lsp in pairs(vim.lsp.buf_get_clients()) do
-    table.insert(servers, {name = lsp.name, id = lsp.id})
+    table.insert(servers, { name = lsp.name, id = lsp.id })
   end
   _G.P(servers)
 end
@@ -144,7 +187,7 @@ lspconfig.gopls.setup {
   on_attach = function(client)
     client.resolved_capabilities.document_formatting = false
     on_attach(client)
-  end
+  end,
 }
 
 -- https://github.com/palantir/python-language-server
@@ -166,7 +209,7 @@ lspconfig.gopls.setup {
 
 lspconfig.pyright.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
 }
 
 -- https://github.com/theia-ide/typescript-language-server
@@ -174,97 +217,100 @@ lspconfig.tsserver.setup {
   capabilities = capabilities,
   on_attach = function(client)
     client.resolved_capabilities.document_formatting = false
-    require "nvim-lsp-ts-utils".setup {}
+    require('nvim-lsp-ts-utils').setup {}
     on_attach(client)
-  end
+  end,
 }
 
 local function get_lua_runtime()
   local result = {}
   for _, path in pairs(vim.api.nvim_list_runtime_paths()) do
-    local lua_path = path .. "/lua/"
+    local lua_path = path .. '/lua/'
     if vim.fn.isdirectory(lua_path) then
       result[lua_path] = true
     end
   end
 
-  result[vim.fn.expand("$VIMRUNTIME/lua")] = true
+  result[vim.fn.expand '$VIMRUNTIME/lua'] = true
   -- result[vim.fn.expand("~/dev/neovim/src/nvim/lua")] = true
 
   return result
 end
 
 local system_name
-if vim.fn.has("mac") == 1 then
-  system_name = "macOS"
-elseif vim.fn.has("unix") == 1 then
-  system_name = "Linux"
-elseif vim.fn.has('win32') == 1 then
-  system_name = "Windows"
+if vim.fn.has 'mac' == 1 then
+  system_name = 'macOS'
+elseif vim.fn.has 'unix' == 1 then
+  system_name = 'Linux'
+elseif vim.fn.has 'win32' == 1 then
+  system_name = 'Windows'
 else
-  print("Unsupported system for sumneko")
+  print 'Unsupported system for sumneko'
 end
 
 -- local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/sumneko_lua/lua-language-server'
-local sumneko_root_path = vim.fn.expand("~/Projects/tools/lua-language-server")
-local sumneko_binary = sumneko_root_path.."/bin/"..system_name.."/lua-language-server"
+local sumneko_root_path = vim.fn.expand '~/Projects/tools/lua-language-server'
+local sumneko_binary = sumneko_root_path
+  .. '/bin/'
+  .. system_name
+  .. '/lua-language-server'
 
 lspconfig.sumneko_lua.setup {
   capabilities = capabilities,
   on_attach = on_attach,
   --cmd = {"lua-language-server"},
-  cmd = {sumneko_binary, "-E", sumneko_root_path .. "/main.lua"},
+  cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
   settings = {
     Lua = {
       runtime = {
-        version = "LuaJIT"
+        version = 'LuaJIT',
       },
       completion = {
-        keywordSnippet = "Disable"
+        keywordSnippet = 'Disable',
       },
       diagnostics = {
         enable = true,
         globals = {
           -- Neovim
-          "vim",
+          'vim',
           -- Busted
-          "describe",
-          "it",
-          "before_each",
-          "after_each",
-          "teardown",
-          "pending",
+          'describe',
+          'it',
+          'before_each',
+          'after_each',
+          'teardown',
+          'pending',
           -- packer
-          "use"
+          'use',
         },
         workspace = {
           library = get_lua_runtime(),
           maxPreload = 1000,
-          preloadFileSize = 1000
+          preloadFileSize = 1000,
         },
         -- Do not send telemetry data containing a randomized but unique identifier
         telemetry = {
           enable = false,
-        }
-      }
-    }
-  }
+        },
+      },
+    },
+  },
 }
 
 -- https://github.com/iamcco/vim-language-server
 lspconfig.vimls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
 }
 
 -- https://github.com/vscode-langservers/vscode-json-languageserver
 lspconfig.jsonls.setup {
   capabilities = capabilities,
   on_attach = on_attach,
-  cmd = {"vscode-json-language-server", "--stdio"},
+  cmd = { 'vscode-json-language-server', '--stdio' },
   init_options = {
-    provideFormatter = false
-  }
+    provideFormatter = false,
+  },
 }
 
 -- https://github.com/redhat-developer/yaml-language-server
@@ -272,8 +318,8 @@ lspconfig.yamlls.setup {
   capabilities = capabilities,
   on_attach = on_attach,
   init_options = {
-    provideFormatter = false
-  }
+    provideFormatter = false,
+  },
 }
 
 -- NOT WORKING due to error
@@ -296,8 +342,8 @@ lspconfig.cssls.setup {
   capabilities = capabilities,
   on_attach = on_attach,
   init_options = {
-    provideFormatter = false
-  }
+    provideFormatter = false,
+  },
 }
 
 -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
@@ -305,20 +351,20 @@ lspconfig.html.setup {
   capabilities = capabilities,
   on_attach = on_attach,
   init_options = {
-    provideFormatter = false
-  }
+    provideFormatter = false,
+  },
 }
 
 -- https://github.com/bash-lsp/bash-language-server
 lspconfig.bashls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
 }
 
 -- https://github.com/rcjsuen/dockerfile-language-server-nodejs
 lspconfig.dockerls.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
 }
 
 -- NOTE: paid alternative is https://intelephense.com/
@@ -330,13 +376,13 @@ lspconfig.solargraph.setup {
   settings = {
     solargraph = {
       formatting = true,
-      diagnostics = true
-    }
+      diagnostics = true,
+    },
   },
   init_options = {
     documentFormatting = true,
-    provideFormatter = true
-  }
+    provideFormatter = true,
+  },
 }
 
 -- DISABLED for now, as can't install/compile PHP on arm64 for some reason
@@ -351,12 +397,11 @@ lspconfig.solargraph.setup {
 lspconfig.terraformls.setup {
   capabilities = capabilities,
   on_attach = on_attach,
-  cmd = {"terraform-ls", "serve"},
-  filetypes = {"tf"}
+  cmd = { 'terraform-ls', 'serve' },
+  filetypes = { 'tf' },
 }
 
-
-local null_ls = require("null-ls")
+local null_ls = require 'null-ls'
 
 -- register any number of sources simultaneously
 local sources = {
@@ -365,10 +410,10 @@ local sources = {
   null_ls.builtins.formatting.sqlformat,
 }
 
-null_ls.config({ sources = sources })
+null_ls.config { sources = sources }
 
 -- general purpose language server, useful for hooking up prettier
-lspconfig["null-ls"].setup {
+lspconfig['null-ls'].setup {
   capabilities = capabilities,
   on_attach = on_attach,
 }
@@ -381,7 +426,7 @@ lspconfig.eslint.setup {
 
 lspconfig.clangd.setup {
   capabilities = capabilities,
-  on_attach = on_attach
+  on_attach = on_attach,
 }
 
 return M

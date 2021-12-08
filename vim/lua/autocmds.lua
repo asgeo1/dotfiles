@@ -6,7 +6,6 @@
 -- vim.cmd [[autocmd User PackerComplete,PackerCompileDone lua require("indent_blankline.utils").reset_highlights()]]
 -- vim.cmd [[augroup END]]
 
-
 -- vim-flog
 vim.cmd [[augroup myfloggroup]]
 -- use `q` to quit, rather than `gq`

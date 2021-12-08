@@ -1,8 +1,8 @@
-local utils = require "utils"
+local utils = require 'utils'
 local M = {}
 
-local quickfix = "Quickfix"
-local location = "Location"
+local quickfix = 'Quickfix'
+local location = 'Location'
 
 M.setup = function()
   vim.g.active_list = quickfix
@@ -13,8 +13,12 @@ M.change_active = function(list)
 end
 
 M.toggle_active = function()
-  vim.g.active_list = utils._if(vim.g.active_list == quickfix, location, quickfix)
-  print(string.format("%s list", vim.g.active_list))
+  vim.g.active_list = utils._if(
+    vim.g.active_list == quickfix,
+    location,
+    quickfix
+  )
+  print(string.format('%s list', vim.g.active_list))
 end
 
 M.move = function(direction)
@@ -26,25 +30,25 @@ M.move = function(direction)
     end
   end
 
-  if direction == "up" then
+  if direction == 'up' then
     if vim.g.active_list == quickfix then
-      wrap("cprevious", "clast")
+      wrap('cprevious', 'clast')
     else
-      wrap("labove", "llast")
+      wrap('labove', 'llast')
     end
-  elseif direction == "down" then
+  elseif direction == 'down' then
     if vim.g.active_list == quickfix then
-      wrap("cnext", "cfirst")
+      wrap('cnext', 'cfirst')
     else
-      wrap("lbelow", "lfirst")
+      wrap('lbelow', 'lfirst')
     end
-  elseif direction == "left" then
+  elseif direction == 'left' then
     if vim.g.active_list == quickfix then
       pcall(vim.cmd, [[colder]])
     else
       pcall(vim.cmd, [[lolder]])
     end
-  elseif direction == "right" then
+  elseif direction == 'right' then
     if vim.g.active_list == quickfix then
       pcall(vim.cmd, [[cnewer]])
     else

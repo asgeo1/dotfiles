@@ -16,21 +16,17 @@ M._if = function(bool, a, b)
 end
 
 M.map = function(modes, key, result, options)
-  options =
-    M.merge(
-    {
-      noremap = true,
-      silent = false,
-      expr = false,
-      nowait = false
-    },
-    options or {}
-  )
+  options = M.merge({
+    noremap = true,
+    silent = false,
+    expr = false,
+    nowait = false,
+  }, options or {})
   local buffer = options.buffer
   options.buffer = nil
 
-  if type(modes) ~= "table" then
-    modes = {modes}
+  if type(modes) ~= 'table' then
+    modes = { modes }
   end
 
   for i = 1, #modes do
@@ -43,7 +39,7 @@ M.map = function(modes, key, result, options)
 end
 
 function _G.copy(obj, seen)
-  if type(obj) ~= "table" then
+  if type(obj) ~= 'table' then
     return obj
   end
   if seen and seen[obj] then
@@ -59,7 +55,7 @@ function _G.copy(obj, seen)
 end
 
 function _G.P(...)
-  local objects = vim.tbl_map(vim.inspect, {...})
+  local objects = vim.tbl_map(vim.inspect, { ... })
   print(unpack(objects))
 end
 
@@ -69,20 +65,20 @@ function _G.R(package)
 end
 
 function _G.T()
-  print(require("nvim-treesitter.ts_utils").get_node_at_cursor():type())
+  print(require('nvim-treesitter.ts_utils').get_node_at_cursor():type())
 end
 
 M.ansi_codes = {
-  _clear = "[0m",
-  _red = "[0;31m",
-  _green = "[0;32m",
-  _yellow = "[0;33m",
-  _blue = "[0;34m",
-  _magenta = "[0;35m",
-  _cyan = "[0;36m",
-  _grey = "[0;90m",
-  _dark_grey = "[0;97m",
-  _white = "[0;98m",
+  _clear = '[0m',
+  _red = '[0;31m',
+  _green = '[0;32m',
+  _yellow = '[0;33m',
+  _blue = '[0;34m',
+  _magenta = '[0;35m',
+  _cyan = '[0;36m',
+  _grey = '[0;90m',
+  _dark_grey = '[0;97m',
+  _white = '[0;98m',
   red = function(self, string)
     return self._red .. string .. self._clear
   end,
@@ -109,7 +105,7 @@ M.ansi_codes = {
   end,
   white = function(self, string)
     return self._white .. string .. self._clear
-  end
+  end,
 }
 
 M.shorten_string = function(string, length)
@@ -118,16 +114,16 @@ M.shorten_string = function(string, length)
   end
   local start = string:sub(1, (length / 2) - 2)
   local _end = string:sub(#string - (length / 2) + 1, #string)
-  return start .. "..." .. _end
+  return start .. '...' .. _end
 end
 
 M.wrap_lines = function(input, width)
   local output = {}
   for _, line in ipairs(input) do
-    line = line:gsub("\r", "")
+    line = line:gsub('\r', '')
     while #line > width + 2 do
       local trimmed_line = string.sub(line, 1, width)
-      local index = trimmed_line:reverse():find(" ")
+      local index = trimmed_line:reverse():find ' '
       if index == nil or index > #trimmed_line / 2 then
         break
       end
