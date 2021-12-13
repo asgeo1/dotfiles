@@ -165,3 +165,6 @@ map('n', '<C-k>', 'k<C-y>')
 -- up/down movement now works on wrapped lines
 map('n', 'j', 'gj')
 map('n', 'k', 'gk')
+
+-- Neovim 0.6 new default mapping for 'Y' annoys me, remove it
+vim.api.nvim_del_keymap('n', 'Y')
