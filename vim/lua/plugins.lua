@@ -111,7 +111,9 @@ packer.startup(function()
   use 'tpope/vim-sleuth'
 
   use {
-    'nvim-telescope/telescope.nvim',
+    -- Use this fork & branch until https://github.com/nvim-telescope/telescope.nvim/pull/1559 is merged
+    'Conni2461/telescope.nvim',
+    branch = 'fix/selection_strategy_madness',
     requires = {
       'nvim-lua/plenary.nvim',
       'kyazdani42/nvim-web-devicons',
