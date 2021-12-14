@@ -401,19 +401,19 @@ lspconfig.terraformls.setup {
   filetypes = { 'tf' },
 }
 
+-- General purpose language server, useful for hooking up prettier
+--
+-- NOTE: This is no longer integrated or dependent on lspconfig
+--
 local null_ls = require 'null-ls'
 
--- register any number of sources simultaneously
-local sources = {
-  null_ls.builtins.formatting.prettierd,
-  null_ls.builtins.formatting.stylua,
-  null_ls.builtins.formatting.sqlformat,
-}
-
-null_ls.config { sources = sources }
-
--- general purpose language server, useful for hooking up prettier
-lspconfig['null-ls'].setup {
+null_ls.setup {
+  -- register any number of sources simultaneously
+  sources = {
+    null_ls.builtins.formatting.prettierd,
+    null_ls.builtins.formatting.stylua,
+    null_ls.builtins.formatting.sqlformat,
+  },
   capabilities = capabilities,
   on_attach = on_attach,
 }
