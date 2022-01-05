@@ -1,6 +1,5 @@
 require 'lsp.handlers'
 require 'lsp.formatting'
-local lspconfig = require 'lspconfig'
 local utils = require 'utils'
 local M = {}
 
@@ -161,10 +160,6 @@ local on_attach = function(client)
   -- require "lsp_signature".on_attach()
 end
 
-local capabilities = require('cmp_nvim_lsp').update_capabilities(
-  vim.lsp.protocol.make_client_capabilities()
-)
-
 function _G.activeLSP()
   local servers = {}
   for _, lsp in pairs(vim.lsp.get_active_clients()) do
@@ -181,252 +176,259 @@ function _G.bufferActiveLSP()
   _G.P(servers)
 end
 
--- https://github.com/golang/tools/tree/master/gopls
-lspconfig.gopls.setup {
-  capabilities = capabilities,
-  on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
-    on_attach(client)
-  end,
-}
+M.after_packer_complete = function()
+  local lspconfig = require 'lspconfig'
+  local capabilities = require('cmp_nvim_lsp').update_capabilities(
+    vim.lsp.protocol.make_client_capabilities()
+  )
 
--- https://github.com/palantir/python-language-server
--- lspconfig.pyls.setup {
---     on_attach = on_attach,
---     settings = {
---         pyls = {
---             plugins = {
---                 pycodestyle = {
---                     enabled = false,
---                     ignore = {
---                         "E501"
---                     }
---                 }
---             }
---         }
---     }
--- }
+  -- https://github.com/golang/tools/tree/master/gopls
+  lspconfig.gopls.setup {
+    capabilities = capabilities,
+    on_attach = function(client)
+      client.resolved_capabilities.document_formatting = false
+      on_attach(client)
+    end,
+  }
 
-lspconfig.pyright.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
+  -- https://github.com/palantir/python-language-server
+  -- lspconfig.pyls.setup {
+  --     on_attach = on_attach,
+  --     settings = {
+  --         pyls = {
+  --             plugins = {
+  --                 pycodestyle = {
+  --                     enabled = false,
+  --                     ignore = {
+  --                         "E501"
+  --                     }
+  --                 }
+  --             }
+  --         }
+  --     }
+  -- }
 
--- https://github.com/theia-ide/typescript-language-server
-lspconfig.tsserver.setup {
-  capabilities = capabilities,
-  on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
-    require('nvim-lsp-ts-utils').setup {}
-    on_attach(client)
-  end,
-}
+  lspconfig.pyright.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
 
-local function get_lua_runtime()
-  local result = {}
-  for _, path in pairs(vim.api.nvim_list_runtime_paths()) do
-    local lua_path = path .. '/lua/'
-    if vim.fn.isdirectory(lua_path) then
-      result[lua_path] = true
+  -- https://github.com/theia-ide/typescript-language-server
+  lspconfig.tsserver.setup {
+    capabilities = capabilities,
+    on_attach = function(client)
+      client.resolved_capabilities.document_formatting = false
+      require('nvim-lsp-ts-utils').setup {}
+      on_attach(client)
+    end,
+  }
+
+  local function get_lua_runtime()
+    local result = {}
+    for _, path in pairs(vim.api.nvim_list_runtime_paths()) do
+      local lua_path = path .. '/lua/'
+      if vim.fn.isdirectory(lua_path) then
+        result[lua_path] = true
+      end
     end
+
+    result[vim.fn.expand '$VIMRUNTIME/lua'] = true
+    -- result[vim.fn.expand("~/dev/neovim/src/nvim/lua")] = true
+
+    return result
   end
 
-  result[vim.fn.expand '$VIMRUNTIME/lua'] = true
-  -- result[vim.fn.expand("~/dev/neovim/src/nvim/lua")] = true
+  local system_name
+  if vim.fn.has 'mac' == 1 then
+    system_name = 'macOS'
+  elseif vim.fn.has 'unix' == 1 then
+    system_name = 'Linux'
+  elseif vim.fn.has 'win32' == 1 then
+    system_name = 'Windows'
+  else
+    print 'Unsupported system for sumneko'
+  end
 
-  return result
-end
+  -- local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/sumneko_lua/lua-language-server'
+  local sumneko_root_path = vim.fn.expand '~/Projects/tools/lua-language-server'
+  local sumneko_binary = sumneko_root_path
+    .. '/bin/'
+    .. system_name
+    .. '/lua-language-server'
 
-local system_name
-if vim.fn.has 'mac' == 1 then
-  system_name = 'macOS'
-elseif vim.fn.has 'unix' == 1 then
-  system_name = 'Linux'
-elseif vim.fn.has 'win32' == 1 then
-  system_name = 'Windows'
-else
-  print 'Unsupported system for sumneko'
-end
-
--- local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/sumneko_lua/lua-language-server'
-local sumneko_root_path = vim.fn.expand '~/Projects/tools/lua-language-server'
-local sumneko_binary = sumneko_root_path
-  .. '/bin/'
-  .. system_name
-  .. '/lua-language-server'
-
-lspconfig.sumneko_lua.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  --cmd = {"lua-language-server"},
-  cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
-  settings = {
-    Lua = {
-      runtime = {
-        version = 'LuaJIT',
-      },
-      completion = {
-        keywordSnippet = 'Disable',
-      },
-      diagnostics = {
-        enable = true,
-        globals = {
-          -- Neovim
-          'vim',
-          -- Busted
-          'describe',
-          'it',
-          'before_each',
-          'after_each',
-          'teardown',
-          'pending',
-          -- packer
-          'use',
+  lspconfig.sumneko_lua.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    --cmd = {"lua-language-server"},
+    cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT',
         },
-        workspace = {
-          library = get_lua_runtime(),
-          maxPreload = 1000,
-          preloadFileSize = 1000,
+        completion = {
+          keywordSnippet = 'Disable',
         },
-        -- Do not send telemetry data containing a randomized but unique identifier
-        telemetry = {
-          enable = false,
+        diagnostics = {
+          enable = true,
+          globals = {
+            -- Neovim
+            'vim',
+            -- Busted
+            'describe',
+            'it',
+            'before_each',
+            'after_each',
+            'teardown',
+            'pending',
+            -- packer
+            'use',
+          },
+          workspace = {
+            library = get_lua_runtime(),
+            maxPreload = 1000,
+            preloadFileSize = 1000,
+          },
+          -- Do not send telemetry data containing a randomized but unique identifier
+          telemetry = {
+            enable = false,
+          },
         },
       },
     },
-  },
-}
+  }
 
--- https://github.com/iamcco/vim-language-server
-lspconfig.vimls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
+  -- https://github.com/iamcco/vim-language-server
+  lspconfig.vimls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
 
--- https://github.com/vscode-langservers/vscode-json-languageserver
-lspconfig.jsonls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  cmd = { 'vscode-json-language-server', '--stdio' },
-  init_options = {
-    provideFormatter = false,
-  },
-}
-
--- https://github.com/redhat-developer/yaml-language-server
-lspconfig.yamlls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  init_options = {
-    provideFormatter = false,
-  },
-}
-
--- NOT WORKING due to error
---
--- ERROR: sqlls: config.cmd error, ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: cmd: expected list, got nil
--- stack traceback:
--- ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: in function <...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:177>
--- [C]: in function 'pcall'
--- ...ack/packer/start/nvim-lspconfig/lua/lspconfig/health.lua:11: in function 'check'
--- [string ":lua"]:1: in main chunk
---
--- -- https://github.com/joe-re/sql-language-server
--- lspconfig.sqlls.setup {
---   capabilities = capabilities,
---   on_attach = on_attach
--- }
-
--- https://github.com/vscode-langservers/vscode-css-languageserver-bin
-lspconfig.cssls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  init_options = {
-    provideFormatter = false,
-  },
-}
-
--- https://github.com/vscode-langservers/vscode-html-languageserver-bin
-lspconfig.html.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  init_options = {
-    provideFormatter = false,
-  },
-}
-
--- https://github.com/bash-lsp/bash-language-server
-lspconfig.bashls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
-
--- https://github.com/rcjsuen/dockerfile-language-server-nodejs
-lspconfig.dockerls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
-
--- NOTE: paid alternative is https://intelephense.com/
---
--- https://solargraph.org/
-lspconfig.solargraph.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  settings = {
-    solargraph = {
-      formatting = true,
-      diagnostics = true,
+  -- https://github.com/vscode-langservers/vscode-json-languageserver
+  lspconfig.jsonls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    cmd = { 'vscode-json-language-server', '--stdio' },
+    init_options = {
+      provideFormatter = false,
     },
-  },
-  init_options = {
-    documentFormatting = true,
-    provideFormatter = true,
-  },
-}
+  }
 
--- DISABLED for now, as can't install/compile PHP on arm64 for some reason
---
--- https://github.com/phpactor/phpactor
--- lspconfig.phpactor.setup {
---   capabilities = capabilities,
---   on_attach = on_attach
--- }
+  -- https://github.com/redhat-developer/yaml-language-server
+  lspconfig.yamlls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    init_options = {
+      provideFormatter = false,
+    },
+  }
 
--- https://github.com/hashicorp/terraform-ls
-lspconfig.terraformls.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-  cmd = { 'terraform-ls', 'serve' },
-  filetypes = { 'tf' },
-}
+  -- NOT WORKING due to error
+  --
+  -- ERROR: sqlls: config.cmd error, ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: cmd: expected list, got nil
+  -- stack traceback:
+  -- ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: in function <...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:177>
+  -- [C]: in function 'pcall'
+  -- ...ack/packer/start/nvim-lspconfig/lua/lspconfig/health.lua:11: in function 'check'
+  -- [string ":lua"]:1: in main chunk
+  --
+  -- -- https://github.com/joe-re/sql-language-server
+  -- lspconfig.sqlls.setup {
+  --   capabilities = capabilities,
+  --   on_attach = on_attach
+  -- }
 
--- General purpose language server, useful for hooking up prettier
---
--- NOTE: This is no longer integrated or dependent on lspconfig
---
-local null_ls = require 'null-ls'
+  -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
+  lspconfig.cssls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    init_options = {
+      provideFormatter = false,
+    },
+  }
 
-null_ls.setup {
-  -- register any number of sources simultaneously
-  sources = {
-    null_ls.builtins.formatting.prettierd,
-    null_ls.builtins.formatting.stylua,
-    null_ls.builtins.formatting.sqlformat,
-  },
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
+  -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
+  lspconfig.html.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    init_options = {
+      provideFormatter = false,
+    },
+  }
 
--- https://github.com/hrsh7th/vscode-langservers-extracted
-lspconfig.eslint.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
+  -- https://github.com/bash-lsp/bash-language-server
+  lspconfig.bashls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
 
-lspconfig.clangd.setup {
-  capabilities = capabilities,
-  on_attach = on_attach,
-}
+  -- https://github.com/rcjsuen/dockerfile-language-server-nodejs
+  lspconfig.dockerls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
+
+  -- NOTE: paid alternative is https://intelephense.com/
+  --
+  -- https://solargraph.org/
+  lspconfig.solargraph.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    settings = {
+      solargraph = {
+        formatting = true,
+        diagnostics = true,
+      },
+    },
+    init_options = {
+      documentFormatting = true,
+      provideFormatter = true,
+    },
+  }
+
+  -- DISABLED for now, as can't install/compile PHP on arm64 for some reason
+  --
+  -- https://github.com/phpactor/phpactor
+  -- lspconfig.phpactor.setup {
+  --   capabilities = capabilities,
+  --   on_attach = on_attach
+  -- }
+
+  -- https://github.com/hashicorp/terraform-ls
+  lspconfig.terraformls.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+    cmd = { 'terraform-ls', 'serve' },
+    filetypes = { 'tf' },
+  }
+
+  -- General purpose language server, useful for hooking up prettier
+  --
+  -- NOTE: This is no longer integrated or dependent on lspconfig
+  --
+  local null_ls = require 'null-ls'
+
+  null_ls.setup {
+    -- register any number of sources simultaneously
+    sources = {
+      null_ls.builtins.formatting.prettierd,
+      null_ls.builtins.formatting.stylua,
+      null_ls.builtins.formatting.sqlformat,
+    },
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
+
+  -- https://github.com/hrsh7th/vscode-langservers-extracted
+  lspconfig.eslint.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
+
+  lspconfig.clangd.setup {
+    capabilities = capabilities,
+    on_attach = on_attach,
+  }
+end
 
 return M

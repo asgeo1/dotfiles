@@ -1,5 +1,6 @@
 local map = require('utils').map
 local leader = ','
+local M = {}
 
 map('n', leader .. 'nt', ':NnnPicker<CR>', { silent = true })
 map('n', leader .. 'nf', ':NnnPicker %:p<CR>', { silent = true })
@@ -40,47 +41,49 @@ local feedkey = function(key, mode)
   )
 end
 
-local cmp = require 'cmp'
-cmp.setup {
-  snippet = {
-    expand = function(args)
-      vim.fn['vsnip#anonymous'](args.body)
-    end,
-  },
-  mapping = {
-    ['<CR>'] = cmp.mapping.confirm { select = true },
+M.after_packer_complete = function()
+  local cmp = require 'cmp'
+  cmp.setup {
+    snippet = {
+      expand = function(args)
+        vim.fn['vsnip#anonymous'](args.body)
+      end,
+    },
+    mapping = {
+      ['<CR>'] = cmp.mapping.confirm { select = true },
 
-    ['<Tab>'] = cmp.mapping(function(fallback)
-      if vim.fn.pumvisible() == 1 then
-        feedkey('<C-n>', 'n')
-      elseif vim.fn['vsnip#available']() == 1 then
-        feedkey('<Plug>(vsnip-expand-or-jump)', '')
-      elseif has_words_before() then
-        cmp.complete()
-      else
-        fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
-      end
-    end, { 'i', 's' }),
+      ['<Tab>'] = cmp.mapping(function(fallback)
+        if vim.fn.pumvisible() == 1 then
+          feedkey('<C-n>', 'n')
+        elseif vim.fn['vsnip#available']() == 1 then
+          feedkey('<Plug>(vsnip-expand-or-jump)', '')
+        elseif has_words_before() then
+          cmp.complete()
+        else
+          fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+        end
+      end, { 'i', 's' }),
 
-    ['<S-Tab>'] = cmp.mapping(function()
-      if vim.fn.pumvisible() == 1 then
-        feedkey('<C-p>', 'n')
-      elseif vim.fn['vsnip#jumpable'](-1) == 1 then
-        feedkey('<Plug>(vsnip-jump-prev)', '')
-      end
-    end, { 'i', 's' }),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'buffer' },
-    { name = 'path' },
-    { name = 'vsnip' },
-    { name = 'nvim_lua' },
-    { name = 'calc' },
-    { name = 'emoji' },
-    { name = 'treesitter' },
-  },
-}
+      ['<S-Tab>'] = cmp.mapping(function()
+        if vim.fn.pumvisible() == 1 then
+          feedkey('<C-p>', 'n')
+        elseif vim.fn['vsnip#jumpable'](-1) == 1 then
+          feedkey('<Plug>(vsnip-jump-prev)', '')
+        end
+      end, { 'i', 's' }),
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'buffer' },
+      { name = 'path' },
+      { name = 'vsnip' },
+      { name = 'nvim_lua' },
+      { name = 'calc' },
+      { name = 'emoji' },
+      { name = 'treesitter' },
+    },
+  }
+end
 
 -- =============================================================================
 -- Telescope
@@ -168,3 +171,5 @@ map('n', 'k', 'gk')
 
 -- Neovim 0.6 new default mapping for 'Y' annoys me, remove it
 vim.api.nvim_del_keymap('n', 'Y')
+
+return M
