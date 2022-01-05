@@ -1,3 +1,18 @@
+-- install packer
+local fn = vim.fn
+local install_path = fn.stdpath 'data' .. '/site/pack/packer/start/packer.nvim'
+local packer_bootstrap
+if fn.empty(fn.glob(install_path)) > 0 then
+  packer_bootstrap = fn.system {
+    'git',
+    'clone',
+    '--depth',
+    '1',
+    'https://github.com/wbthomason/packer.nvim',
+    install_path,
+  }
+end
+
 vim.g.loaded_netrwPlugin = false
 vim.cmd [[packadd cfilter]]
 
@@ -366,4 +381,10 @@ packer.startup(function()
   --     vim.cmd [[colorscheme dracula_pro]]
   --   end
   -- }
+
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Put this at the end after all plugins
+  if packer_bootstrap then
+    require('packer').sync()
+  end
 end)
