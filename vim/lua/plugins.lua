@@ -184,9 +184,6 @@ local function load_plugins()
       use 'machakann/vim-sandwich'
       use 'AndrewRadev/splitjoin.vim'
 
-      -- use fork until https://github.com/glepnir/galaxyline.nvim/pull/154 is merged
-      use 'eruizc-dev/galaxyline.nvim'
-
       use {
         'lewis6991/gitsigns.nvim',
         requires = {
@@ -385,8 +382,10 @@ local function load_plugins()
       use {
         'navarasu/onedark.nvim',
         config = function()
-          require('onedark').setup {}
-          vim.cmd [[colorscheme onedark]]
+          require('onedark').setup {
+            style = 'deep',
+          }
+          require('onedark').load()
         end,
       }
 
@@ -398,6 +397,18 @@ local function load_plugins()
       --     vim.cmd [[colorscheme dracula_pro]]
       --   end
       -- }
+
+      use {
+        'NTBBloodbath/galaxyline.nvim',
+        config = function()
+          -- Built-in theme
+          require 'galaxyline.themes.eviline'
+        end,
+        requires = {
+          'kyazdani42/nvim-web-devicons',
+          'navarasu/onedark.nvim',
+        },
+      }
     end,
 
     -- Be explicit about where packer packages are installed. This makes it easy
