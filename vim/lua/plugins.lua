@@ -89,7 +89,7 @@ local function load_plugins()
         config = function()
           require('nvim-treesitter.configs').setup {
             ensure_installed = 'all',
-            ignore_install = { 'haskell' }, -- keeps failing to install
+            ignore_install = { 'haskell', 'phpdoc' }, -- keeps failing to install
             highlight = {
               enable = true,
               language_tree = true,
