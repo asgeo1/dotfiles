@@ -57,9 +57,6 @@ local function load_plugins()
       use {
         'hrsh7th/nvim-cmp',
         requires = {
-          'hrsh7th/vim-vsnip',
-          'rafamadriz/friendly-snippets',
-          'hrsh7th/cmp-vsnip',
           'hrsh7th/cmp-nvim-lsp',
           'hrsh7th/cmp-nvim-lua',
           'hrsh7th/cmp-buffer',

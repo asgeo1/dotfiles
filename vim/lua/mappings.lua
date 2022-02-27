@@ -44,19 +44,12 @@ end
 M.after_packer_complete = function()
   local cmp = require 'cmp'
   cmp.setup {
-    snippet = {
-      expand = function(args)
-        vim.fn['vsnip#anonymous'](args.body)
-      end,
-    },
     mapping = {
       ['<CR>'] = cmp.mapping.confirm { select = true },
 
       ['<Tab>'] = cmp.mapping(function(fallback)
         if vim.fn.pumvisible() == 1 then
           feedkey('<C-n>', 'n')
-        elseif vim.fn['vsnip#available']() == 1 then
-          feedkey('<Plug>(vsnip-expand-or-jump)', '')
         elseif has_words_before() then
           cmp.complete()
         else
@@ -67,8 +60,6 @@ M.after_packer_complete = function()
       ['<S-Tab>'] = cmp.mapping(function()
         if vim.fn.pumvisible() == 1 then
           feedkey('<C-p>', 'n')
-        elseif vim.fn['vsnip#jumpable'](-1) == 1 then
-          feedkey('<Plug>(vsnip-jump-prev)', '')
         end
       end, { 'i', 's' }),
     },
@@ -76,7 +67,6 @@ M.after_packer_complete = function()
       { name = 'nvim_lsp' },
       { name = 'buffer' },
       { name = 'path' },
-      { name = 'vsnip' },
       { name = 'nvim_lua' },
       { name = 'calc' },
       { name = 'emoji' },
