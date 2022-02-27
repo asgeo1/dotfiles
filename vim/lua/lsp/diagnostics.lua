@@ -77,9 +77,11 @@ M.line_diagnostics = function()
     border = vim.g.floating_window_border_dark,
   })
 
-  vim.lsp.util.close_preview_autocmd(
-    { 'CursorMoved', 'CursorMovedI', 'BufHidden', 'BufLeave', 'WinScrolled' },
-    winnr
+  vim.api.nvim_command(
+    string.format(
+      'autocmd CursorMoved,CursorMovedI,BufHidden,BufLeave,WinScrolled <buffer> ++once lua pcall(vim.api.nvim_win_close, %d, true)',
+      winnr
+    )
   )
 end
 
