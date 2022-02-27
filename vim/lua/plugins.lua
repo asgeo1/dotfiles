@@ -376,15 +376,7 @@ local function load_plugins()
       -- performance issues, disabled:
       -- use 'ray-x/lsp_signature.nvim'
 
-      use {
-        'navarasu/onedark.nvim',
-        config = function()
-          require('onedark').setup {
-            style = 'deep',
-          }
-          require('onedark').load()
-        end,
-      }
+      use { 'navarasu/onedark.nvim' }
 
       -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
       -- use {
@@ -397,6 +389,12 @@ local function load_plugins()
 
       use {
         'NTBBloodbath/galaxyline.nvim',
+        setup = function()
+          require('onedark').setup {
+            style = 'deep',
+          }
+          require('onedark').load()
+        end,
         config = function()
           -- Built-in theme
           require 'galaxyline.themes.eviline'
