@@ -45,7 +45,8 @@ M.after_packer_complete = function()
   local cmp = require 'cmp'
   cmp.setup {
     mapping = {
-      ['<CR>'] = cmp.mapping.confirm { select = true },
+      -- Disabled for now, finding it a bit anoying
+      -- ['<CR>'] = cmp.mapping.confirm { select = true },
 
       ['<Tab>'] = cmp.mapping(function(fallback)
         if vim.fn.pumvisible() == 1 then
