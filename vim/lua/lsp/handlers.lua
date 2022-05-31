@@ -7,11 +7,12 @@ vim.lsp.handlers['textDocument/formatting'] = function(err, result, ctx)
   end
 
   local bufnr = ctx.bufnr
-
   if not vim.api.nvim_buf_get_option(bufnr, 'modified') then
     local view = vim.fn.winsaveview()
+    local client = vim.lsp.get_client_by_id(ctx.client_id)
+    local offset_encoding = client.offset_encoding or 'utf-16'
 
-    vim.lsp.util.apply_text_edits(result, bufnr)
+    vim.lsp.util.apply_text_edits(result, bufnr, offset_encoding)
     vim.fn.winrestview(view)
 
     if bufnr == vim.api.nvim_get_current_buf() then
