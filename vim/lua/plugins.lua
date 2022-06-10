@@ -141,9 +141,7 @@ local function load_plugins()
       use 'tpope/vim-surround'
 
       use {
-        -- Use this fork & branch until https://github.com/nvim-telescope/telescope.nvim/pull/1559 is merged
-        'Conni2461/telescope.nvim',
-        branch = 'fix/selection_strategy_madness',
+        'nvim-telescope/telescope.nvim',
         requires = {
           'nvim-lua/plenary.nvim',
           'kyazdani42/nvim-web-devicons',
