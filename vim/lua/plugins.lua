@@ -138,6 +138,7 @@ local function load_plugins()
       use 'tpope/vim-fugitive'
       use 'tpope/vim-repeat'
       use 'tpope/vim-sleuth'
+      use 'tpope/vim-surround'
 
       use {
         -- Use this fork & branch until https://github.com/nvim-telescope/telescope.nvim/pull/1559 is merged
