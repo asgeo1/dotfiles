@@ -403,6 +403,9 @@ local function load_plugins()
           'navarasu/onedark.nvim',
         },
       }
+
+      -- For Jinja templates https://jinja.palletsprojects.com/en/3.1.x/
+      use 'lepture/vim-jinja'
     end,
 
     -- Be explicit about where packer packages are installed. This makes it easy
