@@ -191,6 +191,26 @@ local function load_plugins()
       }
 
       use {
+        'sindrets/diffview.nvim',
+        requires = 'nvim-lua/plenary.nvim',
+        config = function()
+          require('diffview').setup {
+            view = {
+              merge_tool = {
+                layout = 'diff4_mixed',
+              },
+            },
+            file_history_panel = {
+              win_config = {
+                position = 'bottom',
+                height = 26,
+              },
+            },
+          }
+        end,
+      }
+
+      use {
         'mcchrish/nnn.vim',
         config = function()
           require('nnn').setup {
