@@ -12,9 +12,21 @@ map('n', '<C-w>O', '<Esc>:ZoomWinTabToggle<CR>')
 -- u (undo)
 -- x (delete) are slow!
 
-map('n', leader .. 'fp', "<cmd>lua require('spectre').open()<CR>i")
-map('n', leader .. 'fw', "viw:lua require('spectre').open_visual()<CR>")
-map('v', leader .. 'fw', "<cmd>lua require('spectre').open_visual()<CR>")
+map(
+  'n',
+  leader .. 'fp',
+  "<cmd>lua require('spectre').open({ is_close = true })<CR>i"
+)
+map(
+  'n',
+  leader .. 'fw',
+  "viw:lua require('spectre').open_visual({ is_close = true })<CR>"
+)
+map(
+  'v',
+  leader .. 'fw',
+  "<cmd>lua require('spectre').open_visual({ is_close = true })<CR>"
+)
 
 map('n', leader .. 'db', ':Bclose<CR>', { silent = true })
 
