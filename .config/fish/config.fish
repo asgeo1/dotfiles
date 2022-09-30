@@ -54,6 +54,7 @@ set -x PATH "$HOME/.pyenv/bin" $PATH
 set -x PATH "$HOME/.goenv/bin" $PATH
 set -x PATH "$HOME/.cargo/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
+set -x PATH "$HOME/.composer/vendor/bin" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Library/Android/sdk" # deprecated
