@@ -144,6 +144,7 @@ local function load_plugins()
         'nvim-telescope/telescope.nvim',
         requires = {
           'nvim-lua/plenary.nvim',
+          { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' },
           'kyazdani42/nvim-web-devicons',
           'nvim-treesitter/nvim-treesitter',
         },
@@ -172,6 +173,7 @@ local function load_plugins()
               },
             },
           }
+          require('telescope').load_extension 'fzf'
         end,
       }
 

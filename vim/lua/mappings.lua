@@ -45,36 +45,34 @@ local has_words_before = function()
       == nil
 end
 
-local feedkey = function(key, mode)
-  vim.api.nvim_feedkeys(
-    vim.api.nvim_replace_termcodes(key, true, true, true),
-    mode,
-    true
-  )
-end
-
 M.after_packer_complete = function()
   local cmp = require 'cmp'
   cmp.setup {
     mapping = {
-      -- Disabled for now, finding it a bit anoying
-      -- ['<CR>'] = cmp.mapping.confirm { select = true },
+      ['<C-Space>'] = cmp.mapping.confirm {
+        behavior = cmp.ConfirmBehavior.Insert,
+        select = true,
+      },
 
-      ['<Tab>'] = cmp.mapping(function(fallback)
-        if vim.fn.pumvisible() == 1 then
-          feedkey('<C-n>', 'n')
-        elseif has_words_before() then
-          cmp.complete()
-        else
-          fallback() -- The fallback function sends a already mapped key. In this case, it's probably `<Tab>`.
+      ['<C-n>'] = function(fallback)
+        if not cmp.select_next_item() then
+          if vim.bo.buftype ~= 'prompt' and has_words_before() then
+            cmp.complete()
+          else
+            fallback()
+          end
         end
-      end, { 'i', 's' }),
+      end,
 
-      ['<S-Tab>'] = cmp.mapping(function()
-        if vim.fn.pumvisible() == 1 then
-          feedkey('<C-p>', 'n')
+      ['<C-p>'] = function(fallback)
+        if not cmp.select_prev_item() then
+          if vim.bo.buftype ~= 'prompt' and has_words_before() then
+            cmp.complete()
+          else
+            fallback()
+          end
         end
-      end, { 'i', 's' }),
+      end,
     },
     sources = {
       { name = 'nvim_lsp' },
