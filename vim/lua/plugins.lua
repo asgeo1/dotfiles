@@ -385,7 +385,18 @@ local function load_plugins()
         end,
       }
 
-      use 'kevinhwang91/nvim-bqf'
+      -- The goal of nvim-bqf is to make Neovim's quickfix window better.
+      use {
+        'kevinhwang91/nvim-bqf',
+        ft = 'qf',
+        config = function()
+          require('bqf').setup {
+            preview = {
+              auto_preview = false,
+            },
+          }
+        end,
+      }
 
       use 'mechatroner/rainbow_csv'
 
