@@ -152,7 +152,8 @@ local function load_plugins()
           local actions = require 'telescope.actions'
           require('telescope').setup {
             defaults = {
-              selection_strategy = 'row', -- prevents cursor for resetting after removing an item from the list
+              -- NOTE: disabled for now, as is breaking the `find_files()` results :-(
+              -- selection_strategy = 'row', -- prevents cursor from resetting after removing an item from the list
               file_ignore_patterns = {
                 'bower_components',
                 'node_modules',
