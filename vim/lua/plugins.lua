@@ -401,6 +401,8 @@ local function load_plugins()
         end,
       }
 
+      use 'sindrets/winshift.nvim'
+
       use 'mechatroner/rainbow_csv'
 
       -- Neat, but has performance issue
