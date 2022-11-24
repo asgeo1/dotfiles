@@ -31,32 +31,6 @@ vim.lsp.protocol.CompletionItemKind = {
   ' [type]',
 }
 
-M.symbol_kind_icons = {
-  Function = '',
-  Method = '',
-  Variable = '',
-  Constant = '',
-  Interface = '',
-  Field = 'ﰠ',
-  Property = '',
-  Struct = '',
-  Enum = '',
-  Class = '',
-}
-
-M.symbol_kind_colors = {
-  Function = 'green',
-  Method = 'green',
-  Variable = 'blue',
-  Constant = 'red',
-  Interface = 'cyan',
-  Field = 'blue',
-  Property = 'blue',
-  Struct = 'cyan',
-  Enum = 'yellow',
-  Class = 'red',
-}
-
 local signs = {
   Error = ' ',
   Warning = ' ',
