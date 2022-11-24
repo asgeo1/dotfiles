@@ -369,20 +369,37 @@ M.after_packer_complete = function()
   -- NOTE: paid alternative is https://intelephense.com/
   --
   -- https://solargraph.org/
-  lspconfig.solargraph.setup {
-    capabilities = capabilities,
-    on_attach = on_attach,
-    settings = {
-      solargraph = {
-        formatting = true,
-        diagnostics = true,
-      },
-    },
-    init_options = {
-      documentFormatting = true,
-      provideFormatter = true,
-    },
-  }
+  -- lspconfig.solargraph.setup {
+  --   capabilities = capabilities,
+  --   on_attach = on_attach,
+  --   settings = {
+  --     solargraph = {
+  --       formatting = true,
+  --       diagnostics = true,
+  --     },
+  --   },
+  --   init_options = {
+  --     documentFormatting = true,
+  --     provideFormatter = true,
+  --   },
+  -- }
+
+  -- Seems slow
+  --
+  -- Mostly useful to integrate Rubocop with the Neovim, though doesn't seem to
+  -- work currently
+  --
+  -- https://shopify.github.io/ruby-lsp/
+  -- lspconfig.ruby_ls.setup {
+  --   capabilities = capabilities,
+  --   on_attach = on_attach,
+  --   cmd = { 'bundle', 'exec', 'ruby-lsp' },
+  -- }
+
+  -- lspconfig.sorbet.setup {
+  --   capabilities = capabilities,
+  --   on_attach = on_attach,
+  -- }
 
   -- DISABLED for now, as can't install/compile PHP on arm64 for some reason
   --
