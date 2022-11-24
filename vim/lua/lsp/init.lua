@@ -178,11 +178,9 @@ end
 
 M.after_packer_complete = function()
   local lspconfig = require 'lspconfig'
-  local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
   -- https://github.com/golang/tools/tree/master/gopls
   lspconfig.gopls.setup {
-    capabilities = capabilities,
     on_attach = function(client)
       client.server_capabilities.documentFormattingProvider = false
       on_attach(client)
@@ -207,13 +205,11 @@ M.after_packer_complete = function()
   -- }
 
   lspconfig.pyright.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
   -- https://github.com/theia-ide/typescript-language-server
   lspconfig.tsserver.setup {
-    capabilities = capabilities,
     on_attach = function(client)
       client.server_capabilities.documentFormattingProvider = false
       require('nvim-lsp-ts-utils').setup {}
@@ -255,7 +251,6 @@ M.after_packer_complete = function()
     .. '/lua-language-server'
 
   lspconfig.sumneko_lua.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     --cmd = {"lua-language-server"},
     cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
@@ -298,13 +293,11 @@ M.after_packer_complete = function()
 
   -- https://github.com/iamcco/vim-language-server
   lspconfig.vimls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
   -- https://github.com/vscode-langservers/vscode-json-languageserver
   lspconfig.jsonls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     cmd = { 'vscode-json-language-server', '--stdio' },
     init_options = {
@@ -314,7 +307,6 @@ M.after_packer_complete = function()
 
   -- https://github.com/redhat-developer/yaml-language-server
   lspconfig.yamlls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     init_options = {
       provideFormatter = false,
@@ -332,13 +324,11 @@ M.after_packer_complete = function()
   --
   -- -- https://github.com/joe-re/sql-language-server
   -- lspconfig.sqlls.setup {
-  --   capabilities = capabilities,
   --   on_attach = on_attach
   -- }
 
   -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
   lspconfig.cssls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     init_options = {
       provideFormatter = false,
@@ -347,7 +337,6 @@ M.after_packer_complete = function()
 
   -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
   lspconfig.html.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     init_options = {
       provideFormatter = false,
@@ -356,13 +345,11 @@ M.after_packer_complete = function()
 
   -- https://github.com/bash-lsp/bash-language-server
   lspconfig.bashls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
   -- https://github.com/rcjsuen/dockerfile-language-server-nodejs
   lspconfig.dockerls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
@@ -370,7 +357,6 @@ M.after_packer_complete = function()
   --
   -- https://solargraph.org/
   -- lspconfig.solargraph.setup {
-  --   capabilities = capabilities,
   --   on_attach = on_attach,
   --   settings = {
   --     solargraph = {
@@ -391,13 +377,11 @@ M.after_packer_complete = function()
   --
   -- https://shopify.github.io/ruby-lsp/
   -- lspconfig.ruby_ls.setup {
-  --   capabilities = capabilities,
   --   on_attach = on_attach,
   --   cmd = { 'bundle', 'exec', 'ruby-lsp' },
   -- }
 
   -- lspconfig.sorbet.setup {
-  --   capabilities = capabilities,
   --   on_attach = on_attach,
   -- }
 
@@ -405,13 +389,11 @@ M.after_packer_complete = function()
   --
   -- https://github.com/phpactor/phpactor
   -- lspconfig.phpactor.setup {
-  --   capabilities = capabilities,
   --   on_attach = on_attach
   -- }
 
   -- https://github.com/hashicorp/terraform-ls
   lspconfig.terraformls.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
     cmd = { 'terraform-ls', 'serve' },
     filetypes = { 'tf' },
@@ -430,18 +412,15 @@ M.after_packer_complete = function()
       null_ls.builtins.formatting.stylua,
       null_ls.builtins.formatting.sqlformat,
     },
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
   -- https://github.com/hrsh7th/vscode-langservers-extracted
   lspconfig.eslint.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 
   lspconfig.clangd.setup {
-    capabilities = capabilities,
     on_attach = on_attach,
   }
 end
