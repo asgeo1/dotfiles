@@ -54,14 +54,16 @@ vim.cmd [[command! FormatEnable lua require'lsp.formatting'.formatToggle(false)]
 -- async buffer formatting:
 M.format_async = function()
   if not vim.g[format_disabled_var()] then
-    vim.lsp.buf.formatting(vim.g[format_options_var()] or {})
+    vim.lsp.buf.format(
+      utils.merge(vim.g[format_options_var()] or {}, { async = true })
+    )
   end
 end
 
 -- synchronous version:
 M.format_sync = function()
   if not vim.g[format_disabled_var()] then
-    vim.lsp.buf.formatting_sync(vim.g[format_options_var()] or {}, 1000)
+    vim.lsp.buf.format(vim.g[format_options_var()] or {})
   end
 end
 

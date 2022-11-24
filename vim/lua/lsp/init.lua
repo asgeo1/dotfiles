@@ -70,7 +70,7 @@ for type, icon in pairs(signs) do
 end
 
 local on_attach = function(client)
-  if client.resolved_capabilities.document_formatting then
+  if client.server_capabilities.documentFormattingProvider then
     vim.cmd [[augroup Format]]
     vim.cmd [[autocmd! * <buffer>]]
     vim.cmd [[autocmd BufWritePost <buffer> lua require'lsp.formatting'.format_async()]]
@@ -84,7 +84,7 @@ local on_attach = function(client)
     )
   end
 
-  if client.resolved_capabilities.goto_definition then
+  if client.server_capabilities.gotoDefinitionProvider then
     utils.map(
       'n',
       '<C-]>',
@@ -93,11 +93,11 @@ local on_attach = function(client)
     )
   end
 
-  if client.resolved_capabilities.hover then
+  if client.server_capabilities.hoverProvider then
     utils.map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { buffer = true })
   end
 
-  if client.resolved_capabilities.find_references then
+  if client.server_capabilities.findReferencesProvider then
     utils.map(
       'n',
       '<Space>*',
@@ -106,7 +106,7 @@ local on_attach = function(client)
     )
   end
 
-  if client.resolved_capabilities.rename then
+  if client.server_capabilities.renameProvider then
     utils.map(
       'n',
       '<Space>rn',
@@ -178,15 +178,13 @@ end
 
 M.after_packer_complete = function()
   local lspconfig = require 'lspconfig'
-  local capabilities = require('cmp_nvim_lsp').update_capabilities(
-    vim.lsp.protocol.make_client_capabilities()
-  )
+  local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
   -- https://github.com/golang/tools/tree/master/gopls
   lspconfig.gopls.setup {
     capabilities = capabilities,
     on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
+      client.server_capabilities.documentFormattingProvider = false
       on_attach(client)
     end,
   }
@@ -217,7 +215,7 @@ M.after_packer_complete = function()
   lspconfig.tsserver.setup {
     capabilities = capabilities,
     on_attach = function(client)
-      client.resolved_capabilities.document_formatting = false
+      client.server_capabilities.documentFormattingProvider = false
       require('nvim-lsp-ts-utils').setup {}
       on_attach(client)
     end,
