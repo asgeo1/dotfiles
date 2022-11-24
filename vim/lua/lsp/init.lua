@@ -382,6 +382,8 @@ M.after_packer_complete = function()
   null_ls.setup {
     -- register any number of sources simultaneously
     sources = {
+      null_ls.builtins.diagnostics.rubocop,
+      null_ls.builtins.formatting.rubocop,
       null_ls.builtins.formatting.prettierd,
       null_ls.builtins.formatting.stylua,
       null_ls.builtins.formatting.sqlformat,
