@@ -126,7 +126,7 @@ local on_attach = function(client)
   utils.map(
     'n',
     '<Space>ll',
-    '<cmd>lua vim.lsp.diagnostic.set_loclist({ open_loclist = false })<CR>',
+    '<cmd>lua vim.diagnostic.setloclist({ open_loclist = false })<CR>',
     { buffer = true }
   )
 
