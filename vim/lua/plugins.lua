@@ -284,11 +284,6 @@ local function load_plugins()
       -- Flog is a fast, beautiful, and powerful git branch viewer for Vim
       use 'rbong/vim-flog'
 
-      -- An ack/ag/pt/rg powered code search and view tool, takes advantage of
-      -- Vim 8's power to support asynchronous searching, and lets you edit file
-      -- in-place with Edit Mode
-      use 'dyng/ctrlsf.vim'
-
       -- This plugin redefines 6 search commands (/,?,n,N,*,#). At every search
       -- command, it automatically prints> "At match #N out of M matches".
       use 'henrik/vim-indexed-search'
