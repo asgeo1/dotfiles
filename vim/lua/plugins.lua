@@ -48,11 +48,14 @@ local packer = require 'packer'
 local function load_plugins()
   packer.startup {
     function()
+      -- Plugin manager
       use 'wbthomason/packer.nvim'
 
+      -- UI / UX
       use 'nvim-lua/plenary.nvim'
       use 'nvim-lua/popup.nvim'
 
+      -- LSP
       use 'neovim/nvim-lspconfig'
       use {
         'hrsh7th/nvim-cmp',
@@ -67,6 +70,7 @@ local function load_plugins()
         },
       }
 
+      -- LSP
       use {
         'jose-elias-alvarez/nvim-lsp-ts-utils',
         requires = {
@@ -75,7 +79,7 @@ local function load_plugins()
         },
       }
 
-      -- general purpose language server, useful for hooking up prettier/eslint
+      -- General purpose language server, useful for hooking up prettier/eslint
       use {
         'jose-elias-alvarez/null-ls.nvim',
         requires = {
@@ -84,6 +88,8 @@ local function load_plugins()
         },
       }
 
+      -- A simple and easy way to use the interface for tree-sitter in Neovim
+      -- and to provide some basic functionality such as highlighting based on it
       use {
         'nvim-treesitter/nvim-treesitter',
         config = function()
@@ -126,6 +132,7 @@ local function load_plugins()
       use 'nvim-treesitter/nvim-treesitter-textobjects'
       use 'JoosepAlviste/nvim-ts-context-commentstring'
 
+      -- Icons for Vim, using patched nerd-font
       use {
         'kyazdani42/nvim-web-devicons',
         config = function()
@@ -135,11 +142,19 @@ local function load_plugins()
         end,
       }
 
+      -- Git wrapper
       use 'tpope/vim-fugitive'
+
+      -- Remaps . in a way that plugins can tap into it
       use 'tpope/vim-repeat'
+
+      -- Automatically adjusts 'shiftwidth' and 'expandtab' heuristically
       use 'tpope/vim-sleuth'
+
+      -- Provides mappings to easily delete, change and add surroundings in pairs
       use 'tpope/vim-surround'
 
+      -- Highly extendable fuzzy finder over lists
       use {
         'nvim-telescope/telescope.nvim',
         requires = {
@@ -179,11 +194,23 @@ local function load_plugins()
         end,
       }
 
+      -- Reveal the hidden message from Git under the cursor quickly. It shows
+      -- the history of commits under the cursor in popup window
       use 'rhysd/git-messenger.vim'
+
+      -- This plugin defines a new text object, based on indentation levels.
+      -- This is very useful in languages such as Python, in which the syntax
+      -- defines scope in terms of indentation
       use 'michaeljsmith/vim-indent-object'
+
+      -- Set of operator and textobject plugins to add/delete/replace
+      -- surroundings of a sandwiched textobject, like (foo), "bar"
       use 'machakann/vim-sandwich'
+
+      -- Switching between a single-line statement and a multi-line one
       use 'AndrewRadev/splitjoin.vim'
 
+      -- Signs for added, removed, and changed lines
       use {
         'lewis6991/gitsigns.nvim',
         requires = {
@@ -194,6 +221,8 @@ local function load_plugins()
         end,
       }
 
+      -- Single tabpage interface for easily cycling through diffs for all
+      -- modified files for any git rev
       use {
         'sindrets/diffview.nvim',
         requires = 'nvim-lua/plenary.nvim',
@@ -214,6 +243,7 @@ local function load_plugins()
         end,
       }
 
+      -- File manager for vim/neovim powered by n³
       use {
         'mcchrish/nnn.vim',
         config = function()
@@ -241,6 +271,8 @@ local function load_plugins()
         end,
       }
 
+      -- Simple zoom window plugin that uses vim's tabs feature to zoom into a
+      -- window inspired by ZoomWin plugin
       use {
         'troydm/zoomwintab.vim',
         -- event = {'ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'}, -- No such event?
@@ -249,48 +281,78 @@ local function load_plugins()
         end,
       }
 
+      -- Flog is a fast, beautiful, and powerful git branch viewer for Vim
       use 'rbong/vim-flog'
+
+      -- An ack/ag/pt/rg powered code search and view tool, takes advantage of
+      -- Vim 8's power to support asynchronous searching, and lets you edit file
+      -- in-place with Edit Mode
       use 'dyng/ctrlsf.vim'
+
+      -- This plugin redefines 6 search commands (/,?,n,N,*,#). At every search
+      -- command, it automatically prints> "At match #N out of M matches".
       use 'henrik/vim-indexed-search'
 
+      -- Deleting a buffer in Vim without closing the window
       use {
         'rbgrouleff/bclose.vim',
         -- event = 'Bclose', -- No such event?
       }
 
+      -- Comment out multiple lines with a single keystroke
       use 'scrooloose/nerdcommenter'
+
+      -- Changes the working directory to the project root when you open a file
+      -- or directory
       use 'airblade/vim-rooter'
+
+      -- takes the <number> out of <number>w or <number>f{char} by highlighting
+      -- all possible choices and allowing you to press one key to jump directly
+      -- to the target
       use 'easymotion/vim-easymotion'
-      use 'terryma/vim-multiple-cursors'
+
+      -- Multiple cursors for editing / refactoring text
+      use 'mg979/vim-visual-multi'
+
+      -- EditorConfig plugin for Vim
       use 'editorconfig/editorconfig-vim'
 
+      --This project adds eco (embedded coffeescript) support to the vim editor.
       use {
         'AndrewRadev/vim-eco',
         ft = { 'eco' },
       }
 
+      -- Massive (in a good way) Vim plugin for editing Ruby on Rails applications
       use {
         'tpope/vim-rails',
         ft = { 'ruby', 'erb', 'yml' }, -- NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
       }
 
+      -- Additional syntax highlighting that I use for C++11/14/17 development in Vim
       use {
         'octol/vim-cpp-enhanced-highlight',
         ft = { 'cpp', 'c' },
       }
 
+      -- A collection of language packs for Vim.
       -- Seems slow for ruby
       use 'sheerun/vim-polyglot'
 
+      -- Enable syntax highlighting for fastlane configuration files in vim
       use 'milch/vim-fastlane'
 
+      -- Yaml files in vim 7.4 are really slow, due to core yaml syntax. This syntax is simpler/faster.
       use 'stephpy/vim-yaml'
 
+      -- Use the scratch plugin to create a temporary scratch buffer to store
+      -- and edit text that will be discarded when you quit/exit vim
       use {
         'vim-scripts/scratch.vim',
         -- event = 'Scratch' -- No such event?
       }
 
+      -- Causes all trailing whitespace characters to be highlighted
       use {
         'ntpeters/vim-better-whitespace',
         config = function()
@@ -313,6 +375,7 @@ local function load_plugins()
         end,
       }
 
+      -- displays a popup with possible key bindings of the command you started typing
       use {
         'folke/which-key.nvim',
         config = function()
@@ -324,6 +387,9 @@ local function load_plugins()
         end,
       }
 
+      -- A pretty list for showing diagnostics, references, telescope results,
+      -- quickfix and location lists to help you solve all the trouble your
+      -- code is causing
       use {
         'folke/trouble.nvim',
         requires = 'kyazdani42/nvim-web-devicons',
@@ -336,6 +402,7 @@ local function load_plugins()
         end,
       }
 
+      -- Highlight and search for todo comments like TODO, HACK, BUG in your code base
       use {
         'folke/todo-comments.nvim',
         requires = 'nvim-lua/plenary.nvim',
@@ -348,6 +415,7 @@ local function load_plugins()
         end,
       }
 
+      -- easily browse and preview json files in neovim
       use {
         'gennaro-tedesco/nvim-jqx',
         config = function()
@@ -355,12 +423,14 @@ local function load_plugins()
         end,
       }
 
+      -- Preview markdown code directly in your neovim terminal
       use {
         'ellisonleao/glow.nvim',
         -- run this manually for now, after install
         -- run = ":GlowInstall"
       }
 
+      -- A search panel for neovim
       use {
         'windwp/nvim-spectre',
         requires = {
@@ -402,19 +472,32 @@ local function load_plugins()
         end,
       }
 
+      -- Lets you freely rearrange your window layouts by letting you move any
+      -- window in any direction. Further, it doesn't only let you move around
+      -- windows, but also lets you form new columns and rows by moving into
+      -- windows horizontally or vertically respectively
       use 'sindrets/winshift.nvim'
 
+      -- Highlight columns in CSV and TSV files and run queries in SQL-like language
       use 'mechatroner/rainbow_csv'
 
       -- Neat, but has performance issue
+      --
+      -- Switches to absolute line numbers (:set number norelativenumber)
+      -- automatically when relative numbers don't make sense
       -- use 'jeffkreeftmeijer/vim-numbertoggle'
 
       -- performance issues, disabled:
+      --
+      -- Show function signature when you type
       -- use 'ray-x/lsp_signature.nvim'
 
+      -- One dark and light colorscheme for neovim
       use { 'navarasu/onedark.nvim' }
 
       -- Not using for now, as doesn't support TreeSitter syntax as well as OneDark
+      --
+      -- Dracula for Vim. A dark theme for Vim
       -- use {
       --   'asgeo1/dracula-pro-vim',
       --   as = 'dracula',
@@ -423,6 +506,8 @@ local function load_plugins()
       --   end
       -- }
 
+      -- Light-weight and Super Fast statusline plugin. Galaxyline componentizes
+      -- Vim's statusline by having a provider for each text area
       use {
         'NTBBloodbath/galaxyline.nvim',
         setup = function()
@@ -442,8 +527,12 @@ local function load_plugins()
       }
 
       -- For Jinja templates https://jinja.palletsprojects.com/en/3.1.x/
+      --
+      -- jinja plugins for vim (syntax and indent).
       use 'lepture/vim-jinja'
 
+      -- GitHub Copilot uses OpenAI Codex to suggest code and entire functions
+      -- in real-time right from your editor
       use 'github/copilot.vim'
     end,
 
