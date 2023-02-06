@@ -16,9 +16,10 @@ return {
       },
       {
         '<leader>fw',
-        function()
-          require('spectre').open { is_close = true }
-        end,
+        "viw:lua require('spectre').open_visual({ is_close = true })<CR>",
+        -- function()
+        --   require('spectre').open_visual { is_close = true }
+        -- end,
         desc = 'Find word under cursor (Spectre)',
       },
     },
