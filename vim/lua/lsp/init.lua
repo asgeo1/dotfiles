@@ -1,6 +1,6 @@
 require 'lsp.handlers'
 require 'lsp.formatting'
-local utils = require 'utils'
+local utils = require 'util.utils'
 local M = {}
 
 vim.lsp.protocol.CompletionItemKind = {

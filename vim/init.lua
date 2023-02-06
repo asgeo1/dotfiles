@@ -1,11 +1,11 @@
-require 'utils'
-require 'settings'
-require 'plugins'
+require 'util.utils'
+require 'config.options'
+require 'config.lazy'
 require 'lsp'
-require 'mappings'
+require 'config.keymaps'
 
-require('lists').setup()
-require 'autocmds'
+require('util.lists').setup()
+require 'config.autocmds'
 
 -- DEPENDENCIES:
 --

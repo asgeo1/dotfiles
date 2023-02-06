@@ -1,5 +1,5 @@
 local M = {}
-local utils = require 'utils'
+local utils = require 'util.utils'
 local rename_prompt = 'Rename -> '
 
 -- Custom function to improve the look of the default rename floating window

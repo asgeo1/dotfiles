@@ -1,4 +1,4 @@
-local utils = require 'utils'
+local utils = require 'util.utils'
 local M = {}
 
 local format_disabled_var = function()
