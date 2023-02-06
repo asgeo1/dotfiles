@@ -16,11 +16,16 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
 
+_G.after_packer_complete = function()
+  require('lsp').after_packer_complete()
+  require('config.keymaps').after_packer_complete()
+end
+
 require('lazy').setup {
   spec = {
     { import = 'plugins' },
   },
-  defaults = { lazy = true },
+  defaults = { lazy = false },
   install = { colorscheme = { 'onedark' } },
   checker = { enabled = true },
   performance = {
@@ -44,3 +49,5 @@ require('lazy').setup {
   },
   debug = false,
 }
+
+vim.cmd [[autocmd User LazyDone ++once lua after_packer_complete()]]

@@ -4,8 +4,8 @@ return {
     'nvim-telescope/telescope.nvim',
     dependencies = {
       'nvim-lua/plenary.nvim',
-      -- NOTE: may need to run 'make' manually in `~.local/share/nvim/site/pack/packer/start/telescope-fzf-native.nvim`
-      { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' },
+      -- NOTE: may need to run 'make' manually in `~/.local/share/nvim/lazy/telescope-fzf-native.nvim`
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
       'kyazdani42/nvim-web-devicons',
       'nvim-treesitter/nvim-treesitter',
     },

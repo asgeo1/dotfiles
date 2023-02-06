@@ -5,7 +5,7 @@ return {
   -- Highlight and search for todo comments like TODO, HACK, BUG in your code base
   {
     'folke/todo-comments.nvim',
-    requires = 'nvim-lua/plenary.nvim',
+    dependencies = 'nvim-lua/plenary.nvim',
     config = function()
       require('todo-comments').setup {
         -- your configuration comes here

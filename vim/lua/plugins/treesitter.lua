@@ -36,7 +36,7 @@ return {
         },
       }
     end,
-    run = ':TSUpdate',
+    build = ':TSUpdate',
   },
   'nvim-treesitter/playground',
   'nvim-treesitter/nvim-treesitter-refactor',

@@ -13,7 +13,7 @@ return {
 
   -- A collection of language packs for Vim.
   -- Seems slow for ruby
-  'sheerun/vim-polyglot',
+  -- 'sheerun/vim-polyglot',
 
   -- Enable syntax highlighting for fastlane configuration files in vim
   'milch/vim-fastlane',
