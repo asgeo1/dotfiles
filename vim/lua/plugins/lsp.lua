@@ -23,6 +23,15 @@ return {
     },
   },
 
+  -- General purpose language server, useful for hooking up prettier/eslint
+  {
+    'jose-elias-alvarez/null-ls.nvim',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'neovim/nvim-lspconfig',
+    },
+  },
+
   -- GitHub Copilot uses OpenAI Codex to suggest code and entire functions
   -- in real-time right from your editor
   'github/copilot.vim',

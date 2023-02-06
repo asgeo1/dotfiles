@@ -16,10 +16,14 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = ','
 vim.g.maplocalleader = ','
 
-_G.after_packer_complete = function()
-  require('lsp').after_packer_complete()
-  require('config.keymaps').after_packer_complete()
-end
+vim.api.nvim_create_autocmd('User', {
+  pattern = 'LazyDone',
+  once = true,
+  callback = function()
+    require('lsp').after_lazy_done()
+    require('config.keymaps').after_lazy_done()
+  end,
+})
 
 require('lazy').setup {
   spec = {
@@ -27,7 +31,13 @@ require('lazy').setup {
   },
   defaults = { lazy = false },
   install = { colorscheme = { 'onedark' } },
-  checker = { enabled = true },
+  checker = {
+    -- automatically check for plugin updates
+    enabled = true,
+    concurrency = nil, ---@type number? set to 1 to check for updates very slowly
+    notify = false, -- don't get a notification when new updates are found
+    frequency = 3600, -- check for updates every hour
+  },
   performance = {
     cache = {
       enabled = true,
@@ -49,5 +59,3 @@ require('lazy').setup {
   },
   debug = false,
 }
-
-vim.cmd [[autocmd User LazyDone ++once lua after_packer_complete()]]

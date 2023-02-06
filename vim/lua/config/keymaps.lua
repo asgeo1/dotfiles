@@ -45,7 +45,7 @@ local has_words_before = function()
       == nil
 end
 
-M.after_packer_complete = function()
+M.after_lazy_done = function()
   local cmp = require 'cmp'
   cmp.setup {
     mapping = {

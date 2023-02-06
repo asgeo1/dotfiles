@@ -150,7 +150,7 @@ function _G.bufferActiveLSP()
   _G.P(servers)
 end
 
-M.after_packer_complete = function()
+M.after_lazy_done = function()
   local lspconfig = require 'lspconfig'
 
   -- https://github.com/golang/tools/tree/master/gopls

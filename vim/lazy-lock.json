@@ -17,6 +17,7 @@
   "lazy.nvim": { "branch": "main", "commit": "9b208696e139a404d159963b975a5b90af38439b" },
   "nerdcommenter": { "branch": "master", "commit": "d069f7fb562fb9eb6911fe23cda7aca2a387043e" },
   "nnn.vim": { "branch": "master", "commit": "46bb8355a3bbe7df9f466bb116534dda4f257895" },
+  "null-ls.nvim": { "branch": "main", "commit": "8f5d730021497233c39d3adbf4b8043d4be163f8" },
   "nvim-bqf": { "branch": "main", "commit": "da1cd2557a16386829a213330e0fd46b61db7632" },
   "nvim-cmp": { "branch": "main", "commit": "cfafe0a1ca8933f7b7968a287d39904156f2c57d" },
   "nvim-jqx": { "branch": "master", "commit": "24d3e0228aec27280e091d09ff65593e99d4d564" },
