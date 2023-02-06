@@ -1,6 +1,20 @@
 return {
-  -- Comment out multiple lines with a single keystroke
-  'scrooloose/nerdcommenter',
+  { 'JoosepAlviste/nvim-ts-context-commentstring', lazy = true },
+
+  {
+    'echasnovski/mini.comment',
+    event = 'VeryLazy',
+    opts = {
+      hooks = {
+        pre = function()
+          require('ts_context_commentstring.internal').update_commentstring {}
+        end,
+      },
+    },
+    config = function(_, opts)
+      require('mini.comment').setup(opts)
+    end,
+  },
 
   -- Highlight and search for todo comments like TODO, HACK, BUG in your code base
   {

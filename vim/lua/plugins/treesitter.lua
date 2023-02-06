@@ -37,9 +37,7 @@ return {
       }
     end,
     build = ':TSUpdate',
+    event = 'BufReadPost',
   },
-  'nvim-treesitter/playground',
   'nvim-treesitter/nvim-treesitter-refactor',
-  'nvim-treesitter/nvim-treesitter-textobjects',
-  'JoosepAlviste/nvim-ts-context-commentstring',
 }
