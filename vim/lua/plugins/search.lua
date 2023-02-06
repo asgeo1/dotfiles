@@ -8,18 +8,12 @@ return {
     keys = {
       {
         '<leader>fp',
-        function()
-          require('spectre').open { is_close = true }
-          -- TODO: enter insert mode
-        end,
+        ":lua require('spectre').open({ is_close = true })<CR>i",
         desc = 'Search files (Spectre)',
       },
       {
         '<leader>fw',
         "viw:lua require('spectre').open_visual({ is_close = true })<CR>",
-        -- function()
-        --   require('spectre').open_visual { is_close = true }
-        -- end,
         desc = 'Find word under cursor (Spectre)',
       },
     },
