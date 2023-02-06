@@ -6,6 +6,14 @@ return {
   -- Deleting a buffer in Vim without closing the window
   {
     'rbgrouleff/bclose.vim',
+    keys = {
+      {
+        '<leader>bd',
+        ':Bclose<CR>',
+        desc = 'Delete buffer',
+        silent = true,
+      },
+    },
     -- event = 'Bclose', -- No such event?
   },
 
@@ -67,6 +75,13 @@ return {
   -- Simple zoom window plugin that uses vim's tabs feature to zoom into a  -- window inspired by ZoomWin plugin
   {
     'troydm/zoomwintab.vim',
+    keys = {
+      {
+        '<C-w>O',
+        '<Esc>:ZoomWinTabToggle<CR>',
+        desc = 'Zoom window',
+      },
+    },
     -- event = {'ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'}, -- No such event?
     config = function()
       vim.g.zoomwintab_hidetabbar = false

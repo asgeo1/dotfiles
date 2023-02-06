@@ -9,6 +9,57 @@ return {
       'kyazdani42/nvim-web-devicons',
       'nvim-treesitter/nvim-treesitter',
     },
+    keys = {
+      {
+        '<leader>tf',
+        function()
+          require('telescope.builtin').find_files()
+        end,
+        desc = 'Find Files',
+      },
+      {
+        '<leader>tF',
+        function()
+          require('telescope.builtin').git_files()
+        end,
+        desc = 'Find Files (version controlled)',
+      },
+      {
+        '<leader>tg',
+        function()
+          require('telescope.builtin').live_grep()
+        end,
+        desc = 'Find files by grep',
+      },
+      {
+        '<leader>ts',
+        function()
+          require('telescope.builtin').grep_string()
+        end,
+        desc = 'Find word',
+      },
+      {
+        '<leader>tS',
+        function()
+          require('telescope.builtin').symbols()
+        end,
+        desc = 'Find symbols',
+      },
+      {
+        '<leader>tb',
+        function()
+          require('telescope.builtin').buffers()
+        end,
+        desc = 'Find buffers',
+      },
+      {
+        '<leader>tr',
+        function()
+          require('telescope.builtin').lsp_references()
+        end,
+        desc = 'Find LSP references',
+      },
+    },
     config = function()
       local actions = require 'telescope.actions'
       require('telescope').setup {

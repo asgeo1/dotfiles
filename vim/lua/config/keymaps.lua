@@ -2,14 +2,10 @@ local map = require('util.utils').map
 local leader = ','
 local M = {}
 
-map('n', '<C-w>O', '<Esc>:ZoomWinTabToggle<CR>')
-
 -- TODO:
 --
 -- u (undo)
 -- x (delete) are slow!
-
-map('n', leader .. 'db', ':Bclose<CR>', { silent = true })
 
 -- =============================================================================
 -- autocomplete
@@ -70,35 +66,7 @@ end
 -- =============================================================================
 -- Telescope
 
-map(
-  'n',
-  leader .. 'tf',
-  "<cmd>lua require('telescope.builtin').find_files()<cr>"
-)
-map(
-  'n',
-  leader .. 'tF',
-  "<cmd>lua require('telescope.builtin').git_files()<cr>"
-)
-map(
-  'n',
-  leader .. 'tg',
-  "<cmd>lua require('telescope.builtin').live_grep()<cr>"
-)
-map(
-  'n',
-  leader .. 'ts',
-  "<cmd>lua require('telescope.builtin').grep_string()<cr>"
-)
-map('n', leader .. 'tS', "<cmd>lua require('telescope.builtin').symbols()<cr>")
-map('n', leader .. 'tb', "<cmd>lua require('telescope.builtin').buffers()<cr>")
-map('n', leader .. 'tB', "<cmd>lua require('telescope.builtin').builtin()<cr>")
-map(
-  'n',
-  leader .. 'tr',
-  "<cmd>lua require('telescope.builtin').lsp_references()<cr>"
-)
-
+-- Not sure what this is for?
 vim.cmd [[cabbrev nw noautocmd write]]
 
 -- =============================================================================
