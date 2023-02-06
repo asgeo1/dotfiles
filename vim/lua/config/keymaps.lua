@@ -2,31 +2,12 @@ local map = require('util.utils').map
 local leader = ','
 local M = {}
 
-map('n', leader .. 'nt', ':NnnPicker<CR>', { silent = true })
-map('n', leader .. 'nf', ':NnnPicker %:p<CR>', { silent = true })
-
 map('n', '<C-w>O', '<Esc>:ZoomWinTabToggle<CR>')
 
 -- TODO:
 --
 -- u (undo)
 -- x (delete) are slow!
-
-map(
-  'n',
-  leader .. 'fp',
-  "<cmd>lua require('spectre').open({ is_close = true })<CR>i"
-)
-map(
-  'n',
-  leader .. 'fw',
-  "viw:lua require('spectre').open_visual({ is_close = true })<CR>"
-)
-map(
-  'v',
-  leader .. 'fw',
-  "<cmd>lua require('spectre').open_visual({ is_close = true })<CR>"
-)
 
 map('n', leader .. 'db', ':Bclose<CR>', { silent = true })
 

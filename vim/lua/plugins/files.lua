@@ -2,6 +2,20 @@ return {
   -- File manager for vim/neovim powered by n³
   {
     'mcchrish/nnn.vim',
+    keys = {
+      {
+        '<leader>nt',
+        ':NnnPicker<CR>',
+        desc = 'Open explorer (NNN)',
+        silent = true,
+      },
+      {
+        '<leader>nf',
+        ':NnnPicker %:p<CR>',
+        desc = 'Show current file in explorer (NNN)',
+        silent = true,
+      },
+    },
     config = function()
       require('nnn').setup {
         -- Disable default mappings

@@ -48,13 +48,20 @@ return {
   {
     'folke/trouble.nvim',
     dependencies = 'kyazdani42/nvim-web-devicons',
-    config = function()
-      require('trouble').setup {
-        -- your configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
-      }
-    end,
+    cmd = { 'TroubleToggle', 'Trouble' },
+    opts = { use_diagnostic_signs = true },
+    keys = {
+      {
+        '<leader>xx',
+        '<cmd>TroubleToggle document_diagnostics<cr>',
+        desc = 'Document Diagnostics (Trouble)',
+      },
+      {
+        '<leader>xX',
+        '<cmd>TroubleToggle workspace_diagnostics<cr>',
+        desc = 'Workspace Diagnostics (Trouble)',
+      },
+    },
   },
 
   -- Simple zoom window plugin that uses vim's tabs feature to zoom into a  -- window inspired by ZoomWin plugin

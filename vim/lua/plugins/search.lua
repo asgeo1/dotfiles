@@ -5,6 +5,23 @@ return {
     dependencies = {
       'nvim-lua/plenary.nvim',
     },
+    keys = {
+      {
+        '<leader>fp',
+        function()
+          require('spectre').open { is_close = true }
+          -- TODO: enter insert mode
+        end,
+        desc = 'Search files (Spectre)',
+      },
+      {
+        '<leader>fw',
+        function()
+          require('spectre').open { is_close = true }
+        end,
+        desc = 'Find word under cursor (Spectre)',
+      },
+    },
     config = function()
       require('spectre').setup {
         mapping = {
