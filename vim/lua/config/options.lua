@@ -35,12 +35,14 @@ vim.o.diffopt = 'internal,filler,closeoff,foldcolumn:0,hiddenoff' -- orig: inter
 vim.o.emoji = false
 vim.o.foldclose = '' -- default
 vim.o.foldopen = 'block,hor,mark,percent,quickfix,tag' -- remove 'search' & 'undo'
+vim.o.grepformat = '%f:%l:%c:%m'
 vim.o.hidden = true -- You can change buffers without saving
 vim.o.history = 10000 -- Keep 10000 lines of command line history
 vim.o.ignorecase = true -- Easier to ignore case for searching     \c   and \C   toggle on and off
 vim.o.inccommand = 'nosplit'
 vim.o.infercase = true
 vim.o.lazyredraw = false -- Do not redraw while running macros (much faster) (LazyRedraw) (disabled for now)
+vim.o.laststatus = 2 -- status line. 3 is global status line, 2 is default. 0 is no status line
 vim.o.mouse = 'a' -- Use mouse everywhere. Seems to disable mouse in status line though :-(
 vim.o.pumblend = 10 -- Enables pseudo-transparency for the popup-menu
 vim.o.ruler = false -- Enables pseudo-transparency for the popup-menu
@@ -50,16 +52,20 @@ vim.o.showcmd = true -- Show information on the command in status line such as n
 vim.o.showmode = false -- " Don't show `-- INSERT --`, as lightline is already showing this
 vim.o.showtabline = 1 -- Only show the tab bar if there is more than one tab open
 vim.o.sidescroll = 5 -- The minimal number of columns to scroll horizontally
-vim.o.sidescrolloff = 15 -- The minimal number of screen columns to keep to the left and to the ight of the cursor if 'nowrap' is set
+vim.o.sidescrolloff = 8 -- The minimal number of screen columns to keep to the left and to the ight of the cursor if 'nowrap' is set
 vim.o.smartcase = true -- All lowercase string - case insensitive - all uppercase case sensitive
 vim.o.hlsearch = true -- Highlight searched for phrases
 vim.o.incsearch = true -- Highlight as you type you search phrase
+vim.opt.sessionoptions = { 'buffers', 'curdir', 'tabpages', 'winsize' }
 vim.o.showmatch = true -- Show matching brackets
+vim.o.shiftround = true -- Round indent
+vim.opt.shortmess:append { W = true, I = true, c = true }
 vim.o.smarttab = true
 vim.o.splitbelow = false
 vim.o.splitright = false
+vim.opt.spelllang = { 'en' }
 vim.o.termguicolors = true
-vim.o.timeoutlen = 500
+vim.o.timeoutlen = 300
 vim.o.backupdir = vim.fn.expand '~/.local/share/nvim/tmp/backup'
 vim.o.directory = vim.fn.expand '~/.local/share/nvim/tmp/swap'
 vim.o.undodir = vim.fn.expand '~/.local/share/nvim/tmp/undo'
@@ -67,8 +73,17 @@ vim.o.updatetime = 4000 -- If this many milliseconds nothing is typed the swap f
 vim.o.viewoptions = '' -- folds,options,cursor,curdir
 vim.o.virtualedit = ''
 vim.o.whichwrap = 'b,h,l' -- original: b,s,<,>,h,l
-vim.o.wildmode = 'longest,full' -- original: full
+vim.o.wildmode = 'longest:full,full' -- original: full
 vim.o.wildoptions = 'pum' -- original: pum,tagfile
+vim.o.winminwidth = 5 -- Minimum window width
+vim.o.wrap = false -- Disable line wrap
+
+-- options for neovim 0.9
+--
+-- if vim.fn.has("nvim-0.9.0") == 1 then
+--   opt.splitkeep = "screen"
+--   opt.shortmess:append { C = true }
+-- end
 
 --- default folding, override once treesitter loads
 vim.wo.foldenable = false
@@ -78,7 +93,7 @@ vim.wo.foldexpr = '0'
 
 vim.wo.colorcolumn = '80' -- Put the "color column" at col 80
 vim.wo.signcolumn = 'yes:1' -- original: yes   Always show the sign column
-vim.wo.conceallevel = 0 -- '2' would be nice, but concealing text is slow, especially for `u` (undo)
+vim.wo.conceallevel = 3 -- '2' would be nice, but concealing text is slow, especially for `u` (undo)
 vim.wo.concealcursor = 'n'
 vim.wo.breakindent = true -- Every wrapped line will continue visually indented (same amount of space as the beginning of that line), thus preserving horizontal blocks of text
 vim.wo.linebreak = true -- If on, Vim will wrap long lines at a character in 'breakat' rather than at the last character that fits on the screen.
@@ -218,3 +233,6 @@ vim.g.multi_cursor_next_key = '<C-n>'
 vim.g.multi_cursor_prev_key = '<C-p>'
 vim.g.multi_cursor_skip_key = '<C-x>'
 vim.g.multi_cursor_quit_key = '<Esc>'
+
+-- Fix markdown indentation settings
+vim.g.markdown_recommended_style = 0
