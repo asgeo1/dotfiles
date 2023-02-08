@@ -16,10 +16,10 @@ return {
   -- 'sheerun/vim-polyglot',
 
   -- Enable syntax highlighting for fastlane configuration files in vim
-  'milch/vim-fastlane',
+  -- 'milch/vim-fastlane',
 
-  -- Yaml files in vim 7.4 are really slow, due to core yaml syntax. This syntax is simpler/faster.
-  'stephpy/vim-yaml',
+  -- -- Yaml files in vim 7.4 are really slow, due to core yaml syntax. This syntax is simpler/faster.
+  -- 'stephpy/vim-yaml',
 
   -- This project adds eco (embedded coffeescript) support to the vim editor.
   {
@@ -36,10 +36,10 @@ return {
   'lepture/vim-jinja',
 
   -- easily browse and preview json files in neovim
-  {
-    'gennaro-tedesco/nvim-jqx',
-    config = function()
-      require('nvim-jqx.config').sort = false
-    end,
-  },
+  -- {
+  --   'gennaro-tedesco/nvim-jqx',
+  --   config = function()
+  --     require('nvim-jqx.config').sort = false
+  --   end,
+  -- },
 }

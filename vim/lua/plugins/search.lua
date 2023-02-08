@@ -40,7 +40,9 @@ return {
     end,
   },
 
+  -- This is anoying with Noice
+  --
   -- This plugin redefines 6 search commands (/,?,n,N,*,#). At every search
   -- command, it automatically prints> "At match #N out of M matches".
-  'henrik/vim-indexed-search',
+  -- 'henrik/vim-indexed-search',
 }

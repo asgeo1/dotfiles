@@ -17,13 +17,6 @@ return {
     -- event = 'Bclose', -- No such event?
   },
 
-  -- Use the scratch plugin to create a temporary scratch buffer to store
-  -- and edit text that will be discarded when you quit/exit vim
-  {
-    'vim-scripts/scratch.vim',
-    -- event = 'Scratch' -- No such event?
-  },
-
   -- The goal of nvim-bqf is to make Neovim's quickfix window better.
   {
     'kevinhwang91/nvim-bqf',

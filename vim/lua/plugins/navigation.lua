@@ -5,10 +5,12 @@ return {
   {
     'ggandor/leap.nvim',
     event = 'VeryLazy',
+    -- This is just anoying IMO
+    --
     -- f/F/t/T motions on steroids, building on the Leap interface
-    dependencies = {
-      { 'ggandor/flit.nvim', opts = { labeled_modes = 'nv' } },
-    },
+    -- dependencies = {
+    --   { 'ggandor/flit.nvim', opts = { labeled_modes = 'nv' } },
+    -- },
     config = function(_, opts)
       local leap = require 'leap'
       for k, v in pairs(opts) do

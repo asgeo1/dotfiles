@@ -4,7 +4,10 @@ return {
 
   -- Reveal the hidden message from Git under the cursor quickly. It shows
   -- the history of commits under the cursor in popup window
-  'rhysd/git-messenger.vim',
+  {
+    'rhysd/git-messenger.vim',
+    keys = { '<leader>gm' },
+  },
 
   -- Signs for added, removed, and changed lines
   {
