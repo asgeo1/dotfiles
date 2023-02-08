@@ -17,6 +17,13 @@ return {
         leap.opts[k] = v
       end
       leap.add_default_mappings(true)
+
+      vim.keymap.del({ 'x', 'o' }, 'x')
+      vim.keymap.del({ 'x', 'o' }, 'X')
+
+      -- To set alternative keys for "exclusive" selection:
+      -- vim.keymap.set({'x', 'o'}, <some-other-key>, '<Plug>(leap-forward-till)')
+      -- vim.keymap.set({'x', 'o'}, <some-other-key>, '<Plug>(leap-backward-till)')
     end,
   },
 
