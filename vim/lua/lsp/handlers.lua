@@ -23,16 +23,6 @@ vim.lsp.handlers['textDocument/formatting'] = function(err, result, ctx)
   end
 end
 
--- Configure how diagnostics will present in the UI
-vim.lsp.handlers['textDocument/publishDiagnostics'] = function(...)
-  vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-    virtual_text = true, -- show virtual text to the right of the line
-    underline = true, -- underline the specific code causing the issue
-    signs = true, -- put an error sign in the gutter
-    update_in_insert = false, -- don't update diagnostics in insert mode (doesn't apply to status-line, that will get updated regardless)
-  })(...)
-end
-
 -- Add a border around hover (K mapping)
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
   border = vim.g.floating_window_border_dark,

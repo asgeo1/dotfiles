@@ -89,18 +89,15 @@ local on_attach = function(client)
     )
   end
 
-  utils.map(
-    'n',
-    '<Space><CR>',
-    "<cmd>lua require'lsp.diagnostics'.line_diagnostics()<CR>",
-    { buffer = true }
-  )
+  -- Signature help
   utils.map(
     'n',
     '<Space>sh',
     '<cmd>lua vim.lsp.buf.signature_help()<CR>',
     { buffer = true }
   )
+
+  -- Perform code action
   utils.map(
     'n',
     '<Space>ca',
