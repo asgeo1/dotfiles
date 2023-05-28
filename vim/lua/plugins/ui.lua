@@ -77,6 +77,18 @@ return {
     config = function()
       -- Built-in theme
       require 'galaxyline.themes.eviline'
+
+      local condition = require 'galaxyline.condition'
+      local colors = require('galaxyline.themes.colors')['doom-one']
+
+      -- Replace FileName with FilePath for section 5
+      require('galaxyline').section.left[5] = {
+        FileName = {
+          provider = 'FilePath',
+          condition = condition.buffer_not_empty,
+          highlight = { colors.magenta, colors.bg, 'bold' },
+        },
+      }
     end,
     dependencies = {
       'kyazdani42/nvim-web-devicons',
