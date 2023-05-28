@@ -214,14 +214,14 @@ M.after_lazy_done = function()
     print 'Unsupported system for sumneko'
   end
 
-  -- local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/sumneko_lua/lua-language-server'
+  -- local sumneko_root_path = vim.fn.stdpath('cache')..'/lspconfig/lua_ls/lua-language-server'
   local sumneko_root_path = vim.fn.expand '~/Projects/tools/lua-language-server'
   local sumneko_binary = sumneko_root_path
     .. '/bin/'
     .. system_name
     .. '/lua-language-server'
 
-  lspconfig.sumneko_lua.setup {
+  lspconfig.lua_ls.setup {
     on_attach = on_attach,
     --cmd = {"lua-language-server"},
     cmd = { sumneko_binary, '-E', sumneko_root_path .. '/main.lua' },
