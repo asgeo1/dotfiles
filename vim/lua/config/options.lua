@@ -109,27 +109,6 @@ vim.wo.listchars = table.concat({
   'precedes:❮',
   'nbsp:_',
 }, ',')
-
-vim.g.floating_window_border = {
-  '╭',
-  '─',
-  '╮',
-  '│',
-  '╯',
-  '─',
-  '╰',
-  '│',
-}
-vim.g.floating_window_border_dark = {
-  { '╭', 'FloatBorderDark' },
-  { '─', 'FloatBorderDark' },
-  { '╮', 'FloatBorderDark' },
-  { '│', 'FloatBorderDark' },
-  { '╯', 'FloatBorderDark' },
-  { '─', 'FloatBorderDark' },
-  { '╰', 'FloatBorderDark' },
-  { '│', 'FloatBorderDark' },
-}
 vim.g.markdown_fenced_languages = {
   'vim',
   'python',
@@ -207,7 +186,7 @@ vim.g.gitgutter_git_executable = 'git'
 
 -- Git Messenger
 vim.g.git_messenger_floating_win_opts = {
-  border = vim.g.floating_window_border_dark,
+  border = 'rounded',
 }
 
 -- SplitJoin

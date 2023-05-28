@@ -89,6 +89,13 @@ local on_attach = function(client)
     )
   end
 
+  utils.map(
+    'n',
+    '<Space><CR>',
+    '<cmd>lua vim.diagnostic.open_float()<CR>',
+    { buffer = true }
+  )
+
   -- Signature help
   utils.map(
     'n',

@@ -23,15 +23,23 @@ vim.lsp.handlers['textDocument/formatting'] = function(err, result, ctx)
   end
 end
 
+-- TODO: textDocument/hover and textDocument/signatureHelp borders don't seem to
+-- be working
+
 -- Add a border around hover (K mapping)
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-  border = vim.g.floating_window_border_dark,
+  border = 'rounded',
 })
 
 -- Add a border around signature help (<Leader>+sh mapping)
 vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(
   vim.lsp.handlers.signature_help,
   {
-    border = vim.g.floating_window_border_dark,
+    border = 'rounded',
   }
 )
+
+-- default border for diagnostic popups
+vim.diagnostic.config {
+  float = { border = 'rounded' },
+}

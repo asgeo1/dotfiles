@@ -25,7 +25,7 @@ M.rename = function()
     row = -3,
     col = 1,
     style = 'minimal',
-    border = vim.g.floating_window_border,
+    border = 'rounded',
   })
   vim.api.nvim_win_set_option(winnr, 'winhl', 'Normal:Floating')
   utils.map('n', '<ESC>', '<cmd>bd!<CR>', { silent = true, buffer = true })
