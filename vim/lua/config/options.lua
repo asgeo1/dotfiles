@@ -93,8 +93,8 @@ vim.wo.foldexpr = '0'
 
 vim.wo.colorcolumn = '80' -- Put the "color column" at col 80
 vim.wo.signcolumn = 'yes:1' -- original: yes   Always show the sign column
-vim.wo.conceallevel = 3 -- '2' would be nice, but concealing text is slow, especially for `u` (undo)
-vim.wo.concealcursor = 'n'
+vim.wo.conceallevel = 0 -- '2' would be nice, but concealing text is slow, especially for `u` (undo). UPDATE: concealing text is just anoying, turn off
+vim.wo.concealcursor = '' -- 'n'
 vim.wo.breakindent = true -- Every wrapped line will continue visually indented (same amount of space as the beginning of that line), thus preserving horizontal blocks of text
 vim.wo.linebreak = true -- If on, Vim will wrap long lines at a character in 'breakat' rather than at the last character that fits on the screen.
 vim.wo.number = true
