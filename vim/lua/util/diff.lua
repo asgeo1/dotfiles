@@ -29,7 +29,7 @@ function M.SetupDiffViewFromBuffers()
   end
 
   -- Derive the result file by removing the `_BASE_` suffix
-  local result_file = remove_base_suffix(base_file)
+  -- local result_file = remove_base_suffix(base_file)
 
   -- Find other files based on their patterns
   local local_file = find_buffer_or_report('_LOCAL_', 'Local')
@@ -49,6 +49,8 @@ function M.SetupDiffViewFromBuffers()
   vim.cmd('tab split' .. remote_file)
   vim.cmd('vsplit ' .. base_file)
   vim.cmd 'windo diffthis'
+
+  vim.cmd 'tabfirst'
 end
 
 return M
