@@ -122,4 +122,11 @@ map('n', 'k', 'gk')
 -- Neovim 0.6 new default mapping for 'Y' annoys me, remove it
 vim.api.nvim_del_keymap('n', 'Y')
 
+map(
+  'n',
+  '<leader>d',
+  [[:lua require('util.diff').SetupDiffViewFromBuffers()<CR>]],
+  { noremap = true, silent = true }
+)
+
 return M
