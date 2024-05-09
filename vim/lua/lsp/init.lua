@@ -355,13 +355,14 @@ M.after_lazy_done = function()
   --
   -- https://shopify.github.io/ruby-lsp/
   -- lspconfig.ruby_ls.setup {
-  --   on_attach = on_attach,
-  --   cmd = { 'bundle', 'exec', 'ruby-lsp' },
+  -- on_attach = on_attach,
+  -- cmd = { 'bundle', 'exec', 'ruby-lsp' },
   -- }
 
-  -- lspconfig.sorbet.setup {
-  --   on_attach = on_attach,
-  -- }
+  lspconfig.sorbet.setup {
+    -- on_attach = on_attach,
+    -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
+  }
 
   -- DISABLED for now, as can't install/compile PHP on arm64 for some reason
   --
@@ -388,11 +389,14 @@ M.after_lazy_done = function()
     sources = {
       null_ls.builtins.diagnostics.rubocop,
       null_ls.builtins.formatting.rubocop,
-      null_ls.builtins.formatting.prettierd,
+      -- Using prettier rather than prettierd, as prettierd doesn't seem to support ESM config files very well, nor does it seem to work with tail
+      -- null_ls.builtins.formatting.prettier,
+      null_ls.builtins.formatting.prettier,
       null_ls.builtins.formatting.stylua,
       null_ls.builtins.formatting.sqlformat,
     },
     on_attach = on_attach,
+    -- debug = true,
   }
 
   -- https://github.com/hrsh7th/vscode-langservers-extracted
@@ -410,6 +414,16 @@ M.after_lazy_done = function()
       -- client.server_capabilities.definitionProvider = false
       on_attach(client)
     end,
+  }
+
+  lspconfig.rust_analyzer.setup {
+    settings = {
+      ['rust-analyzer'] = {
+        diagnostics = {
+          enable = false,
+        },
+      },
+    },
   }
 end
 
