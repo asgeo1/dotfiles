@@ -7,27 +7,34 @@ require 'config.keymaps'
 require('util.lists').setup()
 require 'config.autocmds'
 
--- DEPENDENCIES:
+-- LANGUAGE SERVER DEPENDENCIES:
+--
+-- npm install -g typescript-language-server
+-- npm install -g cssmodules-language-server
+-- npm install -g vim-language-server
+-- npm install -g sql-language-server
+-- npm install -g bash-language-server
+-- npm install -g dockerfile-language-server-nodejs
+-- npm install -g pyright
+-- npm install -g vscode-langservers-extracted
+-- npm install -g yaml-language-server
+--
+-- Is this needed if using null-ls?
+-- npm install -g vscode-eslint-language-server
+--
+--
+-- OTHER LINTERS (for use with null-ls)
+--
+-- npm install -g eslint_d
+-- npm install -g @fsouza/prettierd
+--
+--
+-- OTHER LSPs
 --
 -- go install golang.org/x/tools/gopls@latest
 -- pip install 'python-language-server[all]'
--- npm install -g typescript-language-server
--- npm install -g vim-language-server
--- npm install -g vscode-json-languageserver
--- npm i -g sql-language-server
--- npm install --global vscode-css-languageserver-bin
--- npm install --global vscode-html-languageserver-bin
--- npm i -g bash-language-server
--- npm install -g dockerfile-language-server-nodejs
 -- gem install solargraph
--- yarn global add yaml-language-server
 -- brew install hashicorp/tap/terraform-ls
--- sudo npm install -g pyright
--- npm i -g sql-language-server
--- npm i -g vscode-langservers-extracted
--- npm install -g vscode-json-languageserver
--- npm install -g yaml-language-server
---
 --
 -- git clone https://github.com/sumneko/lua-language-server
 -- cd lua-language-server
@@ -44,3 +51,13 @@ require 'config.autocmds'
 -- $ composer install
 -- $ cd /usr/local/bin
 -- $ sudo ln -s ~/your/projects/phpactor/bin/phpactor phpactor
+--
+--
+--
+-- FOR RUBY
+--
+-- gem install sorbet
+--
+-- gem install ruby-lsp
+-- gem install ruby-lsp-rails
+-- gem install ruby-lsp-rspec
