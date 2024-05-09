@@ -53,14 +53,17 @@ set -x PATH "$HOME/.nodenv/bin" $PATH
 set -x PATH "$HOME/.pyenv/bin" $PATH
 set -x PATH "$HOME/.goenv/bin" $PATH
 set -x PATH "$HOME/.cargo/bin" $PATH
+set -x PATH "$HOME/.local/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/.composer/vendor/bin" $PATH
+set -x PATH "/opt/homebrew/opt/libpq/bin" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Library/Android/sdk" # deprecated
 
 # Use jdk bundled by Android Studio, has less issues
-set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jre/Contents/Home"
+# set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jre/Contents/Home"
+set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
 set -x PATH "$JAVA_HOME/bin" $PATH
 
