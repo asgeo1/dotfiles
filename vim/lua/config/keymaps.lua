@@ -124,8 +124,15 @@ vim.api.nvim_del_keymap('n', 'Y')
 
 map(
   'n',
-  '<leader>d',
+  '<leader>dd',
   [[:lua require('util.diff').SetupDiffViewFromBuffers()<CR>]],
+  { noremap = true, silent = true }
+)
+
+map(
+  'n',
+  '<leader>ee',
+  [[:lua require('util.disable').TurnOffSyntaxAndAutoCmdsForCurrentBuffer()<CR>]],
   { noremap = true, silent = true }
 )
 
