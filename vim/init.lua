@@ -61,3 +61,6 @@ require 'config.autocmds'
 -- gem install ruby-lsp
 -- gem install ruby-lsp-rails
 -- gem install ruby-lsp-rspec
+--
+--
+-- NOTE:  also don't forget to `:TSInstall` or `:TSUpdate` for treesitter
