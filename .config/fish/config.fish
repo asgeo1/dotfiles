@@ -39,8 +39,6 @@ set -x FZF_ALT_C_COMMAND "$FZF_DEFAULT_COMMAND"
 # Things I don't want to publish to github
 source "$HOME/.secrets"
 
-set -g fish_user_paths "/opt/homebrew/bin" $fish_user_paths
-
 # customise the path
 set -x PATH "$HOME/Projects/dotfiles/bin" $PATH
 set -x PATH "$HOME/Library/Android/sdk/tools" $PATH
@@ -57,6 +55,7 @@ set -x PATH "$HOME/.local/bin" $PATH
 set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/.composer/vendor/bin" $PATH
 set -x PATH "/opt/homebrew/opt/libpq/bin" $PATH
+set -x PATH "/opt/homebrew/opt/gcc/bin" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Library/Android/sdk" # deprecated
@@ -78,9 +77,10 @@ set -x LANG en_AU.UTF-8
 
 set -g fish_user_paths "/usr/local/opt/icu4c/bin" $fish_user_paths
 set -g fish_user_paths "/usr/local/opt/icu4c/sbin" $fish_user_paths
+set -g fish_user_paths "/opt/homebrew/bin" $fish_user_paths
 
 status --is-interactive; and source (rbenv init -|psub)
-# status --is-interactive; and source (phpenv init -|psub)
+status --is-interactive; and source (phpenv init -|psub)
 status --is-interactive; and source (nodenv init -|psub)
 status --is-interactive; and source (pyenv init -|psub)
 status --is-interactive; and source (goenv init -|psub)
