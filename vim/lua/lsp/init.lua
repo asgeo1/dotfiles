@@ -364,12 +364,10 @@ M.after_lazy_done = function()
     -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
   }
 
-  -- DISABLED for now, as can't install/compile PHP on arm64 for some reason
-  --
   -- https://github.com/phpactor/phpactor
-  -- lspconfig.phpactor.setup {
-  --   on_attach = on_attach
-  -- }
+  lspconfig.phpactor.setup {
+    on_attach = on_attach,
+  }
 
   -- https://github.com/hashicorp/terraform-ls
   lspconfig.terraformls.setup {
