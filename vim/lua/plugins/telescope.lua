@@ -15,49 +15,70 @@ return {
         function()
           require('telescope.builtin').find_files()
         end,
-        desc = 'Find Files',
+        desc = 'Find Files (Telescope)',
       },
       {
         '<leader>tF',
         function()
           require('telescope.builtin').git_files()
         end,
-        desc = 'Find Files (version controlled)',
+        desc = 'Find Files (version controlled) (Telescope)',
       },
       {
         '<leader>tg',
         function()
           require('telescope.builtin').live_grep()
         end,
-        desc = 'Find files by grep',
+        desc = 'Find files by grep (Telescope)',
       },
       {
         '<leader>ts',
         function()
           require('telescope.builtin').grep_string()
         end,
-        desc = 'Find word',
+        desc = 'Find word (Telescope)',
+      },
+      {
+        '<leader>tc',
+        function()
+          require('telescope.builtin').commands()
+        end,
+        desc = 'Find command (Telescope)',
+      },
+      {
+        '<leader>tk',
+        function()
+          require('telescope.builtin').keymaps()
+        end,
+        desc = 'Find keymap (Telescope)',
       },
       {
         '<leader>tS',
         function()
           require('telescope.builtin').symbols()
         end,
-        desc = 'Find symbols',
+        desc = 'Find symbols (Telescope)',
       },
       {
         '<leader>tb',
         function()
           require('telescope.builtin').buffers()
         end,
-        desc = 'Find buffers',
+        desc = 'Find buffers (Telescope)',
+      },
+      {
+        '<leader>tp',
+        function()
+          require('telescope.builtin').builtin()
+        end,
+        desc = 'Find Telescope picker',
       },
       {
         '<leader>tr',
         function()
           require('telescope.builtin').lsp_references()
         end,
-        desc = 'Find LSP references',
+        desc = 'Find LSP references (Telescope)',
       },
     },
     config = function()
