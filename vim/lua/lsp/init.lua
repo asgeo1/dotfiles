@@ -414,6 +414,11 @@ M.after_lazy_done = function()
     end,
   }
 
+  -- https://github.com/tailwindlabs/tailwindcss-intellisense
+  lspconfig.tailwindcss.setup {
+    on_attach = on_attach,
+  }
+
   lspconfig.rust_analyzer.setup {
     settings = {
       ['rust-analyzer'] = {

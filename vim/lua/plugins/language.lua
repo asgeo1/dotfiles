@@ -5,6 +5,13 @@ return {
     ft = { 'ruby', 'erb', 'yml' }, -- NOTE: this quite slow on vim startup time, but OK if just for ruby and erb
   },
 
+  -- Tools for tailwindcss in neovim
+  {
+    'luckasRanarison/tailwind-tools.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    opts = {}, -- empty opts is needed at minimum
+  },
+
   -- Additional syntax highlighting that I use for C++11/14/17 development in Vim
   {
     'octol/vim-cpp-enhanced-highlight',

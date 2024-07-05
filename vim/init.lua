@@ -18,6 +18,7 @@ require 'config.autocmds'
 -- npm install -g pyright
 -- npm install -g vscode-langservers-extracted
 -- npm install -g yaml-language-server
+-- npm install -g @tailwindcss/language-server
 --
 -- Is this needed if using null-ls?
 -- npm install -g vscode-eslint-language-server

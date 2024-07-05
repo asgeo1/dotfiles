@@ -1,6 +1,8 @@
 return {
   -- LSP
   'neovim/nvim-lspconfig',
+
+  -- Completion
   {
     'hrsh7th/nvim-cmp',
     dependencies = {
@@ -11,7 +13,23 @@ return {
       'hrsh7th/cmp-calc',
       'hrsh7th/cmp-emoji',
       'ray-x/cmp-treesitter',
+
+      -- Makes the completion color items appear in the correct color
+      'luckasRanarison/tailwind-tools.nvim',
+
+      -- LSP kind icons for completion items
+      'onsails/lspkind-nvim',
     },
+
+    opts = function()
+      return {
+        formatting = {
+          format = require('lspkind').cmp_format {
+            before = require('tailwind-tools.cmp').lspkind_format,
+          },
+        },
+      }
+    end,
   },
 
   -- LSP
