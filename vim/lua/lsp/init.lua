@@ -182,6 +182,7 @@ M.after_lazy_done = function()
   --     }
   -- }
 
+  -- https://github.com/microsoft/pyright
   lspconfig.pyright.setup {
     on_attach = on_attach,
   }
@@ -359,6 +360,7 @@ M.after_lazy_done = function()
   -- cmd = { 'bundle', 'exec', 'ruby-lsp' },
   -- }
 
+  -- https://github.com/sorbet/sorbet
   lspconfig.sorbet.setup {
     -- on_attach = on_attach,
     -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
@@ -376,6 +378,8 @@ M.after_lazy_done = function()
     filetypes = { 'tf' },
   }
 
+  -- https://github.com/jose-elias-alvarez/null-ls.nvim
+  --
   -- General purpose language server, useful for hooking up prettier
   --
   -- NOTE: This is no longer integrated or dependent on lspconfig
@@ -402,10 +406,12 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
+  -- https://github.com/clangd/clangd
   lspconfig.clangd.setup {
     on_attach = on_attach,
   }
 
+  -- https://github.com/antonk52/cssmodules-language-server
   lspconfig.cssmodules_ls.setup {
     on_attach = function(client)
       -- avoid accepting `definitionProvider` responses from this LSP
@@ -419,6 +425,7 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
+  -- https://github.com/rust-lang/rust-analyzer
   lspconfig.rust_analyzer.setup {
     settings = {
       ['rust-analyzer'] = {
