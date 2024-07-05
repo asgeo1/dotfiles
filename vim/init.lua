@@ -3,24 +3,15 @@ require 'config.options'
 require 'config.lazy'
 require 'lsp'
 require 'config.keymaps'
+require 'config.commands'
 
 require('util.lists').setup()
 require 'config.autocmds'
 
 -- LANGUAGE SERVER DEPENDENCIES:
 --
--- npm install -g typescript-language-server
--- npm install -g vscode-langservers-extracted
--- npm install -g cssmodules-language-server
--- npm install -g css-variables-language-server
--- npm install -g vim-language-server
--- npm install -g sql-language-server
--- npm install -g bash-language-server
--- npm install -g dockerfile-language-server-nodejs
--- npm install -g @microsoft/compose-language-service
--- npm install -g pyright
--- npm install -g yaml-language-server
--- npm install -g @tailwindcss/language-server
+-- NOTE:
+-- Language servers written as npm / node package, can be installed with :InstallLspServers command
 --
 -- OTHER LSPs
 --

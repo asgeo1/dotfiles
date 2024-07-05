@@ -1,5 +1,9 @@
+-- NOTE:
+-- Language servers written as npm / node package, can be installed with :InstallLspServers command
+
 require 'lsp.handlers'
 require 'lsp.formatting'
+
 local utils = require 'util.utils'
 local M = {}
 
