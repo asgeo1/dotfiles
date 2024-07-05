@@ -64,6 +64,14 @@ M.after_lazy_done = function()
 end
 
 -- =============================================================================
+-- Tailwind
+
+map('n', 'twc', ':TailwindConcealToggle<CR>', {
+  noremap = true,
+  silent = true,
+})
+
+-- =============================================================================
 -- Telescope
 
 -- Not sure what this is for?
