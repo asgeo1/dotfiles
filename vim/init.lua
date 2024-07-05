@@ -40,6 +40,9 @@ require 'config.autocmds'
 -- # RUBY
 -- gem install rubocop
 -- gem install sorbet
+--
+-- # NOT USING:
+-- gem install typeprof
 -- gem install ruby-lsp
 -- gem install ruby-lsp-rails
 -- gem install ruby-lsp-rspec

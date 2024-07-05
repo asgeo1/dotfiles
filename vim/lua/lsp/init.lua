@@ -303,16 +303,26 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
+  -- NOTE: not using 'typeprof' lsp as not currently using ruby's built-in type
+  -- syntax, preferring sorbet/tapioca for now.
+
+  -- NOTE: not using 'ruby_lsp', as it seems to not really work compared to
+  -- sorbet lsp, and they probably conflict in some way
+
   -- https://github.com/sorbet/sorbet
   lspconfig.sorbet.setup {
     -- on_attach = on_attach,
     -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
   }
 
+  -- Disabled for now, as seems a bit buggy. Null-ls rubocop formatter and
+  -- diagnostics seems to work better.
+  -- May need to wait until using newest rubocop version
+  --
   -- https://github.com/rubocop/rubocop
-  lspconfig.rubocop.setup {
-    on_attach = on_attach,
-  }
+  -- lspconfig.rubocop.setup {
+  --   on_attach = on_attach,
+  -- }
 
   -- https://github.com/phpactor/phpactor
   lspconfig.phpactor.setup {
@@ -339,6 +349,7 @@ M.after_lazy_done = function()
   null_ls.setup {
     -- register any number of sources simultaneously
     sources = {
+      null_ls.builtins.diagnostics.rubocop,
       null_ls.builtins.formatting.rubocop,
       null_ls.builtins.formatting.prettier,
       null_ls.builtins.formatting.stylua,
