@@ -165,23 +165,6 @@ M.after_lazy_done = function()
     end,
   }
 
-  -- https://github.com/palantir/python-language-server
-  -- lspconfig.pyls.setup {
-  --     on_attach = on_attach,
-  --     settings = {
-  --         pyls = {
-  --             plugins = {
-  --                 pycodestyle = {
-  --                     enabled = false,
-  --                     ignore = {
-  --                         "E501"
-  --                     }
-  --                 }
-  --             }
-  --         }
-  --     }
-  -- }
-
   -- https://github.com/microsoft/pyright
   lspconfig.pyright.setup {
     on_attach = on_attach,
@@ -275,51 +258,56 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
-  -- https://github.com/vscode-langservers/vscode-json-languageserver
+  -- https://github.com/hrsh7th/vscode-langservers-extracted
   lspconfig.jsonls.setup {
     on_attach = on_attach,
     cmd = { 'vscode-json-language-server', '--stdio' },
     init_options = {
-      provideFormatter = false,
+      provideFormatter = false, -- prefer prettier
     },
+  }
+
+  -- https://github.com/hrsh7th/vscode-langservers-extracted
+  lspconfig.html.setup {
+    on_attach = on_attach,
+    init_options = {
+      provideFormatter = false, -- prefer prettier
+    },
+  }
+
+  -- https://github.com/hrsh7th/vscode-langservers-extracted
+  lspconfig.cssls.setup {
+    on_attach = on_attach,
+    init_options = {
+      provideFormatter = false, -- prefer prettier
+    },
+  }
+
+  -- https://github.com/antonk52/cssmodules-language-server
+  lspconfig.cssmodules_ls.setup {
+    on_attach = function(client)
+      -- avoid accepting `definitionProvider` responses from this LSP
+      -- client.server_capabilities.definitionProvider = false
+      on_attach(client)
+    end,
+  }
+
+  -- https://github.com/tailwindlabs/tailwindcss-intellisense
+  lspconfig.tailwindcss.setup {
+    on_attach = on_attach,
   }
 
   -- https://github.com/redhat-developer/yaml-language-server
   lspconfig.yamlls.setup {
     on_attach = on_attach,
     init_options = {
-      provideFormatter = false,
+      provideFormatter = false, -- prefer prettier
     },
   }
 
-  -- NOT WORKING due to error
-  --
-  -- ERROR: sqlls: config.cmd error, ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: cmd: expected list, got nil
-  -- stack traceback:
-  -- ...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:178: in function <...Cellar/neovim/0.5.1_1/share/nvim/runtime/lua/vim/lsp.lua:177>
-  -- [C]: in function 'pcall'
-  -- ...ack/packer/start/nvim-lspconfig/lua/lspconfig/health.lua:11: in function 'check'
-  -- [string ":lua"]:1: in main chunk
-  --
-  -- -- https://github.com/joe-re/sql-language-server
-  -- lspconfig.sqlls.setup {
-  --   on_attach = on_attach
-  -- }
-
-  -- https://github.com/vscode-langservers/vscode-css-languageserver-bin
-  lspconfig.cssls.setup {
+  -- https://github.com/joe-re/sql-language-server
+  lspconfig.sqlls.setup {
     on_attach = on_attach,
-    init_options = {
-      provideFormatter = false,
-    },
-  }
-
-  -- https://github.com/vscode-langservers/vscode-html-languageserver-bin
-  lspconfig.html.setup {
-    on_attach = on_attach,
-    init_options = {
-      provideFormatter = false,
-    },
   }
 
   -- https://github.com/bash-lsp/bash-language-server
@@ -331,34 +319,6 @@ M.after_lazy_done = function()
   lspconfig.dockerls.setup {
     on_attach = on_attach,
   }
-
-  -- NOTE: paid alternative is https://intelephense.com/
-  --
-  -- https://solargraph.org/
-  -- lspconfig.solargraph.setup {
-  --   on_attach = on_attach,
-  --   settings = {
-  --     solargraph = {
-  --       formatting = true,
-  --       diagnostics = true,
-  --     },
-  --   },
-  --   init_options = {
-  --     documentFormatting = true,
-  --     provideFormatter = true,
-  --   },
-  -- }
-
-  -- Seems slow
-  --
-  -- Mostly useful to integrate Rubocop with the Neovim, though doesn't seem to
-  -- work currently
-  --
-  -- https://shopify.github.io/ruby-lsp/
-  -- lspconfig.ruby_ls.setup {
-  -- on_attach = on_attach,
-  -- cmd = { 'bundle', 'exec', 'ruby-lsp' },
-  -- }
 
   -- https://github.com/sorbet/sorbet
   lspconfig.sorbet.setup {
@@ -384,6 +344,8 @@ M.after_lazy_done = function()
   --
   -- NOTE: This is no longer integrated or dependent on lspconfig
   --
+  -- NOTE: no longer supported
+  --
   local null_ls = require 'null-ls'
 
   null_ls.setup {
@@ -391,8 +353,6 @@ M.after_lazy_done = function()
     sources = {
       null_ls.builtins.diagnostics.rubocop,
       null_ls.builtins.formatting.rubocop,
-      -- Using prettier rather than prettierd, as prettierd doesn't seem to support ESM config files very well, nor does it seem to work with tail
-      -- null_ls.builtins.formatting.prettier,
       null_ls.builtins.formatting.prettier,
       null_ls.builtins.formatting.stylua,
       null_ls.builtins.formatting.sqlformat,
@@ -408,20 +368,6 @@ M.after_lazy_done = function()
 
   -- https://github.com/clangd/clangd
   lspconfig.clangd.setup {
-    on_attach = on_attach,
-  }
-
-  -- https://github.com/antonk52/cssmodules-language-server
-  lspconfig.cssmodules_ls.setup {
-    on_attach = function(client)
-      -- avoid accepting `definitionProvider` responses from this LSP
-      -- client.server_capabilities.definitionProvider = false
-      on_attach(client)
-    end,
-  }
-
-  -- https://github.com/tailwindlabs/tailwindcss-intellisense
-  lspconfig.tailwindcss.setup {
     on_attach = on_attach,
   }
 
