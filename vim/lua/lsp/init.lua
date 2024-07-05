@@ -292,6 +292,8 @@ M.after_lazy_done = function()
     end,
   }
 
+  -- https://github.com/vunguyentuan/vscode-css-variables/tree/master/packages/css-variables-language-server
+
   -- https://github.com/tailwindlabs/tailwindcss-intellisense
   lspconfig.tailwindcss.setup {
     on_attach = on_attach,
@@ -320,10 +322,20 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
+  -- https://github.com/microsoft/compose-language-service
+  lspconfig.docker_compose_language_service.setup {
+    on_attach = on_attach,
+  }
+
   -- https://github.com/sorbet/sorbet
   lspconfig.sorbet.setup {
     -- on_attach = on_attach,
     -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
+  }
+
+  -- https://github.com/rubocop/rubocop
+  lspconfig.rubocop.setup {
+    on_attach = on_attach,
   }
 
   -- https://github.com/phpactor/phpactor
@@ -351,7 +363,6 @@ M.after_lazy_done = function()
   null_ls.setup {
     -- register any number of sources simultaneously
     sources = {
-      null_ls.builtins.diagnostics.rubocop,
       null_ls.builtins.formatting.rubocop,
       null_ls.builtins.formatting.prettier,
       null_ls.builtins.formatting.stylua,
