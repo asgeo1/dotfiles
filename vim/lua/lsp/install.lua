@@ -200,6 +200,9 @@ M.install_npm_packages = function()
     'pyright',
     'yaml-language-server',
     '@tailwindcss/language-server',
+
+    -- Not actually a LSP, but still useful to have
+    'neovim',
   }
 
   local home_dir = os.getenv 'HOME'

@@ -41,6 +41,9 @@ require 'config.autocmds'
 -- gem install rubocop
 -- gem install sorbet
 --
+-- # also useful, but not LSP
+-- gem install neovim
+--
 -- # NOT USING:
 -- gem install typeprof
 -- gem install ruby-lsp
