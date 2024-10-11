@@ -146,8 +146,8 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
-  -- https://github.com/theia-ide/typescript-language-server
-  lspconfig.tsserver.setup {
+  -- https://github.com/typescript-language-server/typescript-language-server
+  lspconfig.ts_ls.setup {
     on_attach = function(client)
       client.server_capabilities.documentFormattingProvider = false
       require('nvim-lsp-ts-utils').setup {}
