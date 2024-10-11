@@ -19,3 +19,7 @@ vim.cmd 'autocmd BufNewFile,BufRead *.rbi set syntax=ruby'
 vim.cmd 'autocmd BufNewFile,BufRead *.rbi set filetype=ruby'
 vim.cmd 'autocmd BufNewFile,BufRead *.env.* set filetype=sh'
 vim.cmd [[augroup END]]
+
+vim.cmd [[augroup custom_perl_settings]]
+vim.cmd 'autocmd FileType perl setlocal iskeyword+=\\$'
+vim.cmd [[augroup END]]
