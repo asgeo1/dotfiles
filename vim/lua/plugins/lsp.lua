@@ -68,6 +68,36 @@ return {
   -- in real-time right from your editor
   'github/copilot.vim',
 
+  -- ChatGPT plugin for NeoVim
+  --
+  -- Note that session data is stored in ~/.local/state/nvim/chatgpt/
+  {
+    'jackMort/ChatGPT.nvim',
+    event = 'VeryLazy',
+    config = function()
+      require('chatgpt').setup {
+        -- Don't use this until this issue is resolved: https://github.com/jackMort/ChatGPT.nvim/issues/461
+        -- api_key_cmd = 'op read op://private/OpenAI-NeoVim-ChatGPT/credential --no-newline',
+
+        openai_params = {
+          model = 'gpt-4o',
+        },
+        openai_edit_params = {
+          model = 'gpt-4o',
+        },
+        popup_input = {
+          submit = '<C-t>',
+        },
+      }
+    end,
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      'nvim-lua/plenary.nvim',
+      'folke/trouble.nvim',
+      'nvim-telescope/telescope.nvim',
+    },
+  },
+
   -- performance issues, disabled:
   --
   -- Show function signature when you type
