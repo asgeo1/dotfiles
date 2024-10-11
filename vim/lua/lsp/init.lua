@@ -351,7 +351,25 @@ M.after_lazy_done = function()
     sources = {
       null_ls.builtins.diagnostics.rubocop,
       null_ls.builtins.formatting.rubocop,
-      null_ls.builtins.formatting.prettier,
+      null_ls.builtins.formatting.prettier.with {
+        filetypes = {
+          'javascript',
+          'javascriptreact',
+          'typescript',
+          'typescriptreact',
+          'vue',
+          'css',
+          'scss',
+          'less',
+          'html',
+          'json',
+          'jsonc',
+          'yaml',
+          'markdown',
+          'markdown.mdx',
+          'graphql',
+        }, -- removed 'handlebars' from the default prettier filetypes - causes issues when editing .hbs files
+      },
       null_ls.builtins.formatting.stylua,
       null_ls.builtins.formatting.sqlformat,
     },
