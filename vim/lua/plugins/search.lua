@@ -36,6 +36,18 @@ return {
             desc = 'open in new tab',
           },
         },
+
+        -- Fix for sed issue on OSX, see https://github.com/nvim-pack/nvim-spectre/issues/118
+        replace_engine = {
+          ['sed'] = {
+            cmd = 'sed',
+            args = {
+              '-i',
+              '',
+              '-E',
+            },
+          },
+        },
       }
     end,
   },
