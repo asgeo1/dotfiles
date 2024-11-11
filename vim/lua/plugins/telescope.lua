@@ -98,6 +98,7 @@ return {
             'build/',
             'external/',
           },
+          root_dirs = { '.git', '.devcontainer' },
           mappings = {
             i = {
               ['<C-j>'] = actions.move_selection_next,

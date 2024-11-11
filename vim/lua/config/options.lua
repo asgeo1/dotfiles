@@ -197,7 +197,15 @@ vim.g.conjoin_map_gJ = '<con-nope>'
 vim.g.bclose_no_plugin_maps = true
 
 -- Vim-rooter
-vim.g.rooter_patterns = { '.git', '.git/', '_darcs/', '.hg/', '.bzr/', '.svn/' }
+vim.g.rooter_patterns = {
+  '.git',
+  '.git/',
+  '_darcs/',
+  '.hg/',
+  '.bzr/',
+  '.svn/',
+  '.devcontainer',
+}
 vim.g.rooter_silent_chdir = true
 
 -- Multiple Cursors
