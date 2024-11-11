@@ -23,3 +23,11 @@ vim.cmd [[augroup END]]
 vim.cmd [[augroup custom_perl_settings]]
 vim.cmd 'autocmd FileType perl setlocal iskeyword+=\\$'
 vim.cmd [[augroup END]]
+
+-- Fix loading of jsonc files
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = { 'devcontainer.json', '.devcontainer.json', '*.jsonc' },
+  callback = function()
+    vim.bo.filetype = 'jsonc'
+  end,
+})
