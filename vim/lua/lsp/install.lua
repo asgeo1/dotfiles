@@ -200,6 +200,7 @@ M.install_npm_packages = function()
     'pyright',
     'yaml-language-server',
     '@tailwindcss/language-server',
+    'graphql-language-service-cli',
 
     -- Not actually a LSP, but still useful to have
     'neovim',

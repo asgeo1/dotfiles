@@ -332,6 +332,11 @@ M.after_lazy_done = function()
     filetypes = { 'tf' },
   }
 
+  -- https://www.npmjs.com/package/graphql-language-service-cli
+  lspconfig.graphql.setup {
+    on_attach = on_attach,
+  }
+
   -- https://github.com/jose-elias-alvarez/null-ls.nvim
   --
   -- General purpose language server, useful for hooking up prettier
