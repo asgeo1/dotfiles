@@ -315,14 +315,10 @@ M.after_lazy_done = function()
     -- cmd = { 'bundle exec srb', 'tc', '--lsp' },
   }
 
-  -- Disabled for now, as seems a bit buggy. Null-ls rubocop formatter and
-  -- diagnostics seems to work better.
-  -- May need to wait until using newest rubocop version
-  --
   -- https://github.com/rubocop/rubocop
-  -- lspconfig.rubocop.setup {
-  --   on_attach = on_attach,
-  -- }
+  lspconfig.rubocop.setup {
+    on_attach = on_attach,
+  }
 
   -- https://github.com/phpactor/phpactor
   lspconfig.phpactor.setup {
@@ -349,8 +345,6 @@ M.after_lazy_done = function()
   null_ls.setup {
     -- register any number of sources simultaneously
     sources = {
-      null_ls.builtins.diagnostics.rubocop,
-      null_ls.builtins.formatting.rubocop,
       null_ls.builtins.formatting.prettier.with {
         filetypes = {
           'javascript',
