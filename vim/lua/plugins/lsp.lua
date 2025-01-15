@@ -55,7 +55,7 @@ return {
     end,
   },
 
-  -- General purpose language server, useful for hooking up prettier/eslint
+  -- General purpose language server, useful for hooking up prettier
   {
     'jose-elias-alvarez/null-ls.nvim',
     dependencies = {

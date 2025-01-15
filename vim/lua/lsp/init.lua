@@ -379,6 +379,18 @@ M.after_lazy_done = function()
   -- https://github.com/hrsh7th/vscode-langservers-extracted
   lspconfig.eslint.setup {
     on_attach = on_attach,
+    filetypes = {
+      'javascript',
+      'javascriptreact',
+      'javascript.jsx',
+      'typescript',
+      'typescriptreact',
+      'typescript.tsx',
+      'vue',
+      'svelte',
+      'astro',
+      'graphql',
+    },
   }
 
   -- https://github.com/clangd/clangd
