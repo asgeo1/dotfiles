@@ -13,7 +13,17 @@ return {
       {
         '<leader>tf',
         function()
-          require('telescope.builtin').find_files()
+          require('telescope.builtin').find_files {
+            find_command = {
+              'rg',
+              '--files',
+              '--color',
+              'never',
+              '--hidden',
+              '--glob=!**/.git/**',
+              '--glob=!**/.keep',
+            },
+          }
         end,
         desc = 'Find Files (Telescope)',
       },
