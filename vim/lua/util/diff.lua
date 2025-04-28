@@ -43,11 +43,13 @@ function M.SetupDiffViewFromBuffers()
   -- First TabPage: Local vs Base
   vim.cmd('tab split' .. base_file)
   vim.cmd('vsplit ' .. local_file)
+  vim.cmd 'windo setlocal nofoldenable'
   vim.cmd 'windo diffthis'
 
   -- Second TabPage: Base vs Remote
   vim.cmd('tab split' .. remote_file)
   vim.cmd('vsplit ' .. base_file)
+  vim.cmd 'windo setlocal nofoldenable'
   vim.cmd 'windo diffthis'
 
   vim.cmd 'tabfirst'
