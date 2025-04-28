@@ -57,7 +57,7 @@ return {
 
   -- General purpose language server, useful for hooking up prettier
   {
-    'jose-elias-alvarez/null-ls.nvim',
+    'nvimtools/none-ls.nvim',
     dependencies = {
       'nvim-lua/plenary.nvim',
       'neovim/nvim-lspconfig',

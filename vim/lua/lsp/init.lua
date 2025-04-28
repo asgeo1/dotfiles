@@ -337,20 +337,20 @@ M.after_lazy_done = function()
     on_attach = on_attach,
   }
 
-  -- https://github.com/jose-elias-alvarez/null-ls.nvim
+  -- https://github.com/nvimtools/none-ls.nvim
   --
   -- General purpose language server, useful for hooking up prettier
   --
   -- NOTE: This is no longer integrated or dependent on lspconfig
   --
-  -- NOTE: no longer supported
+  -- NOTE: Now using fork none-ls, rather than original null-ls, which is no longer maintained
   --
-  local null_ls = require 'null-ls'
+  local none_ls = require 'null-ls'
 
-  null_ls.setup {
+  none_ls.setup {
     -- register any number of sources simultaneously
     sources = {
-      null_ls.builtins.formatting.prettier.with {
+      none_ls.builtins.formatting.prettier.with {
         filetypes = {
           'javascript',
           'javascriptreact',
@@ -369,8 +369,8 @@ M.after_lazy_done = function()
           'graphql',
         }, -- removed 'handlebars' from the default prettier filetypes - causes issues when editing .hbs files
       },
-      null_ls.builtins.formatting.stylua,
-      null_ls.builtins.formatting.sqlformat,
+      none_ls.builtins.formatting.stylua,
+      none_ls.builtins.formatting.sqlformat,
     },
     on_attach = on_attach,
     -- debug = true,
