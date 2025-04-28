@@ -7,7 +7,8 @@ alias vim="nvim"
 # -e = text in $VISUAL/$EDITOR/vi
 # -a = auto NNN_FIFO
 # -H = show hidden files
-alias nnn="nnn -e -a -H"
+# -A = disable auto cd when filtering
+alias nnn="nnn -e -a -H -A"
 
 # context colors, each context a different color
 set -x NNN_COLORS '4231'
