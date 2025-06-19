@@ -101,7 +101,6 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
     │   ├── keymaps.lua     # Global key mappings
     │   ├── lazy.lua        # Plugin manager bootstrap and configuration
     │   └── options.lua     # Vim options (tabs, search, UI settings)
-    ├── galaxyline/         # Custom status line theme
     ├── lsp/                # Language Server Protocol configuration
     │   ├── formatting.lua  # Document formatting setup
     │   ├── handlers.lua    # LSP handler customizations
@@ -146,7 +145,7 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
 ### Notable Features
 - **AI Integration**: GitHub Copilot and Avante.nvim
 - **Git Integration**: Fugitive, Gitsigns, and git-messenger
-- **Modern UI**: Telescope, Trouble, and custom galaxyline status
+- **Modern UI**: Telescope, Trouble, and lualine statusline
 - **Smart Editing**: Treesitter, autopairs, and comment.nvim
 - **File Management**: nnn.nvim integration
 - **Testing**: vim-test with projectionist support

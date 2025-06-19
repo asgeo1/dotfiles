@@ -63,10 +63,9 @@ return {
     end,
   },
 
-  -- Light-weight and Super Fast statusline plugin. Galaxyline componentizes
-  -- Vim's statusline by having a provider for each text area
+  -- A blazing fast and easy to configure neovim statusline plugin
   {
-    'NTBBloodbath/galaxyline.nvim',
+    'nvim-lualine/lualine.nvim',
     event = 'VeryLazy',
     init = function()
       require('onedark').setup {
@@ -75,19 +74,52 @@ return {
       require('onedark').load()
     end,
     config = function()
-      -- Built-in theme
-      require 'galaxyline.themes.eviline'
+      -- Custom filename component to show full path
+      local custom_filename = require('lualine.components.filename'):extend()
+      function custom_filename:init(options)
+        custom_filename.super.init(self, options)
+        self.options.path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
+      end
 
-      local condition = require 'galaxyline.condition'
-      local colors = require('galaxyline.themes.colors')['doom-one']
-
-      -- Replace FileName with FilePath for section 5
-      require('galaxyline').section.left[5] = {
-        FileName = {
-          provider = 'FilePath',
-          condition = condition.buffer_not_empty,
-          highlight = { colors.magenta, colors.bg, 'bold' },
+      require('lualine').setup {
+        options = {
+          theme = 'onedark',
+          icons_enabled = true,
+          component_separators = { left = '', right = '' },
+          section_separators = { left = '', right = '' },
+          disabled_filetypes = {
+            statusline = {},
+            winbar = {},
+          },
+          ignore_focus = {},
+          always_divide_middle = true,
+          globalstatus = false,
+          refresh = {
+            statusline = 1000,
+            tabline = 1000,
+            winbar = 1000,
+          }
         },
+        sections = {
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', 'diff', 'diagnostics' },
+          lualine_c = { custom_filename },
+          lualine_x = { 'encoding', 'fileformat', 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' }
+        },
+        inactive_sections = {
+          lualine_a = {},
+          lualine_b = {},
+          lualine_c = { 'filename' },
+          lualine_x = { 'location' },
+          lualine_y = {},
+          lualine_z = {}
+        },
+        tabline = {},
+        winbar = {},
+        inactive_winbar = {},
+        extensions = {}
       }
     end,
     dependencies = {
