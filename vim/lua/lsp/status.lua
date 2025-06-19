@@ -1,36 +1,5 @@
-local Job = require 'plenary.job'
 local M = {}
-
--- List of npm packages that are LSP servers
-local npm_lsp_packages = {
-  ['typescript-language-server'] = 'TypeScript',
-  ['vscode-langservers-extracted'] = 'HTML/CSS/JSON/ESLint',
-  ['cssmodules-language-server'] = 'CSS Modules',
-  ['css-variables-language-server'] = 'CSS Variables',
-  ['vim-language-server'] = 'VimScript',
-  ['sql-language-server'] = 'SQL',
-  ['bash-language-server'] = 'Bash',
-  ['dockerfile-language-server-nodejs'] = 'Dockerfile',
-  ['@microsoft/compose-language-service'] = 'Docker Compose',
-  ['pyright'] = 'Python',
-  ['yaml-language-server'] = 'YAML',
-  ['@tailwindcss/language-server'] = 'Tailwind CSS',
-  ['graphql-language-service-cli'] = 'GraphQL',
-}
-
--- Manual installation servers
-local manual_lsp_servers = {
-  { name = 'Go', check_cmd = 'gopls version' },
-  { name = 'Lua', check_cmd = 'lua-language-server --version' },
-  { name = 'PHP (intelephense)', check_cmd = 'intelephense --version' },
-  { name = 'PHP (phpactor)', check_cmd = 'phpactor --version' },
-  { name = 'Ruby (solargraph)', check_cmd = 'solargraph -v' },
-  { name = 'Ruby (sorbet)', check_cmd = 'srb --version' },
-  { name = 'Ruby (rubocop)', check_cmd = 'rubocop --version' },
-  { name = 'Terraform', check_cmd = 'terraform-ls --version' },
-  { name = 'C/C++ (clangd)', check_cmd = 'clangd --version' },
-  { name = 'Rust', check_cmd = 'rust-analyzer --version' },
-}
+local servers = require 'lsp.servers'
 
 M.show_status = function()
   -- Create floating window
@@ -102,10 +71,10 @@ M.show_status = function()
       
       -- Check npm packages
       local npm_count = 0
-      local npm_total = vim.tbl_count(npm_lsp_packages)
+      local npm_total = vim.tbl_count(servers.npm_packages)
       local npm_results = {}
       
-      for package, name in pairs(npm_lsp_packages) do
+      for package, info in pairs(servers.npm_packages) do
         local npm_cmd = string.format(
           'export PATH="%s/.nodenv/bin:$PATH" && eval "$(nodenv init -)" && npm list -g --depth=0 2>/dev/null | grep "%s@"',
           home_dir,
@@ -117,7 +86,7 @@ M.show_status = function()
             if data and data[1] and data[1] ~= '' then
               local version = data[1]:match('@(.+)$') or 'unknown'
               table.insert(npm_results, {
-                name = name,
+                name = info.name,
                 status = '✓ Installed',
                 version = version
               })
@@ -126,7 +95,7 @@ M.show_status = function()
           on_exit = function(_, exit_code)
             if exit_code ~= 0 then
               table.insert(npm_results, {
-                name = name,
+                name = info.name,
                 status = '✗ Not installed',
                 version = ''
               })
@@ -154,7 +123,7 @@ M.show_status = function()
               local manual_count = 0
               local manual_results = {}
               
-              for _, server in ipairs(manual_lsp_servers) do
+              for _, server in ipairs(servers.manual_servers) do
                 vim.fn.jobstart({'bash', '-c', 'command -v ' .. server.check_cmd:match('^%S+') .. ' && ' .. server.check_cmd}, {
                   on_stdout = function(_, data)
                     if data and data[1] then
@@ -192,7 +161,7 @@ M.show_status = function()
                       })
                     end
                     
-                    if manual_count == #manual_lsp_servers then
+                    if manual_count == #servers.manual_servers then
                       -- Sort and add manual results
                       table.sort(manual_results, function(a, b) return a.name < b.name end)
                       for _, result in ipairs(manual_results) do

@@ -186,25 +186,9 @@ M.install_npm_packages = function()
   -- Create the floating window
   local buf, win = create_floating_window()
 
-  -- List of npm packages to install globally
-  local npm_packages = {
-    'typescript-language-server',
-    'vscode-langservers-extracted',
-    'cssmodules-language-server',
-    'css-variables-language-server',
-    'vim-language-server',
-    'sql-language-server',
-    'bash-language-server',
-    'dockerfile-language-server-nodejs',
-    '@microsoft/compose-language-service',
-    'pyright',
-    'yaml-language-server',
-    '@tailwindcss/language-server',
-    'graphql-language-service-cli',
-
-    -- Not actually a LSP, but still useful to have
-    'neovim',
-  }
+  -- Get list of npm packages from shared configuration
+  local servers = require 'lsp.servers'
+  local npm_packages = servers.get_all_npm_packages()
 
   local home_dir = os.getenv 'HOME'
   local nodenv_path = home_dir .. '/.nodenv/bin/nodenv'
