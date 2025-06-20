@@ -184,18 +184,6 @@ vim.g.gitgutter_git_executable = 'git'
 -- vim.highlight GitGutterChange       guifg=#bbbb00 guibg=NONE ctermfg=3 ctermbg=0
 -- vim.highlight GitGutterDelete       guifg=#ff2222 guibg=NONE ctermfg=1 ctermbg=0
 
--- Git Messenger
-vim.g.git_messenger_floating_win_opts = {
-  border = 'rounded',
-}
-
--- SplitJoin
-vim.g.conjoin_map_J = 'gJ'
-vim.g.conjoin_map_gJ = '<con-nope>'
-
--- Bclose
-vim.g.bclose_no_plugin_maps = true
-
 -- Vim-rooter
 vim.g.rooter_patterns = {
   '.git',
@@ -207,19 +195,6 @@ vim.g.rooter_patterns = {
   '.devcontainer',
 }
 vim.g.rooter_silent_chdir = true
-
--- Multiple Cursors
-vim.g.multi_cursor_use_default_mapping = false
-
--- Default mapping
-vim.g.multi_cursor_start_word_key = '<C-n>'
-vim.g.multi_cursor_select_all_word_key = '<C-a>'
-vim.g.multi_cursor_start_key = 'g<C-n>'
-vim.g.multi_cursor_select_all_key = 'g<C-a>'
-vim.g.multi_cursor_next_key = '<C-n>'
-vim.g.multi_cursor_prev_key = '<C-p>'
-vim.g.multi_cursor_skip_key = '<C-x>'
-vim.g.multi_cursor_quit_key = '<Esc>'
 
 -- Fix markdown indentation settings
 vim.g.markdown_recommended_style = 0

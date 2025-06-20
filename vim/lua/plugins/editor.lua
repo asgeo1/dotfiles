@@ -3,18 +3,31 @@ return {
   -- or directory
   'airblade/vim-rooter',
 
-  -- Deleting a buffer in Vim without closing the window
+  -- Deleting a buffer without closing the window
   {
-    'rbgrouleff/bclose.vim',
+    'echasnovski/mini.bufremove',
+    version = false,
     keys = {
       {
         '<leader>bd',
-        ':Bclose<CR>',
+        function()
+          require('mini.bufremove').delete(0, false)
+        end,
         desc = 'Delete buffer',
         silent = true,
       },
+      {
+        '<leader>bD',
+        function()
+          require('mini.bufremove').delete(0, true)
+        end,
+        desc = 'Delete buffer (force)',
+        silent = true,
+      },
     },
-    -- event = 'Bclose', -- No such event?
+    config = function()
+      require('mini.bufremove').setup()
+    end,
   },
 
   -- The goal of nvim-bqf is to make Neovim's quickfix window better.

@@ -81,6 +81,22 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
 - `<leader>fb` - Browse buffers
 - `<leader>fh` - Help tags
 
+### Git (Neogit & Gitsigns)
+- `<leader>gs` - Git status (Neogit)
+- `<leader>gc` - Git commit
+- `<leader>gp` - Git push
+- `<leader>gP` - Git pull
+- `<leader>gb` - Git branch
+- `<leader>gl` - Git log
+- `<leader>gm` - Git blame current line
+- `]h` / `[h` - Next/Previous git hunk
+- `<leader>ghs` - Stage hunk
+- `<leader>ghr` - Reset hunk
+- `<leader>ghS` - Stage buffer
+- `<leader>ghR` - Reset buffer
+- `<leader>ghp` - Preview hunk
+- `<leader>ghb` - Blame line (full)
+
 ### Autocomplete (nvim-cmp)
 - `<C-p>`/`<C-n>` - Navigate completion items
 - `<C-b>`/`<C-f>` - Scroll documentation
@@ -147,9 +163,9 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
 
 ### Notable Features
 - **AI Integration**: GitHub Copilot and Avante.nvim
-- **Git Integration**: Fugitive, Gitsigns, and git-messenger
+- **Git Integration**: Neogit, Gitsigns, Diffview, and Flog
 - **Modern UI**: Telescope, Trouble, and lualine statusline
-- **Smart Editing**: Treesitter, autopairs, and comment.nvim
+- **Smart Editing**: Treesitter, treesj, mini modules, and multicursors
 - **File Management**: nnn.nvim integration
 - **Testing**: vim-test with projectionist support
 

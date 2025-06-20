@@ -1,12 +1,63 @@
 return {
-  -- Git wrapper
-  'tpope/vim-fugitive',
-
-  -- Reveal the hidden message from Git under the cursor quickly. It shows
-  -- the history of commits under the cursor in popup window
+  -- Modern Git interface for Neovim
   {
-    'rhysd/git-messenger.vim',
-    keys = { '<leader>gm' },
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'sindrets/diffview.nvim',
+      'nvim-telescope/telescope.nvim',
+    },
+    config = function()
+      require('neogit').setup({
+        disable_signs = false,
+        disable_hint = true,
+        disable_context_highlighting = false,
+        disable_commit_confirmation = false,
+        auto_refresh = true,
+        sort_branches = '-committerdate',
+        kind = 'tab',
+        console_timeout = 2000,
+        auto_show_console = true,
+        remember_settings = true,
+        use_magit_keybindings = false,
+        ignored_settings = {},
+        -- Override/add mappings
+        mappings = {
+          -- Modify the default mappings as you see fit
+          status = {
+            ['cc'] = 'CommitPopup',
+            ['s'] = 'Stage',
+            ['S'] = 'StageAll',
+            ['u'] = 'Unstage',
+            ['U'] = 'UnstageAll',
+            ['d'] = 'DiffAtFile',
+            ['x'] = 'Discard',
+            ['X'] = 'DiscardAll',
+            ['p'] = 'PullPopup',
+            ['P'] = 'PushPopup',
+            ['b'] = 'BranchPopup',
+            ['?'] = 'HelpPopup',
+            ['q'] = 'Close',
+          },
+        },
+        integrations = {
+          telescope = true,
+          diffview = true,
+        },
+      })
+    end,
+    keys = {
+      { '<leader>gs', '<cmd>Neogit<cr>', desc = 'Git status' },
+      { '<leader>gc', '<cmd>Neogit commit<cr>', desc = 'Git commit' },
+      { '<leader>gp', '<cmd>Neogit push<cr>', desc = 'Git push' },
+      { '<leader>gP', '<cmd>Neogit pull<cr>', desc = 'Git pull' },
+      { '<leader>gb', '<cmd>Neogit branch<cr>', desc = 'Git branch' },
+      { '<leader>gl', '<cmd>Neogit log<cr>', desc = 'Git log' },
+      { '<leader>gm', function() 
+          -- Git blame current line (replaces git-messenger)
+          require('gitsigns').blame_line({ full = true })
+        end, desc = 'Git blame line' },
+    },
   },
 
   -- Signs for added, removed, and changed lines

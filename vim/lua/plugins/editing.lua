@@ -45,8 +45,22 @@ return {
     end,
   },
 
-  -- Switching between a single-line statement and a multi-line one
-  'AndrewRadev/splitjoin.vim',
+  -- Switching between a single-line statement and a multi-line one (Treesitter-based)
+  {
+    'Wansmer/treesj',
+    keys = {
+      { 'gJ', '<cmd>TSJToggle<cr>', desc = 'Join/Split' },
+      { 'gS', '<cmd>TSJSplit<cr>', desc = 'Split' },
+      { 'gj', '<cmd>TSJJoin<cr>', desc = 'Join' },
+    },
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      require('treesj').setup({
+        use_default_keymaps = false,
+        max_join_length = 150,
+      })
+    end,
+  },
 
   -- This plugin defines a new text object, based on indentation levels.
   -- This is very useful in languages such as Python, in which the syntax
@@ -54,7 +68,53 @@ return {
   'michaeljsmith/vim-indent-object',
 
   -- Multiple cursors for editing / refactoring text
-  'mg979/vim-visual-multi',
+  {
+    'jake-stewart/multicursor.nvim',
+    branch = '1.0',
+    config = function()
+      local mc = require('multicursor-nvim')
+      mc.setup()
+
+      -- Add cursors above/below
+      vim.keymap.set({'n', 'v'}, '<up>', function() mc.addCursor('k') end)
+      vim.keymap.set({'n', 'v'}, '<down>', function() mc.addCursor('j') end)
+
+      -- Add cursor by matching word
+      vim.keymap.set({'n', 'v'}, '<leader>n', function() mc.addCursor('*') end)
+
+      -- Add cursor with mouse
+      vim.keymap.set('n', '<c-leftmouse>', mc.handleMouse)
+
+      -- Toggle multicursor mode
+      vim.keymap.set({'n', 'v'}, '<c-q>', mc.toggleCursor)
+
+      -- Navigate between cursors
+      vim.keymap.set({'n', 'v'}, '<left>', mc.prevCursor)
+      vim.keymap.set({'n', 'v'}, '<right>', mc.nextCursor)
+
+      -- Delete current cursor
+      vim.keymap.set({'n', 'v'}, '<leader>x', mc.deleteCursor)
+
+      -- Add cursors for all matches
+      vim.keymap.set('n', '<leader>A', function()
+        mc.addCursor('*')
+        mc.splitCursors()
+      end)
+
+      -- Align cursors
+      vim.keymap.set('n', '<leader>a', mc.alignCursors)
+
+      -- Clear multicursors and enable Neovim's ESC behavior
+      vim.keymap.set('n', '<esc>', function()
+        if mc.hasCursors() then
+          mc.clearCursors()
+        else
+          -- Default ESC behavior
+          vim.cmd('noh')
+        end
+      end)
+    end,
+  },
 
   -- better text-objects
   {
