@@ -58,6 +58,8 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
 - `:TSInstall <language>` - Install specific parser
 - `:TSBufEnable highlight` - Enable highlighting for buffer
 - `:TSBufDisable highlight` - Disable highlighting for buffer
+- `:InspectTree` - View Treesitter AST (replaces deprecated playground)
+- `:EditQuery` - Edit Treesitter queries
 
 ### Custom Commands
 - `:Format` - Format current buffer (uses LSP or prettier via none-ls)
@@ -134,13 +136,14 @@ This is a modern Neovim configuration written entirely in Lua. The configuration
 ### LSP Configuration
 - **Servers**: Configured in lua/lsp/init.lua
 - **Auto-installed servers** (via npm/nodenv):
-  - cssls, eslint, html, jsonls, tsserver, vimls, yamlls, bashls,
+  - cssls, eslint, html, jsonls, ts_ls, vimls, yamlls, bashls,
   - dockerls, emmet_ls, graphql, prismals, stylelint_lsp, svelte,
   - tailwindcss, vuels, astro, pylsp
 - **Manual installation required**:
   - gopls (Go), sumneko_lua (Lua), intelephense (PHP), solargraph (Ruby)
 - **Completion**: nvim-cmp with LSP, buffer, path, and snippet sources
 - **Formatting**: Uses none-ls (null-ls fork) with prettier
+- **TypeScript**: Uses native ts_ls configuration (nvim-lsp-ts-utils removed, tsserver renamed to ts_ls)
 
 ### Notable Features
 - **AI Integration**: GitHub Copilot and Avante.nvim

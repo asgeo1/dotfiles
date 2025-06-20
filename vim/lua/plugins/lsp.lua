@@ -32,14 +32,6 @@ return {
     end,
   },
 
-  -- LSP
-  {
-    'jose-elias-alvarez/nvim-lsp-ts-utils',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'neovim/nvim-lspconfig',
-    },
-  },
 
   -- LSP diagnostics displayed as virtual text
   {

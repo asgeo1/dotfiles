@@ -1,11 +1,5 @@
 return {
   -- UI / UX
-  {
-    'nvim-lua/popup.nvim',
-    dependencies = 'nvim-lua/plenary.nvim',
-    lazy = true,
-  },
-
   -- ui components
   { 'MunifTanjim/nui.nvim', lazy = true },
 

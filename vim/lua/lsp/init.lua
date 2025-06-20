@@ -376,6 +376,21 @@ M.after_lazy_done = function()
     -- debug = true,
   }
 
+  -- https://github.com/typescript-language-server/typescript-language-server
+  lspconfig.ts_ls.setup {
+    on_attach = on_attach,
+    init_options = {
+      preferences = {
+        disableSuggestions = false,
+      },
+    },
+    handlers = {
+      ["textDocument/formatting"] = function()
+        -- Disable tsserver formatting; we use prettier via none-ls
+      end,
+    },
+  }
+
   -- https://github.com/hrsh7th/vscode-langservers-extracted
   lspconfig.eslint.setup {
     on_attach = on_attach,

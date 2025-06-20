@@ -3,7 +3,7 @@ local M = {}
 
 -- NPM-based LSP servers that can be installed via :InstallLspServers
 M.npm_packages = {
-  ['typescript-language-server'] = { name = 'TypeScript', lsp_name = 'tsserver' },
+  ['typescript-language-server'] = { name = 'TypeScript', lsp_name = 'ts_ls' },
   ['vscode-langservers-extracted'] = { name = 'HTML/CSS/JSON/ESLint', lsp_name = 'multiple' },
   ['cssmodules-language-server'] = { name = 'CSS Modules', lsp_name = 'cssmodules_ls' },
   ['css-variables-language-server'] = { name = 'CSS Variables', lsp_name = 'css_variables' },
