@@ -2,6 +2,16 @@
 
 This guide provides strategic guidance on when and how to use MCP tools effectively.
 
+## IMPORTANT: Project-Specific Tool Availability
+
+**Not all MCP tools listed below may be available for the current project.** The available tools depend on which MCP servers were installed for this specific project:
+
+- **Frontend projects** typically exclude: `database`
+- **Backend/API projects** typically exclude: `browser`, `playwright`
+- **Full-stack projects** typically include all tools
+
+To check which MCP tools are actually available in the current project, look for error messages when attempting to use a tool, or check the project's MCP configuration.
+
 ## Tool Categories
 
 ### 🔍 Context7 - Library Documentation
@@ -24,6 +34,13 @@ This guide provides strategic guidance on when and how to use MCP tools effectiv
 ### 🎭 Playwright/Browser MCP - Browser Automation
 - **When to use**: Web testing, scraping, automation, or visual verification
 - **Key principle**: Always snapshot before interacting
+- **Common exclusion**: Backend/API projects
+
+### 🗄️ Database MCP - SQL Database Access
+- **When to use**: Direct SQL database queries, schema inspection, data analysis
+- **Key tools**: Query execution, schema exploration, data manipulation
+- **Common exclusion**: Frontend projects
+- **Note**: Requires database connection URLs configured during installation
 
 ---
 
@@ -161,6 +178,7 @@ This guide provides strategic guidance on when and how to use MCP tools effectiv
 | Testing | Playwright | Zen (testgen) |
 | Documentation | Context7 | Tavily (examples) |
 | Security | Zen (secaudit) | Serena (patterns) |
+| Database work | Database MCP | Zen (analysis) |
 
 ---
 
@@ -216,7 +234,8 @@ This guide provides strategic guidance on when and how to use MCP tools effectiv
 - **Complex analysis**: `mcp__zen__thinkdeep` or `mcp__zen__planner`
 - **Web research**: `mcp__tavily__tavily-search`
 - **Library docs**: `mcp__context7__resolve-library-id`
-- **Browser automation**: `mcp__playwright__browser_navigate`
+- **Browser automation**: `mcp__playwright__browser_navigate` (if available)
+- **Database queries**: Check if database MCP is available first
 
 ### 💡 Remember
 
@@ -224,3 +243,4 @@ This guide provides strategic guidance on when and how to use MCP tools effectiv
 - Use memory to maintain context across sessions
 - Combine tools for powerful workflows
 - Think before acting, plan before executing
+- Check tool availability before use - not all projects have all MCP servers

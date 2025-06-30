@@ -21,10 +21,10 @@ The following environment variables must be set before running the installation:
 ### Installation Commands
 
 ```bash
-# Install all servers for current directory (default)
+# Interactive installation (default) - prompts for project type
 mcp-setup install
 
-# Install all servers explicitly
+# Install all servers explicitly (bypasses interactive prompt)
 mcp-setup install --all
 
 # Install specific servers
@@ -34,6 +34,16 @@ mcp-setup install serena zen context7
 # Install for a specific project directory
 mcp-setup install ~/Projects/myapp
 mcp-setup install serena ~/Projects/myapp
+
+# Install with profiles (predefined exclusions)
+mcp-setup install --profile frontend    # Excludes database
+mcp-setup install --profile backend     # Excludes browser, playwright
+mcp-setup install --profile api         # Excludes browser, playwright
+mcp-setup install --profile fullstack   # Installs everything
+
+# Exclude specific servers
+mcp-setup install --exclude database
+mcp-setup install --exclude database,browser,playwright
 
 # Non-interactive mode (useful for scripts/CI)
 mcp-setup install --non-interactive
@@ -63,15 +73,38 @@ mcp-setup help
 
 ## Available MCP Servers
 
-| Server Key | Description | Notes |
-|------------|-------------|-------|
-| `serena` | Code development and editing | Requires project-specific configuration |
-| `context7` | Library documentation lookup | Quick access to documentation |
-| `zen` | AI assistant tools and workflows | Complex analysis, planning, debugging |
-| `tavily` | Web search and content extraction | Requires TAVILY_API_KEY |
-| `browser` | Browser automation tools | Web interaction capabilities |
-| `playwright` | Browser testing and automation | Advanced browser control |
-| `database` | Database MCP (SQL Access) | Requires database URLs (PostgreSQL/MySQL) |
+| Server Key | Description | Notes | Common Exclusions |
+|------------|-------------|-------|-------------------|
+| `serena` | Code development and editing | Requires project-specific configuration | - |
+| `context7` | Library documentation lookup | Quick access to documentation | - |
+| `zen` | AI assistant tools and workflows | Complex analysis, planning, debugging | - |
+| `tavily` | Web search and content extraction | Requires TAVILY_API_KEY | - |
+| `browser` | Browser automation tools | Web interaction capabilities | Backend/API projects |
+| `playwright` | Browser testing and automation | Advanced browser control | Backend/API projects |
+| `database` | Database MCP (SQL Access) | Requires database URLs (PostgreSQL/MySQL) | Frontend projects |
+
+## Installation Behavior
+
+### Interactive Mode (Default)
+
+When you run `mcp-setup install` without arguments, you'll be prompted to select your project type:
+
+1. **Frontend project** - Excludes `database`
+2. **Backend/API project** - Excludes `browser` and `playwright`
+3. **Full-stack project** - Installs all servers
+4. **Custom selection** - Choose specific servers manually
+5. **Install all servers** - Install everything
+
+This ensures you don't accidentally install unnecessary MCP servers for your project type.
+
+### Project Profiles
+
+You can also use profiles directly to skip the interactive prompt:
+
+- **`--profile frontend`**: Installs all servers except `database`
+- **`--profile backend`**: Installs all servers except `browser` and `playwright`
+- **`--profile api`**: Installs all servers except `browser` and `playwright`
+- **`--profile fullstack`**: Installs all servers
 
 ## Post-Installation
 

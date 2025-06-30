@@ -454,6 +454,7 @@ handle_install() {
     shift # Remove 'install' from arguments
     local project_dir=""
     local servers_to_install=()
+    local servers_to_exclude=()
     local install_all=false
     export SERENA_PROJECT_NAME=""
     export NON_INTERACTIVE=false
@@ -465,6 +466,45 @@ handle_install() {
             --all)
                 install_all=true
                 shift
+                ;;
+            --exclude)
+                if [ -z "$2" ]; then
+                    print_error "Option --exclude requires a value"
+                    exit 1
+                fi
+                # Split comma-separated values
+                IFS=',' read -ra exclude_list <<< "$2"
+                servers_to_exclude+=("${exclude_list[@]}")
+                shift 2
+                ;;
+            --profile)
+                if [ -z "$2" ]; then
+                    print_error "Option --profile requires a value"
+                    exit 1
+                fi
+                case $2 in
+                    frontend)
+                        install_all=true
+                        servers_to_exclude+=("database")
+                        ;;
+                    backend)
+                        install_all=true
+                        servers_to_exclude+=("browser" "playwright")
+                        ;;
+                    api)
+                        install_all=true
+                        servers_to_exclude+=("browser" "playwright")
+                        ;;
+                    fullstack)
+                        install_all=true
+                        ;;
+                    *)
+                        print_error "Unknown profile: $2"
+                        echo "Available profiles: frontend, backend, api, fullstack"
+                        exit 1
+                        ;;
+                esac
+                shift 2
                 ;;
             --non-interactive|-n)
                 NON_INTERACTIVE=true
@@ -513,18 +553,111 @@ handle_install() {
     
     export PROJECT_DIR="$project_dir"
     
-    # If no servers specified and not --all, default to all
+    # If no servers specified and not --all, show interactive menu
     if [ ${#servers_to_install[@]} -eq 0 ] && [ "$install_all" = false ]; then
-        install_all=true
+        if [ "$NON_INTERACTIVE" = true ]; then
+            # Non-interactive mode defaults to all
+            install_all=true
+        else
+            # Interactive server selection
+            echo "Select servers to install for your project type:"
+            echo ""
+            echo "  1) Frontend project (excludes: database)"
+            echo "  2) Backend/API project (excludes: browser, playwright)"
+            echo "  3) Full-stack project (all servers)"
+            echo "  4) Custom selection"
+            echo "  5) Install all servers"
+            echo ""
+            read -p "Enter your choice (1-5): " choice
+            
+            case $choice in
+                1)
+                    install_all=true
+                    servers_to_exclude+=("database")
+                    print_info "Using Frontend profile"
+                    ;;
+                2)
+                    install_all=true
+                    servers_to_exclude+=("browser" "playwright")
+                    print_info "Using Backend/API profile"
+                    ;;
+                3)
+                    install_all=true
+                    print_info "Using Full-stack profile"
+                    ;;
+                4)
+                    # Custom selection
+                    echo ""
+                    echo "Available servers:"
+                    local all_keys=$(get_all_server_keys)
+                    local i=1
+                    for key in $all_keys; do
+                        echo "  $i) $key - $(get_server_name "$key")"
+                        ((i++))
+                    done
+                    echo ""
+                    echo "Enter server numbers to install (space-separated, e.g., '1 3 5'):"
+                    read -p "> " selections
+                    
+                    # Convert selections to server keys
+                    local key_array=($all_keys)
+                    for num in $selections; do
+                        if [[ $num =~ ^[0-9]+$ ]] && [ $num -ge 1 ] && [ $num -le ${#key_array[@]} ]; then
+                            servers_to_install+=("${key_array[$((num-1))]}")
+                        fi
+                    done
+                    
+                    if [ ${#servers_to_install[@]} -eq 0 ]; then
+                        print_error "No valid servers selected"
+                        exit 1
+                    fi
+                    ;;
+                5)
+                    install_all=true
+                    print_info "Installing all servers"
+                    ;;
+                *)
+                    print_error "Invalid choice"
+                    exit 1
+                    ;;
+            esac
+            echo ""
+        fi
     fi
     
-    # Determine which servers to install
-    if [ "$install_all" = true ]; then
+    # Determine which servers to install (if using --all or profiles)
+    if [ "$install_all" = true ] && [ ${#servers_to_install[@]} -eq 0 ]; then
         servers_to_install=($(get_all_server_keys))
+    fi
+    
+    # Filter out excluded servers
+    if [ ${#servers_to_exclude[@]} -gt 0 ]; then
+        local filtered=()
+        for server in "${servers_to_install[@]}"; do
+            local excluded=false
+            for exclude in "${servers_to_exclude[@]}"; do
+                if [ "$server" = "$exclude" ]; then
+                    excluded=true
+                    break
+                fi
+            done
+            if [ "$excluded" = false ]; then
+                filtered+=("$server")
+            fi
+        done
+        servers_to_install=("${filtered[@]}")
     fi
     
     print_info "MCP Server Setup for project: $project_dir"
     echo ""
+    
+    # Show what will be installed
+    if [ ${#servers_to_exclude[@]} -gt 0 ]; then
+        print_status "Excluding servers: ${servers_to_exclude[*]}"
+    fi
+    print_status "Installing servers: ${servers_to_install[*]}"
+    echo ""
+    
     check_environment
     echo ""
     check_requirements
@@ -665,9 +798,22 @@ show_help() {
     echo "  $(basename "$0") install serena ~/Projects/app  # Install serena for specific directory"
     echo ""
     echo "Install options:"
+    echo "  --exclude <servers>                        # Exclude servers (comma-separated)"
+    echo "  --profile <type>                           # Use predefined profile (frontend, backend, api, fullstack)"
     echo "  --non-interactive, -n                      # Don't prompt for input"
     echo "  --serena-project-name <name>               # Set Serena project name (for non-interactive mode)"
     echo "  --database-urls <urls>                     # Database URLs separated by semicolons (for non-interactive mode)"
+    echo ""
+    echo "Profile examples:"
+    echo "  $(basename "$0") install --profile frontend   # All servers except database"
+    echo "  $(basename "$0") install --profile backend    # All servers except browser/playwright"
+    echo "  $(basename "$0") install --profile api        # All servers except browser/playwright"
+    echo "  $(basename "$0") install --profile fullstack  # All servers"
+    echo ""
+    echo "Exclude examples:"
+    echo "  $(basename "$0") install --exclude database                  # Install all except database"
+    echo "  $(basename "$0") install --exclude database,browser         # Exclude multiple servers"
+    echo "  $(basename "$0") install serena zen --exclude database      # Only works with --all"
     echo ""
     echo "Non-interactive examples:"
     echo "  $(basename "$0") install --non-interactive --serena-project-name myapp-frontend"
