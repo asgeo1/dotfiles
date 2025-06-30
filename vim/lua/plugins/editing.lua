@@ -80,7 +80,7 @@ return {
       vim.keymap.set({'n', 'v'}, '<down>', function() mc.addCursor('j') end)
 
       -- Add cursor by matching word
-      vim.keymap.set({'n', 'v'}, '<leader>n', function() mc.addCursor('*') end)
+      vim.keymap.set({'n', 'v'}, '<C-n>', function() mc.addCursor('*') end)
 
       -- Add cursor with mouse
       vim.keymap.set('n', '<c-leftmouse>', mc.handleMouse)
