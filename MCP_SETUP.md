@@ -71,6 +71,7 @@ mcp-setup help
 | `tavily` | Web search and content extraction | Requires TAVILY_API_KEY |
 | `browser` | Browser automation tools | Web interaction capabilities |
 | `playwright` | Browser testing and automation | Advanced browser control |
+| `database` | Database MCP (SQL Access) | Requires database URLs (PostgreSQL/MySQL) |
 
 ## Post-Installation
 
@@ -101,6 +102,28 @@ mcp-setup install --non-interactive --serena-project-name myapp-frontend
 1. First run: "Read initial instructions"
 2. Then run: "Activate the project [your-chosen-name]"
 3. If needed, edit `.serena/project.yml` and update the project_name field
+
+### Database Configuration
+
+The database server supports both PostgreSQL and MySQL databases. Connection URL formats:
+```
+postgres://username:password@host:port/database_name
+mysql://username:password@host:port/database_name
+```
+
+**Interactive mode**: When installing the database server, you'll be prompted to enter database URLs one at a time. Press Enter on an empty line when done.
+
+**Non-interactive mode**:
+```bash
+# Use semicolons to separate multiple database URLs
+mcp-setup install database -n --database-urls 'postgres://user:pass@localhost:5432/db1;mysql://user:pass@localhost:3306/db2'
+```
+
+**Mixed databases**: You can configure both PostgreSQL and MySQL databases in the same installation.
+
+**Environment variable**: If `DB_CONFIGS` is already set in your environment, it will be used automatically.
+
+**Security Note**: Database passwords are stored in Claude's MCP configuration. Ensure you're comfortable with this before proceeding.
 
 ### Other Servers
 All other MCP servers (Context7, Zen, Tavily, Browser Tools, Playwright) are ready to use immediately without additional configuration.

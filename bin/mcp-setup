@@ -39,6 +39,7 @@ get_server_name() {
         tavily) echo "Tavily (Web Search)" ;;
         browser) echo "Browser Tools" ;;
         playwright) echo "Playwright" ;;
+        database) echo "Database MCP (SQL Access)" ;;
         *) echo "" ;;
     esac
 }
@@ -52,13 +53,14 @@ get_server_command() {
         tavily) echo 'claude mcp add tavily -- sh -c "exec npx -y tavily-mcp@latest"' ;;
         browser) echo 'claude mcp add browsermcp -- sh -c "exec npx @browsermcp/mcp@latest"' ;;
         playwright) echo 'claude mcp add playwright -- sh -c "exec npx @playwright/mcp@latest"' ;;
+        database) echo 'SPECIAL_HANDLING' ;; # Database needs custom handling for DB_CONFIGS
         *) echo "" ;;
     esac
 }
 
 # Get all server keys
 get_all_server_keys() {
-    echo "serena context7 zen tavily browser playwright"
+    echo "serena context7 zen tavily browser playwright database"
 }
 
 # Check for required environment variables
@@ -135,6 +137,180 @@ check_requirements() {
     print_status "All required tools are installed ✓"
 }
 
+# Parse a database URL and extract components
+parse_database_url() {
+    local url="$1"
+    
+    # Try to use Python if available for robust parsing
+    if command -v python3 &> /dev/null; then
+        python3 -c "
+import urllib.parse
+import json
+import sys
+
+try:
+    url = '$url'
+    parsed = urllib.parse.urlparse(url)
+    
+    # Determine default port based on scheme
+    default_port = 5432 if parsed.scheme in ['postgres', 'postgresql'] else 3306
+    
+    # Extract components
+    result = {
+        'scheme': parsed.scheme,
+        'user': parsed.username or '',
+        'password': parsed.password or '',
+        'host': parsed.hostname or 'localhost',
+        'port': parsed.port or default_port,
+        'dbname': parsed.path.lstrip('/') if parsed.path else ''
+    }
+    
+    # Output as key=value pairs for bash
+    for k, v in result.items():
+        print(f'{k}={v}')
+except Exception as e:
+    sys.exit(1)
+"
+    else
+        # Fallback to bash parsing
+        # Format: scheme://user:pass@host:port/dbname
+        local regex='^(postgres|postgresql|mysql|mariadb)://([^:]+):([^@]+)@([^:]+):([0-9]+)/(.+)$'
+        
+        if [[ $url =~ $regex ]]; then
+            echo "scheme=${BASH_REMATCH[1]}"
+            echo "user=${BASH_REMATCH[2]}"
+            echo "password=${BASH_REMATCH[3]}"
+            echo "host=${BASH_REMATCH[4]}"
+            echo "port=${BASH_REMATCH[5]}"
+            echo "dbname=${BASH_REMATCH[6]}"
+        else
+            # Try without port
+            regex='^(postgres|postgresql|mysql|mariadb)://([^:]+):([^@]+)@([^/]+)/(.+)$'
+            if [[ $url =~ $regex ]]; then
+                local scheme="${BASH_REMATCH[1]}"
+                local default_port=5432
+                if [[ "$scheme" == "mysql" ]] || [[ "$scheme" == "mariadb" ]]; then
+                    default_port=3306
+                fi
+                echo "scheme=$scheme"
+                echo "user=${BASH_REMATCH[2]}"
+                echo "password=${BASH_REMATCH[3]}"
+                echo "host=${BASH_REMATCH[4]}"
+                echo "port=$default_port"
+                echo "dbname=${BASH_REMATCH[5]}"
+            else
+                return 1
+            fi
+        fi
+    fi
+}
+
+# Generate DB_CONFIGS JSON for database-mcp
+generate_db_configs() {
+    local urls=("$@")
+    local json_configs=()
+    
+    for url in "${urls[@]}"; do
+        # Parse the URL
+        local parsed=$(parse_database_url "$url")
+        if [ $? -ne 0 ]; then
+            print_error "Failed to parse database URL: $url"
+            return 1
+        fi
+        
+        # Extract values
+        eval "$parsed"
+        
+        # Determine db_type based on scheme
+        local db_type=""
+        case "$scheme" in
+            postgres|postgresql)
+                db_type="pg"
+                ;;
+            mysql|mariadb)
+                db_type="mysql"
+                ;;
+            *)
+                print_error "Unsupported database type: $scheme"
+                return 1
+                ;;
+        esac
+        
+        # Generate description
+        local description="${scheme^} Database for $dbname"
+        
+        # Build JSON config for this database
+        local config=$(printf '{
+            "id": "%s",
+            "db_type": "%s",
+            "configuration": {
+                "host": "%s",
+                "port": %d,
+                "user": "%s",
+                "password": "%s",
+                "dbname": "%s"
+            },
+            "description": "%s"
+        }' "$dbname" "$db_type" "$host" "$port" "$user" "$password" "$dbname" "$description")
+        
+        json_configs+=("$config")
+    done
+    
+    # Join configs into array
+    local joined=""
+    for ((i=0; i<${#json_configs[@]}; i++)); do
+        if [ $i -gt 0 ]; then
+            joined+=","
+        fi
+        joined+="${json_configs[$i]}"
+    done
+    
+    # Output as single-line JSON array
+    echo "[$joined]" | tr -d '\n' | sed 's/[[:space:]]\+/ /g'
+}
+
+# Collect database URLs interactively
+collect_database_urls() {
+    local urls=()
+    
+    echo ""
+    echo "Enter database URLs (one per line)."
+    echo "Supported formats:"
+    echo "  postgres://user:password@host:port/dbname"
+    echo "  mysql://user:password@host:port/dbname"
+    echo "Press Enter with empty line when done."
+    echo ""
+    
+    while true; do
+        read -p "Database URL (or press Enter to finish): " url
+        if [ -z "$url" ]; then
+            break
+        fi
+        
+        # Validate URL format
+        if parse_database_url "$url" > /dev/null 2>&1; then
+            urls+=("$url")
+            print_status "Added database URL for parsing"
+        else
+            print_error "Invalid database URL format. Please try again."
+            print_error "Supported schemes: postgres, postgresql, mysql, mariadb"
+        fi
+    done
+    
+    if [ ${#urls[@]} -eq 0 ]; then
+        return 1
+    fi
+    
+    # Generate and export DB_CONFIGS
+    local db_configs=$(generate_db_configs "${urls[@]}")
+    if [ $? -eq 0 ]; then
+        export DB_CONFIGS="$db_configs"
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Function to install a single MCP server
 install_server() {
     local server_key=$1
@@ -148,7 +324,56 @@ install_server() {
     
     print_status "Installing $server_name..."
     
-    # Evaluate the command with PROJECT_DIR substitution
+    # Special handling for database server
+    if [ "$server_key" = "database" ]; then
+        local urls=()
+        
+        # Check if DB_CONFIGS is already set
+        if [ -z "$DB_CONFIGS" ]; then
+            if [ "$NON_INTERACTIVE" = true ]; then
+                if [ -z "$DATABASE_URLS" ]; then
+                    print_error "Database URLs required. Use --database-urls or set DB_CONFIGS environment variable"
+                    return 1
+                fi
+                # Parse DATABASE_URLS (semicolon-separated for safety)
+                IFS=';' read -ra urls <<< "$DATABASE_URLS"
+                local db_configs=$(generate_db_configs "${urls[@]}")
+                if [ $? -ne 0 ]; then
+                    return 1
+                fi
+                export DB_CONFIGS="$db_configs"
+            else
+                # Interactive mode: collect URLs
+                if ! collect_database_urls; then
+                    print_error "No database URLs provided"
+                    return 1
+                fi
+                # Count URLs from DB_CONFIGS (rough estimate)
+                urls=($(echo "$DB_CONFIGS" | grep -o '"id"' | wc -l))
+            fi
+        else
+            # DB_CONFIGS already set, estimate count
+            urls=($(echo "$DB_CONFIGS" | grep -o '"id"' | wc -l))
+        fi
+        
+        # Install with DB_CONFIGS
+        # Escape single quotes in DB_CONFIGS for shell command
+        local escaped_configs="${DB_CONFIGS//\'/\'\\\'\'}"
+        local cmd="claude mcp add database -- sh -c 'DB_CONFIGS='\''$escaped_configs'\'' exec uvx --from git+https://github.com/TheRaLabs/legion-mcp.git database-mcp'"
+        if eval "$cmd"; then
+            print_status "✓ $server_name installed successfully"
+            if [ "${#urls[@]}" -gt 0 ]; then
+                echo ""
+                print_info "Database MCP configured with database connection(s)"
+            fi
+            return 0
+        else
+            print_error "✗ Failed to install $server_name"
+            return 1
+        fi
+    fi
+    
+    # Regular server installation
     if eval "$server_command"; then
         print_status "✓ $server_name installed successfully"
         
@@ -211,6 +436,8 @@ uninstall_server() {
     local mcp_name=$server_key
     if [ "$server_key" = "browser" ]; then
         mcp_name="browsermcp"
+    elif [ "$server_key" = "database" ]; then
+        mcp_name="database"
     fi
     
     if claude mcp remove "$mcp_name"; then
@@ -230,6 +457,7 @@ handle_install() {
     local install_all=false
     export SERENA_PROJECT_NAME=""
     export NON_INTERACTIVE=false
+    export DATABASE_URLS=""
     
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -248,6 +476,14 @@ handle_install() {
                     exit 1
                 fi
                 SERENA_PROJECT_NAME="$2"
+                shift 2
+                ;;
+            --database-urls)
+                if [ -z "$2" ]; then
+                    print_error "Option --database-urls requires a value"
+                    exit 1
+                fi
+                DATABASE_URLS="$2"
                 shift 2
                 ;;
             -*)
@@ -431,9 +667,15 @@ show_help() {
     echo "Install options:"
     echo "  --non-interactive, -n                      # Don't prompt for input"
     echo "  --serena-project-name <name>               # Set Serena project name (for non-interactive mode)"
+    echo "  --database-urls <urls>                     # Database URLs separated by semicolons (for non-interactive mode)"
     echo ""
-    echo "Non-interactive example:"
+    echo "Non-interactive examples:"
     echo "  $(basename "$0") install --non-interactive --serena-project-name myapp-frontend"
+    echo "  $(basename "$0") install database -n --database-urls 'postgres://user:pass@localhost:5432/db1;postgres://user:pass@localhost:5432/db2'"
+    echo ""
+    echo "Database URL formats:"
+    echo "  postgres://username:password@host:port/database_name"
+    echo "  mysql://username:password@host:port/database_name"
     echo ""
     echo "Uninstall examples:"
     echo "  $(basename "$0") uninstall serena          # Uninstall serena"
