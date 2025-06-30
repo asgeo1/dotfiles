@@ -39,3 +39,6 @@ tags.tmp
 tags.temp
 tags.temp.tmp
 .tags
+
+# Serena MCP
+.serena
