@@ -98,19 +98,32 @@ return {
     },
   },
 
-  -- Simple zoom window plugin that uses vim's tabs feature to zoom into a  -- window inspired by ZoomWin plugin
+  -- Stack-based window zooming with full layout preservation
   {
-    'troydm/zoomwintab.vim',
+    dir = vim.fn.stdpath('config') .. '/lua/zoom-stack',
+    name = 'zoom-stack',
     keys = {
       {
-        '<C-w>O',
-        '<Esc>:ZoomWinTabToggle<CR>',
-        desc = 'Zoom window',
+        '<C-w>o',
+        function() require('zoom-stack').zoom() end,
+        desc = 'Zoom current window',
+      },
+      {
+        '<C-w>r',
+        function() require('zoom-stack').restore() end,
+        desc = 'Restore previous window layout',
       },
     },
-    -- event = {'ZoomWinTabIn', 'ZoomWinTabOut', 'ZoomWinTabToggle'}, -- No such event?
     config = function()
-      vim.g.zoomwintab_hidetabbar = false
+      require('zoom-stack').setup({
+        keymaps = {
+          -- Already defined in keys above, so we can disable here
+          zoom = false,
+          restore = false,
+          toggle = false,
+        },
+        hide_tabline = false,
+      })
     end,
   },
 

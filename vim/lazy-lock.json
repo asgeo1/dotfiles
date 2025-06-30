@@ -60,6 +60,5 @@
   "vim-rooter": { "branch": "master", "commit": "51402fb77c4d6ae94994e37dc7ca13bec8f4afcc" },
   "vim-startuptime": { "branch": "master", "commit": "b6f0d93f6b8cf6eee0b4c94450198ba2d6a05ff6" },
   "which-key.nvim": { "branch": "main", "commit": "370ec46f710e058c9c1646273e6b225acf47cbed" },
-  "winshift.nvim": { "branch": "main", "commit": "37468ed6f385dfb50402368669766504c0e15583" },
-  "zoomwintab.vim": { "branch": "master", "commit": "3b76f740534ecc4114bc8a207ecb0db77b2fb002" }
+  "winshift.nvim": { "branch": "main", "commit": "37468ed6f385dfb50402368669766504c0e15583" }
 }
