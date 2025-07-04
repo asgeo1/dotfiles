@@ -1,3 +1,9 @@
+# Important Long-Term Memory notes
+
+- Never under any circumstances, ever, EVER use 'as any' in TypeScript code. Always use or import/find the correct type.
+
+---
+
 # MCP Tools Guide
 
 This guide provides strategic guidance on when and how to use MCP tools effectively.
