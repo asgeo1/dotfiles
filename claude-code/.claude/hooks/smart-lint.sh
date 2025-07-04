@@ -84,28 +84,31 @@ detect_project_type() {
     local project_type="unknown"
     local types=()
 
+    # Common exclude patterns for find commands
+    local FIND_EXCLUDES="-path ./node_modules -prune -o -path ./vendor -prune -o -path ./.git -prune -o -path ./dist -prune -o -path ./build -prune -o -path ./.next -prune -o -path ./coverage -prune -o -path ./.cache -prune -o"
+
     # Go project
-    if [[ -f "go.mod" ]] || [[ -f "go.sum" ]] || [[ -n "$(find . -maxdepth 3 -name "*.go" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "go.mod" ]] || [[ -f "go.sum" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.go" -type f -print -quit 2>/dev/null)" ]]; then
         types+=("go")
     fi
 
     # Python project
-    if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find . -maxdepth 3 -name "*.py" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.py" -type f -print -quit 2>/dev/null)" ]]; then
         types+=("python")
     fi
 
     # JavaScript/TypeScript project
-    if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]] || [[ -n "$(find . -maxdepth 3 \( -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES \( -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) -type f -print -quit 2>/dev/null)" ]]; then
         types+=("javascript")
     fi
 
     # Rust project
-    if [[ -f "Cargo.toml" ]] || [[ -n "$(find . -maxdepth 3 -name "*.rs" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "Cargo.toml" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.rs" -type f -print -quit 2>/dev/null)" ]]; then
         types+=("rust")
     fi
 
     # Ruby project
-    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find . -maxdepth 3 -name "*.rb" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.rb" -type f -print -quit 2>/dev/null)" ]]; then
         types+=("ruby")
     fi
 
