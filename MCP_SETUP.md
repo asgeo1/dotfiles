@@ -15,6 +15,18 @@ The following environment variables must be set before running the installation:
 - `uv`/`uvx` - Python package installer
 - `npx` - Node.js package runner
 - `claude` - Claude CLI
+- For database-mcp:
+  - MySQL client libraries (required even if using PostgreSQL):
+    - macOS: `brew install mysql-client`
+    - Ubuntu/Debian: `sudo apt-get install libmysqlclient-dev`
+    - RHEL/CentOS: `sudo yum install mysql-devel`
+  - Pre-install database-mcp:
+    ```bash
+    export LDFLAGS="-L/opt/homebrew/opt/mysql-client/lib"
+    export CPPFLAGS="-I/opt/homebrew/opt/mysql-client/include"
+    export PKG_CONFIG_PATH="/opt/homebrew/opt/mysql-client/lib/pkgconfig"
+    uv tool install git+https://github.com/TheRaLabs/legion-mcp.git
+    ```
 
 ## Usage
 

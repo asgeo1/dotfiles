@@ -236,22 +236,21 @@ generate_db_configs() {
                 ;;
         esac
         
-        # Generate description
-        local description="${scheme^} Database for $dbname"
+        # Generate description (capitalize first letter)
+        local scheme_cap=""
+        case "$scheme" in
+            postgres|postgresql)
+                scheme_cap="PostgreSQL"
+                ;;
+            mysql|mariadb)
+                scheme_cap="MySQL"
+                ;;
+        esac
+        local description="$scheme_cap Database for $dbname"
         
-        # Build JSON config for this database
-        local config=$(printf '{
-            "id": "%s",
-            "db_type": "%s",
-            "configuration": {
-                "host": "%s",
-                "port": %d,
-                "user": "%s",
-                "password": "%s",
-                "dbname": "%s"
-            },
-            "description": "%s"
-        }' "$dbname" "$db_type" "$host" "$port" "$user" "$password" "$dbname" "$description")
+        # Build JSON config for this database (minified)
+        local config=$(printf '{"id":"%s","db_type":"%s","configuration":{"host":"%s","port":%d,"user":"%s","password":"%s","dbname":"%s"},"description":"%s"}' \
+            "$dbname" "$db_type" "$host" "$port" "$user" "$password" "$dbname" "$description")
         
         json_configs+=("$config")
     done
@@ -266,7 +265,7 @@ generate_db_configs() {
     done
     
     # Output as single-line JSON array
-    echo "[$joined]" | tr -d '\n' | sed 's/[[:space:]]\+/ /g'
+    echo "[$joined]"
 }
 
 # Collect database URLs interactively
@@ -326,6 +325,26 @@ install_server() {
     
     # Special handling for database server
     if [ "$server_key" = "database" ]; then
+        # Check for MySQL client libraries (required even for PostgreSQL)
+        if ! command -v mysql_config &> /dev/null && ! command -v mariadb_config &> /dev/null; then
+            print_warning "MySQL client libraries are required for database-mcp (even for PostgreSQL databases)"
+            echo "Install with one of:"
+            echo "  macOS: brew install mysql-client"
+            echo "  Ubuntu/Debian: sudo apt-get install libmysqlclient-dev"
+            echo "  RHEL/CentOS: sudo yum install mysql-devel"
+            echo ""
+            
+            if [ "$NON_INTERACTIVE" = true ]; then
+                print_error "Cannot proceed without MySQL client libraries"
+                return 1
+            else
+                read -p "Do you want to continue anyway? (y/N): " continue_anyway
+                if [[ ! "$continue_anyway" =~ ^[Yy]$ ]]; then
+                    return 1
+                fi
+            fi
+        fi
+        
         local urls=()
         
         # Check if DB_CONFIGS is already set
@@ -357,24 +376,43 @@ install_server() {
         fi
         
         # Install with DB_CONFIGS
-        # Escape single quotes in DB_CONFIGS for shell command
-        local escaped_configs="${DB_CONFIGS//\'/\'\\\'\'}"
-        local cmd="claude mcp add database -- sh -c 'DB_CONFIGS='\''$escaped_configs'\'' exec uvx --from git+https://github.com/TheRaLabs/legion-mcp.git database-mcp'"
-        if eval "$cmd"; then
+        # Need to properly escape the JSON for the command line
+        local escaped_configs="${DB_CONFIGS//\"/\\\"}"
+        
+        local cmd="claude mcp add database -e \"DB_CONFIGS=$escaped_configs\" -- database-mcp"
+        
+        # Redirect the command output to capture it
+        local install_output
+        if install_output=$(eval "$cmd" 2>&1); then
+            # Show only the essential part of the output
+            echo "$install_output" | grep -E "^Added" || echo "Database MCP server added to Claude configuration"
             print_status "✓ $server_name installed successfully"
-            if [ "${#urls[@]}" -gt 0 ]; then
+            
+            # Show configured databases
+            local db_count=$(echo "$DB_CONFIGS" | grep -o '"id"' | wc -l | tr -d ' ')
+            if [ "$db_count" -gt 0 ]; then
                 echo ""
-                print_info "Database MCP configured with database connection(s)"
+                print_info "Configured $db_count database connection(s):"
+                # Extract and display database IDs
+                echo "$DB_CONFIGS" | grep -o '"id": *"[^"]*"' | sed 's/"id": *"//; s/"$//' | while read -r db_id; do
+                    echo "  • $db_id"
+                done
             fi
             return 0
         else
             print_error "✗ Failed to install $server_name"
+            print_error "Error output:"
+            echo "$install_output" >&2
+            print_error "Command that failed: $cmd"
             return 1
         fi
     fi
     
     # Regular server installation
-    if eval "$server_command"; then
+    local install_output
+    if install_output=$(eval "$server_command" 2>&1); then
+        # Show the Added line if present
+        echo "$install_output" | grep -E "^Added" || true
         print_status "✓ $server_name installed successfully"
         
         # For Serena, provide instructions about project name configuration
@@ -416,6 +454,8 @@ install_server() {
         return 0
     else
         print_error "✗ Failed to install $server_name"
+        print_error "Error output:"
+        echo "$install_output" >&2
         return 1
     fi
 }
@@ -680,6 +720,7 @@ handle_install() {
         print_status "Installation completed successfully! 🎉"
         echo ""
         echo "Project: $project_dir"
+        echo "MCP configuration saved to: ~/.claude.json"
         echo ""
         
         # Check if Serena was installed
@@ -772,6 +813,8 @@ show_status() {
     
     if command -v claude &> /dev/null; then
         claude mcp list
+        echo ""
+        echo "MCP configuration file: ~/.claude.json"
     else
         print_error "Claude CLI not found. Cannot check server status."
     fi
