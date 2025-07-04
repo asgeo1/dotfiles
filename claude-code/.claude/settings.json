@@ -1,0 +1,27 @@
+{
+  "model": "opus",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/smart-lint.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/ntfy-notifier.sh notification"
+          }
+        ]
+      }
+    ]
+  }
+}
