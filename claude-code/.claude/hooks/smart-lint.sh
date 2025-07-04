@@ -125,42 +125,6 @@ detect_project_type() {
     echo "$project_type"
 }
 
-# Get list of modified files (if available from git)
-get_modified_files() {
-    if [[ -d .git ]] && command_exists git; then
-        # Get files modified in the last commit or currently staged/modified
-        git diff --name-only HEAD 2>/dev/null || true
-        git diff --cached --name-only 2>/dev/null || true
-    fi
-}
-
-# Check if we should skip a file
-should_skip_file() {
-    local file="$1"
-
-    # Check .claude-hooks-ignore if it exists
-    if [[ -f ".claude-hooks-ignore" ]]; then
-        while IFS= read -r pattern; do
-            # Skip comments and empty lines
-            [[ -z "$pattern" || "$pattern" =~ ^[[:space:]]*# ]] && continue
-
-            # Check if file matches pattern
-            if [[ "$file" == $pattern ]]; then
-                log_debug "Skipping $file due to .claude-hooks-ignore pattern: $pattern"
-                return 0
-            fi
-        done < ".claude-hooks-ignore"
-    fi
-
-    # Check for inline skip comments
-    if [[ -f "$file" ]] && head -n 5 "$file" 2>/dev/null | grep -q "claude-hooks-disable"; then
-        log_debug "Skipping $file due to inline claude-hooks-disable comment"
-        return 0
-    fi
-
-    return 1
-}
-
 # ============================================================================
 # SUMMARY TRACKING
 # ============================================================================
