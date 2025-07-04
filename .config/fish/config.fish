@@ -37,6 +37,9 @@ set -x FZF_DEFAULT_COMMAND 'ag --nocolor -g ""'
 set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
 set -x FZF_ALT_C_COMMAND "$FZF_DEFAULT_COMMAND"
 
+# Default 'less' options, use -R to allow ANSI colors
+set -gx LESS "-R"
+
 # Things I don't want to publish to github
 source "$HOME/.secrets"
 
