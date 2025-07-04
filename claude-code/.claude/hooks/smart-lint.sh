@@ -373,33 +373,7 @@ lint_javascript() {
         [[ -f "package.json" ]] && jq -e ".scripts.\"$script_name\"" package.json >/dev/null 2>&1
     }
 
-    # Check for ESLint
-    if [[ -f "package.json" ]] && grep -q "eslint" package.json 2>/dev/null; then
-        if command_exists npm; then
-            # Try lint:dirty:fix first, then lint:dirty, then fallback to lint
-            if npm_script_exists "lint:dirty:fix"; then
-                log_info "Running npm run lint:dirty:fix"
-                if npm run lint:dirty:fix 2>&1; then
-                    add_summary "success" "ESLint check passed (dirty:fix)"
-                else
-                    add_summary "error" "ESLint found issues"
-                fi
-            elif npm_script_exists "lint:dirty"; then
-                log_info "Running npm run lint:dirty"
-                if npm run lint:dirty 2>&1; then
-                    add_summary "success" "ESLint check passed (dirty)"
-                else
-                    add_summary "error" "ESLint found issues"
-                fi
-            elif npm run lint --if-present 2>&1; then
-                add_summary "success" "ESLint check passed"
-            else
-                add_summary "error" "ESLint found issues"
-            fi
-        fi
-    fi
-
-    # Check for Prettier via npm scripts first, then fallback to direct commands
+    # Check for Prettier FIRST (formatting before linting)
     if [[ -f "package.json" ]]; then
         if command_exists npm; then
             # Try prettier:dirty:fix first, then prettier:dirty, then prettier:fix, then prettier
@@ -450,6 +424,32 @@ lint_javascript() {
                         fi
                     fi
                 fi
+            fi
+        fi
+    fi
+
+    # Check for ESLint AFTER Prettier (lint after formatting)
+    if [[ -f "package.json" ]] && grep -q "eslint" package.json 2>/dev/null; then
+        if command_exists npm; then
+            # Try lint:dirty:fix first, then lint:dirty, then fallback to lint
+            if npm_script_exists "lint:dirty:fix"; then
+                log_info "Running npm run lint:dirty:fix"
+                if npm run lint:dirty:fix 2>&1; then
+                    add_summary "success" "ESLint check passed (dirty:fix)"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
+            elif npm_script_exists "lint:dirty"; then
+                log_info "Running npm run lint:dirty"
+                if npm run lint:dirty 2>&1; then
+                    add_summary "success" "ESLint check passed (dirty)"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
+            elif npm run lint --if-present 2>&1; then
+                add_summary "success" "ESLint check passed"
+            else
+                add_summary "error" "ESLint found issues"
             fi
         fi
     fi
