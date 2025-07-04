@@ -9,6 +9,7 @@ export PATH="./node_modules/.bin:$PATH"
 export PATH="$HOME/Library/Android/sdk/tools:$PATH"
 export PATH="$HOME/Library/Android/sdk/platform-tools:$PATH"
 export PATH="$HOME/Library/Android/sdk/cmdline-tools/latest/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 export ANDROID_HOME="$HOME/Library/Android/sdk" # deprecated
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk" # new
 

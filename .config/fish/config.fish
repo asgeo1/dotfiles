@@ -60,6 +60,7 @@ set -x PATH "./node_modules/.bin" $PATH
 set -x PATH "$HOME/.composer/vendor/bin" $PATH
 set -x PATH "/opt/homebrew/opt/libpq/bin" $PATH
 set -x PATH "/opt/homebrew/opt/gcc/bin" $PATH
+set -x PATH "/opt/homebrew/opt/mysql-client/bin" $PATH
 
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Library/Android/sdk" # deprecated
