@@ -104,6 +104,11 @@ detect_project_type() {
         types+=("rust")
     fi
 
+    # Ruby project
+    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find . -maxdepth 3 -name "*.rb" -type f -print -quit 2>/dev/null)" ]]; then
+        types+=("ruby")
+    fi
+
     # Nix project
     if [[ -f "flake.nix" ]] || [[ -f "default.nix" ]] || [[ -f "shell.nix" ]]; then
         types+=("nix")
@@ -210,6 +215,7 @@ load_config() {
     export CLAUDE_HOOKS_PYTHON_ENABLED="${CLAUDE_HOOKS_PYTHON_ENABLED:-true}"
     export CLAUDE_HOOKS_JS_ENABLED="${CLAUDE_HOOKS_JS_ENABLED:-true}"
     export CLAUDE_HOOKS_RUST_ENABLED="${CLAUDE_HOOKS_RUST_ENABLED:-true}"
+    export CLAUDE_HOOKS_RUBY_ENABLED="${CLAUDE_HOOKS_RUBY_ENABLED:-true}"
     export CLAUDE_HOOKS_NIX_ENABLED="${CLAUDE_HOOKS_NIX_ENABLED:-true}"
 
     # Project-specific overrides
@@ -387,21 +393,56 @@ lint_javascript() {
         fi
     fi
 
-    # Prettier
-    if [[ -f ".prettierrc" ]] || [[ -f "prettier.config.js" ]] || [[ -f ".prettierrc.json" ]]; then
-        if command_exists prettier; then
-            if prettier --check . 2>/dev/null; then
-                add_summary "success" "Prettier formatting correct"
-            else
-                prettier --write . 2>/dev/null
-                add_summary "error" "Files need formatting with Prettier"
+    # Check for Prettier via npm scripts first, then fallback to direct commands
+    if [[ -f "package.json" ]]; then
+        # Check if prettier scripts exist in package.json
+        local has_prettier_script=""
+        local has_prettier_fix_script=""
+
+        if grep -q '"prettier"' package.json 2>/dev/null; then
+            has_prettier_script="true"
+        fi
+
+        if grep -q '"prettier:fix"' package.json 2>/dev/null; then
+            has_prettier_fix_script="true"
+        fi
+
+        if [[ -n "$has_prettier_script" || -n "$has_prettier_fix_script" ]]; then
+            if command_exists npm; then
+                # Try prettier:fix first, then prettier
+                if [[ -n "$has_prettier_fix_script" ]]; then
+                    if npm run prettier:fix 2>&1; then
+                        add_summary "success" "Prettier formatting applied"
+                    else
+                        add_summary "error" "Prettier formatting failed"
+                    fi
+                elif [[ -n "$has_prettier_script" ]]; then
+                    # Check if prettier script is for checking or fixing
+                    if npm run prettier 2>&1; then
+                        add_summary "success" "Prettier check passed"
+                    else
+                        add_summary "error" "Prettier found formatting issues"
+                    fi
+                fi
             fi
-        elif command_exists npx; then
-            if npx prettier --check . 2>/dev/null; then
-                add_summary "success" "Prettier formatting correct"
-            else
-                npx prettier --write . 2>/dev/null
-                add_summary "error" "Files need formatting with Prettier"
+        else
+            # Fallback to direct prettier commands if config files exist
+            if [[ -f ".prettierrc" ]] || [[ -f "prettier.config.js" ]] || [[ -f ".prettierrc.json" ]]; then
+                if command_exists prettier; then
+                    if prettier --check . 2>/dev/null; then
+                        add_summary "success" "Prettier formatting correct"
+                    else
+                        prettier --write . 2>/dev/null
+                        add_summary "error" "Files need formatting with Prettier"
+                    fi
+                elif command_exists npx; then
+                    if npx prettier --check . 2>/dev/null; then
+                        add_summary "success" "Prettier formatting correct"
+                    else
+                        npx prettier --write . 2>/dev/null
+                        add_summary "error" "Files need formatting with Prettier"
+                    fi
+                fi
             fi
         fi
     fi
@@ -432,6 +473,40 @@ lint_rust() {
         fi
     else
         log_info "Cargo not found, skipping Rust checks"
+    fi
+
+    return 0
+}
+
+lint_ruby() {
+    if [[ "${CLAUDE_HOOKS_RUBY_ENABLED:-true}" != "true" ]]; then
+        log_debug "Ruby linting disabled"
+        return 0
+    fi
+
+    log_info "Running Ruby linters..."
+
+    # RuboCop formatting and linting
+    if command_exists rubocop; then
+        # Run rubocop with auto-correct
+        if rubocop --autocorrect-all 2>&1; then
+            add_summary "success" "RuboCop check passed"
+        else
+            add_summary "error" "RuboCop found issues"
+        fi
+    else
+        log_debug "RuboCop not found, skipping Ruby style checks"
+    fi
+
+    # Sorbet type checking
+    if command_exists srb; then
+        if srb tc 2>&1; then
+            add_summary "success" "Sorbet type check passed"
+        else
+            add_summary "error" "Sorbet type check failed"
+        fi
+    else
+        log_debug "Sorbet not found, skipping type checks"
     fi
 
     return 0
@@ -533,6 +608,7 @@ main() {
                 "python") lint_python ;;
                 "javascript") lint_javascript ;;
                 "rust") lint_rust ;;
+                "ruby") lint_ruby ;;
                 "nix") lint_nix ;;
             esac
 
@@ -548,6 +624,7 @@ main() {
             "python") lint_python ;;
             "javascript") lint_javascript ;;
             "rust") lint_rust ;;
+            "ruby") lint_ruby ;;
             "nix") lint_nix ;;
             "unknown")
                 log_info "No recognized project type, skipping checks"
