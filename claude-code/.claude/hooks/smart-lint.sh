@@ -80,6 +80,24 @@ command_exists() {
 # PROJECT DETECTION
 # ============================================================================
 
+# Helper function to find git root directory
+find_git_root() {
+    git rev-parse --show-toplevel 2>/dev/null || echo "."
+}
+
+# Helper function to get the relative path from git root to current directory
+get_mono_repo_path() {
+    local git_root=$(find_git_root)
+    local current_dir=$(pwd)
+    
+    if [[ "$git_root" == "$current_dir" ]]; then
+        echo ""
+    else
+        # Get relative path from git root to current directory
+        echo "${current_dir#$git_root/}/"
+    fi
+}
+
 detect_project_type() {
     local project_type="unknown"
     local types=()
@@ -477,11 +495,36 @@ lint_ruby() {
 
     # RuboCop formatting and linting
     if command_exists rubocop; then
-        # Run rubocop with auto-correct
-        if rubocop --autocorrect-all 2>&1; then
-            add_summary "success" "RuboCop check passed"
+        local mono_path=$(get_mono_repo_path)
+        local git_root=$(find_git_root)
+        
+        # Get dirty Ruby files
+        local dirty_files=""
+        if [[ -n "$mono_path" ]]; then
+            # In a mono-repo subdirectory
+            log_debug "Detected mono-repo structure with path: $mono_path"
+            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake|erb)$' | tr '\n' ' ')
         else
-            add_summary "error" "RuboCop found issues"
+            # In repo root or no git
+            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake|erb)$' | tr '\n' ' ')
+        fi
+        
+        if [[ -n "$dirty_files" ]]; then
+            log_info "Running RuboCop on dirty files only"
+            # Run rubocop on dirty files with auto-correct
+            if echo "$dirty_files" | xargs -r rubocop --autocorrect-all 2>&1; then
+                add_summary "success" "RuboCop check passed (dirty files)"
+            else
+                add_summary "error" "RuboCop found issues"
+            fi
+        else
+            log_debug "No dirty Ruby files found, running full RuboCop"
+            # Run rubocop on all files
+            if rubocop --autocorrect-all 2>&1; then
+                add_summary "success" "RuboCop check passed"
+            else
+                add_summary "error" "RuboCop found issues"
+            fi
         fi
     else
         log_debug "RuboCop not found, skipping Ruby style checks"
@@ -489,10 +532,22 @@ lint_ruby() {
 
     # Sorbet type checking
     if command_exists srb; then
-        if srb tc 2>&1; then
-            add_summary "success" "Sorbet type check passed"
+        if [[ -n "$dirty_files" ]]; then
+            log_info "Running Sorbet on dirty files only"
+            # Run sorbet on dirty files
+            if echo "$dirty_files" | xargs -r srb tc 2>&1; then
+                add_summary "success" "Sorbet type check passed (dirty files)"
+            else
+                add_summary "error" "Sorbet type check failed"
+            fi
         else
-            add_summary "error" "Sorbet type check failed"
+            log_debug "No dirty Ruby files found, running full Sorbet check"
+            # Run sorbet on all files
+            if srb tc 2>&1; then
+                add_summary "success" "Sorbet type check passed"
+            else
+                add_summary "error" "Sorbet type check failed"
+            fi
         fi
     else
         log_debug "Sorbet not found, skipping type checks"
