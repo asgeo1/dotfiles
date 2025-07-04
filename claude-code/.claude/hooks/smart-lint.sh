@@ -349,10 +349,31 @@ lint_javascript() {
 
     log_info "Running JavaScript/TypeScript linters..."
 
+    # Helper function to check if npm script exists
+    npm_script_exists() {
+        local script_name="$1"
+        [[ -f "package.json" ]] && jq -e ".scripts.\"$script_name\"" package.json >/dev/null 2>&1
+    }
+
     # Check for ESLint
     if [[ -f "package.json" ]] && grep -q "eslint" package.json 2>/dev/null; then
         if command_exists npm; then
-            if npm run lint --if-present 2>&1; then
+            # Try lint:dirty:fix first, then lint:dirty, then fallback to lint
+            if npm_script_exists "lint:dirty:fix"; then
+                log_info "Running npm run lint:dirty:fix"
+                if npm run lint:dirty:fix 2>&1; then
+                    add_summary "success" "ESLint check passed (dirty:fix)"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
+            elif npm_script_exists "lint:dirty"; then
+                log_info "Running npm run lint:dirty"
+                if npm run lint:dirty 2>&1; then
+                    add_summary "success" "ESLint check passed (dirty)"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
+            elif npm run lint --if-present 2>&1; then
                 add_summary "success" "ESLint check passed"
             else
                 add_summary "error" "ESLint found issues"
@@ -362,52 +383,53 @@ lint_javascript() {
 
     # Check for Prettier via npm scripts first, then fallback to direct commands
     if [[ -f "package.json" ]]; then
-        # Check if prettier scripts exist in package.json
-        local has_prettier_script=""
-        local has_prettier_fix_script=""
-
-        if grep -q '"prettier"' package.json 2>/dev/null; then
-            has_prettier_script="true"
-        fi
-
-        if grep -q '"prettier:fix"' package.json 2>/dev/null; then
-            has_prettier_fix_script="true"
-        fi
-
-        if [[ -n "$has_prettier_script" || -n "$has_prettier_fix_script" ]]; then
-            if command_exists npm; then
-                # Try prettier:fix first, then prettier
-                if [[ -n "$has_prettier_fix_script" ]]; then
-                    if npm run prettier:fix 2>&1; then
-                        add_summary "success" "Prettier formatting applied"
-                    else
-                        add_summary "error" "Prettier formatting failed"
-                    fi
-                elif [[ -n "$has_prettier_script" ]]; then
-                    # Check if prettier script is for checking or fixing
-                    if npm run prettier 2>&1; then
-                        add_summary "success" "Prettier check passed"
-                    else
-                        add_summary "error" "Prettier found formatting issues"
-                    fi
+        if command_exists npm; then
+            # Try prettier:dirty:fix first, then prettier:dirty, then prettier:fix, then prettier
+            if npm_script_exists "prettier:dirty:fix"; then
+                log_info "Running npm run prettier:dirty:fix"
+                if npm run prettier:dirty:fix 2>&1; then
+                    add_summary "success" "Prettier formatting applied (dirty:fix)"
+                else
+                    add_summary "error" "Prettier formatting failed"
                 fi
-            fi
-        else
-            # Fallback to direct prettier commands if config files exist
-            if [[ -f ".prettierrc" ]] || [[ -f "prettier.config.js" ]] || [[ -f ".prettierrc.json" ]]; then
-                if command_exists prettier; then
-                    if prettier --check . 2>/dev/null; then
-                        add_summary "success" "Prettier formatting correct"
-                    else
-                        prettier --write . 2>/dev/null
-                        add_summary "error" "Files need formatting with Prettier"
-                    fi
-                elif command_exists npx; then
-                    if npx prettier --check . 2>/dev/null; then
-                        add_summary "success" "Prettier formatting correct"
-                    else
-                        npx prettier --write . 2>/dev/null
-                        add_summary "error" "Files need formatting with Prettier"
+            elif npm_script_exists "prettier:dirty"; then
+                log_info "Running npm run prettier:dirty"
+                if npm run prettier:dirty 2>&1; then
+                    add_summary "success" "Prettier formatting applied (dirty)"
+                else
+                    add_summary "error" "Prettier formatting failed"
+                fi
+            elif npm_script_exists "prettier:fix"; then
+                log_info "Running npm run prettier:fix"
+                if npm run prettier:fix 2>&1; then
+                    add_summary "success" "Prettier formatting applied"
+                else
+                    add_summary "error" "Prettier formatting failed"
+                fi
+            elif npm_script_exists "prettier"; then
+                log_info "Running npm run prettier"
+                if npm run prettier 2>&1; then
+                    add_summary "success" "Prettier check passed"
+                else
+                    add_summary "error" "Prettier found formatting issues"
+                fi
+            else
+                # Fallback to direct prettier commands if config files exist
+                if [[ -f ".prettierrc" ]] || [[ -f "prettier.config.js" ]] || [[ -f ".prettierrc.json" ]]; then
+                    if command_exists prettier; then
+                        if prettier --check . 2>/dev/null; then
+                            add_summary "success" "Prettier formatting correct"
+                        else
+                            prettier --write . 2>/dev/null
+                            add_summary "error" "Files need formatting with Prettier"
+                        fi
+                    elif command_exists npx; then
+                        if npx prettier --check . 2>/dev/null; then
+                            add_summary "success" "Prettier formatting correct"
+                        else
+                            npx prettier --write . 2>/dev/null
+                            add_summary "error" "Files need formatting with Prettier"
+                        fi
                     fi
                 fi
             fi
