@@ -89,7 +89,7 @@ find_git_root() {
 get_mono_repo_path() {
     local git_root=$(find_git_root)
     local current_dir=$(pwd)
-    
+
     if [[ "$git_root" == "$current_dir" ]]; then
         echo ""
     else
@@ -102,31 +102,35 @@ detect_project_type() {
     local project_type="unknown"
     local types=()
 
-    # Common exclude patterns for find commands
-    local FIND_EXCLUDES="-path ./node_modules -prune -o -path ./vendor -prune -o -path ./.git -prune -o -path ./dist -prune -o -path ./build -prune -o -path ./.next -prune -o -path ./coverage -prune -o -path ./.cache -prune -o"
+    # Common exclude patterns for find commands (including dot directories)
+    # Using eval to properly handle the find command with excludes
+    find_with_excludes() {
+        local pattern="$1"
+        eval "find . -maxdepth 3 -path ./node_modules -prune -o -path ./vendor -prune -o -path './.*' -prune -o -path ./dist -prune -o -path ./build -prune -o -path ./coverage -prune -o $pattern -type f -print -quit 2>/dev/null"
+    }
 
     # Go project
-    if [[ -f "go.mod" ]] || [[ -f "go.sum" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.go" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "go.mod" ]] || [[ -f "go.sum" ]] || [[ -n "$(find_with_excludes '-name "*.go"')" ]]; then
         types+=("go")
     fi
 
     # Python project
-    if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.py" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find_with_excludes '-name "*.py"')" ]]; then
         types+=("python")
     fi
 
-    # JavaScript/TypeScript project
-    if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES \( -name "*.js" -o -name "*.ts" -o -name "*.jsx" -o -name "*.tsx" \) -type f -print -quit 2>/dev/null)" ]]; then
+    # JavaScript/TypeScript project - only if package.json or tsconfig.json exists
+    if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]]; then
         types+=("javascript")
     fi
 
     # Rust project
-    if [[ -f "Cargo.toml" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.rs" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "Cargo.toml" ]] || [[ -n "$(find_with_excludes '-name "*.rs"')" ]]; then
         types+=("rust")
     fi
 
     # Ruby project
-    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find . -maxdepth 3 $FIND_EXCLUDES -name "*.rb" -type f -print -quit 2>/dev/null)" ]]; then
+    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find_with_excludes '-name "*.rb"')" ]]; then
         types+=("ruby")
     fi
 
@@ -497,7 +501,7 @@ lint_ruby() {
     if command_exists rubocop; then
         local mono_path=$(get_mono_repo_path)
         local git_root=$(find_git_root)
-        
+
         # Get dirty Ruby files
         local dirty_files=""
         if [[ -n "$mono_path" ]]; then
@@ -508,7 +512,7 @@ lint_ruby() {
             # In repo root or no git
             dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake|erb)$' | tr '\n' ' ')
         fi
-        
+
         if [[ -n "$dirty_files" ]]; then
             log_info "Running RuboCop on dirty files only"
             # Run rubocop on dirty files with auto-correct
