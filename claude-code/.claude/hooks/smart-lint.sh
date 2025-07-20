@@ -470,6 +470,8 @@ lint_rust() {
     log_info "Running Rust linters..."
 
     if command_exists cargo; then
+        local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
+        
         if cargo fmt -- --check 2>/dev/null; then
             add_summary "success" "Rust formatting correct"
         else
@@ -477,10 +479,23 @@ lint_rust() {
             add_summary "error" "Rust files need formatting"
         fi
 
+        # Note: We run clippy but not cargo check because clippy includes compilation checks
+        # Running both would be redundant - clippy will fail if there are type errors
         if cargo clippy --quiet -- -D warnings 2>&1; then
             add_summary "success" "Clippy check passed"
         else
             add_summary "error" "Clippy found issues"
+        fi
+
+        # Run project-specific checks only if no Rust errors so far
+        local rust_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
+        if [[ $rust_errors_after -eq $rust_errors_before && -f "bin/project-checks" ]]; then
+            log_info "Running project-specific checks..."
+            if bash bin/project-checks 2>&1; then
+                add_summary "success" "Project checks passed"
+            else
+                add_summary "error" "Project checks failed"
+            fi
         fi
     else
         log_info "Cargo not found, skipping Rust checks"
