@@ -40,6 +40,7 @@ get_server_name() {
         browser) echo "Browser Tools" ;;
         playwright) echo "Playwright" ;;
         database) echo "Database MCP (SQL Access)" ;;
+        vibe-eyes) echo "Vibe Eyes (Browser Canvas Visualization)" ;;
         *) echo "" ;;
     esac
 }
@@ -54,13 +55,14 @@ get_server_command() {
         browser) echo 'claude mcp add browsermcp -- sh -c "exec npx @browsermcp/mcp@latest"' ;;
         playwright) echo 'claude mcp add playwright -- sh -c "exec npx @playwright/mcp@latest"' ;;
         database) echo 'SPECIAL_HANDLING' ;; # Database needs custom handling for DB_CONFIGS
+        vibe-eyes) echo 'SPECIAL_HANDLING' ;; # Vibe-eyes needs special setup
         *) echo "" ;;
     esac
 }
 
 # Get all server keys
 get_all_server_keys() {
-    echo "serena context7 zen tavily browser playwright database"
+    echo "serena context7 zen tavily browser playwright database vibe-eyes"
 }
 
 # Check for required environment variables
@@ -323,6 +325,70 @@ install_server() {
     
     print_status "Installing $server_name..."
     
+    # Special handling for vibe-eyes server
+    if [ "$server_key" = "vibe-eyes" ]; then
+        print_warning "Vibe-eyes requires special setup due to console output issues"
+        echo ""
+        echo "Two options for installing vibe-eyes:"
+        echo ""
+        echo "Option 1: Clone and run locally (recommended):"
+        echo "  git clone https://github.com/monteslu/vibe-eyes.git"
+        echo "  cd vibe-eyes"
+        echo "  npm install"
+        echo "  # Create a wrapper script to suppress console output"
+        echo "  cat > run-silent.mjs << 'EOF'"
+        echo "console.log = console.error = () => {};"
+        echo "import('./mcp.js');"
+        echo "EOF"
+        echo "  # Then add to Claude:"
+        echo "  claude mcp add vibe-eyes -- node \$(pwd)/run-silent.mjs"
+        echo ""
+        echo "Option 2: Create a local wrapper (automated):"
+        
+        if [ "$NON_INTERACTIVE" = true ]; then
+            print_error "Vibe-eyes requires manual setup in non-interactive mode"
+            return 1
+        fi
+        
+        read -p "Would you like to create a local wrapper? (y/N): " create_wrapper
+        if [[ "$create_wrapper" =~ ^[Yy]$ ]]; then
+            local wrapper_dir="$HOME/.claude/mcp-wrappers"
+            mkdir -p "$wrapper_dir"
+            
+            cat > "$wrapper_dir/vibe-eyes-wrapper.mjs" << 'EOF'
+// Wrapper to suppress console output from vibe-eyes
+const originalLog = console.log;
+const originalError = console.error;
+console.log = console.error = () => {};
+
+// Import and run the MCP server
+import '@monteslu/vibe-eyes/mcp.js';
+
+// Note: We can't easily intercept StdioServerTransport with ES modules
+// but the console suppression should handle most issues
+EOF
+            
+            # Install vibe-eyes locally in the wrapper directory
+            print_status "Installing @monteslu/vibe-eyes..."
+            (cd "$wrapper_dir" && npm install @monteslu/vibe-eyes @modelcontextprotocol/sdk)
+            
+            # Add to Claude
+            if claude mcp add vibe-eyes -- node "$wrapper_dir/vibe-eyes-wrapper.mjs"; then
+                print_status "✓ Vibe-eyes installed with wrapper"
+                echo ""
+                print_info "The vibe-eyes server will run on port 8869"
+                print_info "Make sure your browser client connects to ws://localhost:8869"
+                return 0
+            else
+                print_error "Failed to add vibe-eyes to Claude"
+                return 1
+            fi
+        else
+            print_info "Skipping vibe-eyes installation"
+            return 1
+        fi
+    fi
+    
     # Special handling for database server
     if [ "$server_key" = "database" ]; then
         # Check for MySQL client libraries (required even for PostgreSQL)
@@ -478,6 +544,8 @@ uninstall_server() {
         mcp_name="browsermcp"
     elif [ "$server_key" = "database" ]; then
         mcp_name="database"
+    elif [ "$server_key" = "vibe-eyes" ]; then
+        mcp_name="vibe-eyes"
     fi
     
     if claude mcp remove "$mcp_name"; then

@@ -10,3 +10,5 @@ vim/plugged
 tags.lock
 tags.temp
 packer_compiled.lua
+.claude/settings.local.json
+claude-code/.claude/shell-snapshots
