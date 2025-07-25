@@ -470,6 +470,13 @@ lint_rust() {
     log_info "Running Rust linters..."
 
     if command_exists cargo; then
+        # Check if we're actually in a Rust project (cargo can find Cargo.toml)
+        if ! cargo locate-project >/dev/null 2>&1; then
+            log_info "Not in a Rust project directory (no Cargo.toml found in parent directories)"
+            log_info "Rust files detected in repo, but cargo commands must be run from within a Rust project"
+            return 0
+        fi
+
         local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
 
         if cargo fmt -- --check 2>/dev/null; then
