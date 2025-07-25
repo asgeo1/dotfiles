@@ -471,7 +471,7 @@ lint_rust() {
 
     if command_exists cargo; then
         local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
-        
+
         if cargo fmt -- --check 2>/dev/null; then
             add_summary "success" "Rust formatting correct"
         else
@@ -491,7 +491,17 @@ lint_rust() {
         local rust_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
         if [[ $rust_errors_after -eq $rust_errors_before && -f "bin/project-checks" ]]; then
             log_info "Running project-specific checks..."
-            if bash bin/project-checks 2>&1; then
+            # Capture both stdout and stderr
+            local project_output
+            project_output=$(bash bin/project-checks 2>&1)
+            local project_exit_code=$?
+
+            # Always show the output if non-empty (errors or verbose mode)
+            if [[ -n "$project_output" ]]; then
+                echo "$project_output" >&2
+            fi
+
+            if [[ $project_exit_code -eq 0 ]]; then
                 add_summary "success" "Project checks passed"
             else
                 add_summary "error" "Project checks failed"
