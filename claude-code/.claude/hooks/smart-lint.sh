@@ -458,6 +458,42 @@ lint_javascript() {
         fi
     fi
 
+    # Check for TypeScript type checking AFTER linting
+    if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
+        if command_exists npm; then
+            # Try npm run typecheck first
+            if npm_script_exists "typecheck"; then
+                log_info "Running npm run typecheck"
+                if npm run typecheck 2>&1; then
+                    add_summary "success" "TypeScript typecheck passed"
+                else
+                    add_summary "error" "TypeScript typecheck found issues"
+                fi
+            elif command_exists tsc; then
+                log_info "Running tsc --noEmit"
+                if tsc --noEmit 2>&1; then
+                    add_summary "success" "TypeScript typecheck passed"
+                else
+                    add_summary "error" "TypeScript typecheck found issues"
+                fi
+            elif command_exists npx; then
+                log_info "Running npx tsc --noEmit"
+                if npx tsc --noEmit 2>&1; then
+                    add_summary "success" "TypeScript typecheck passed"
+                else
+                    add_summary "error" "TypeScript typecheck found issues"
+                fi
+            fi
+        elif command_exists tsc; then
+            log_info "Running tsc --noEmit"
+            if tsc --noEmit 2>&1; then
+                add_summary "success" "TypeScript typecheck passed"
+            else
+                add_summary "error" "TypeScript typecheck found issues"
+            fi
+        fi
+    fi
+
     return 0
 }
 
