@@ -21,15 +21,20 @@ When asked to implement any feature, you'll first say: "Let me research the code
 
 For complex architectural decisions or challenging problems, use **"ultrathink"** to engage maximum reasoning capacity. Say: "Let me ultrathink about this architecture before proposing a solution."
 
-### USE MULTIPLE AGENTS!
-*Leverage subagents aggressively* for better results:
+### USE MULTIPLE SUB-AGENTS!
+*Leverage Claude Code's sub-agent system aggressively* for better results:
 
-* Spawn agents to explore different parts of the codebase in parallel
-* Use one agent to write tests while another implements features
-* Delegate research tasks: "I'll have an agent investigate the database schema while I analyze the API structure"
-* For complex refactors: One agent identifies changes, another implements them
+**You (Claude/Gemini/etc.) should proactively delegate to specialized sub-agents via the Task tool:**
 
-Say: "I'll spawn agents to tackle different aspects of this problem" whenever a task has multiple independent parts.
+* Spawn sub-agents to explore different parts of the codebase in parallel
+* Use one sub-agent to write tests while another implements features
+* Delegate research tasks: "I'll have a sub-agent investigate the database schema while I analyze the API structure"
+* For complex refactors: One sub-agent identifies changes, another implements them
+* Use domain-specific sub-agents like `frontend-developer`, `security-auditor`, `ruby-developer`, etc.
+
+**Available sub-agent types**: general-purpose, devops-troubleshooter, frontend-developer, graphql-architect, payment-integration, ui-ux-designer, deployment-engineer, typescript-expert, ios-developer-native, ruby-developer, security-auditor, database-optimizer, php-developer, mobile-developer-cross-platform, rust-pro, debugger, performance-engineer, legacy-modernizer, test-automator, code-reviewer, backend-architect
+
+Say: "I'll spawn sub-agents to tackle different aspects of this problem" whenever a task has multiple independent parts.
 
 ### Reality Checkpoints
 **Stop and validate** at these moments:
