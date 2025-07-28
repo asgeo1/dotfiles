@@ -186,18 +186,15 @@ To check which MCP tools are actually available in the current project, look for
 
 ## Tool Categories
 
-### 🔍 Context7 - Library Documentation
-- **When to use**: Need current documentation for any library/framework
-- **Key tools**: `resolve-library-id` → `get-library-docs`
+### 🔍 MCP_DOCKER - Library Documentation & Web Search
+- **When to use**: Need current documentation for any library/framework, or web research
+- **Key tools**: `mcp__MCP_DOCKER__resolve-library-id` → `mcp__MCP_DOCKER__get-library-docs`
+- **Web tools**: `mcp__MCP_DOCKER__tavily-search`, `mcp__MCP_DOCKER__tavily-extract`, `mcp__MCP_DOCKER__tavily-crawl`
 
-### 🌐 Tavily - Web Search & Analysis
-- **When to use**: Current information, documentation, best practices, or web content analysis
-- **Key tools**: `search`, `extract`, `crawl`, `map`
-
-### 💻 Serena - Code Development
-- **When to use**: ANY coding task - editing, refactoring, debugging, or analyzing code
-- **Getting started**: ALWAYS run `mcp__serena__initial_instructions` first
-- **Key principle**: Prefer symbolic operations over text operations
+### 🗂️ Git & GitHub MCP - Version Control
+- **When to use**: ANY git operations - status, commits, branches, GitHub interactions
+- **Key principle**: Use Git MCP instead of bash `git` commands
+- **Key tools**: `mcp__MCP_DOCKER__git_status`, `mcp__MCP_DOCKER__git_commit`, `mcp__MCP_DOCKER__create_pull_request`
 
 ### 🤖 Zen - AI Assistant Tools
 - **When to use**: Complex analysis, planning, consensus building, or structured workflows
@@ -223,57 +220,56 @@ To check which MCP tools are actually available in the current project, look for
 1. **Understand the request**
    - Use `mcp__zen__planner` for complex multi-step tasks
    - Break down into concrete, achievable steps
-   - Store plan in memory using `mcp__serena__write_memory`
+   - Use TodoWrite to track progress
 
 2. **Choose the right tools**
-   - Coding → Serena (start with `initial_instructions`)
-   - Research → Tavily + Zen analysis tools
+   - Coding → Direct file editing + Git MCP
+   - Research → MCP_DOCKER (tavily) + Zen analysis tools
    - Testing → Playwright/Browser MCP
    - Analysis → Zen workflow tools
 
 3. **Execute systematically**
    - Follow the plan step by step
-   - Update memory with progress and findings
    - Use thinking tools to maintain quality
+   - Commit completed tasks individually
 
 ### 📝 Code Development Algorithm
 
-1. **Initialize**
-   ```
-   mcp__serena__initial_instructions
-   mcp__serena__check_onboarding_performed
-   ```
+1. **Create Feature Branch**
+   - Use `mcp__MCP_DOCKER__git_create_branch` for new features
+   - Follow naming convention: `feature/description` or `fix/description`
 
 2. **Explore & Understand**
-   - Use `find_symbol` for targeted search
-   - Use `get_symbols_overview` for structure understanding
-   - Read relevant files with context
+   - Use Grep/Glob tools for code search
+   - Read relevant files to understand patterns
+   - Use TodoWrite to plan implementation steps
 
-3. **Plan Changes**
-   - `mcp__serena__think_about_collected_information`
-   - Write plan to memory
-   - `mcp__serena__think_about_task_adherence`
+3. **Implement Changes**
+   - Make focused, atomic changes
+   - Write tests for new functionality
+   - Run smart-lint hook after each change
 
-4. **Execute Changes**
-   - Prefer `replace_symbol_body` over text replacement
-   - Use `insert_before/after_symbol` for additions
-   - Run tests/lints after changes
+4. **Quality Assurance**
+   - Get code review using `mcp__zen__codereview`
+   - Use specialized agents for complex tasks
+   - Ensure all tests pass and linting is clean
 
-5. **Finalize**
-   - `mcp__serena__think_about_whether_you_are_done`
-   - `mcp__serena__summarize_changes`
-   - Update memory with what was done
+5. **Commit & Review**
+   - Commit individual completed tasks using Git MCP
+   - Only commit when 100% sure the task is complete
+   - Get zen codereview before major commits
+   - **NEVER push unless explicitly instructed**
 
 ### 🔍 Research & Analysis Algorithm
 
 1. **Initial Research**
-   - `mcp__tavily__tavily-search` for broad understanding
-   - `mcp__tavily__tavily-extract` for specific sources
+   - `mcp__MCP_DOCKER__tavily-search` for broad understanding
+   - `mcp__MCP_DOCKER__tavily-extract` for specific sources
 
 2. **Deep Analysis**
    - Use `mcp__zen__thinkdeep` for complex investigation
    - Use `mcp__zen__analyze` for code/architecture analysis
-   - Store findings in memory
+   - Track findings with TodoWrite
 
 3. **Synthesis**
    - Use `mcp__zen__consensus` for multiple perspectives
@@ -283,7 +279,7 @@ To check which MCP tools are actually available in the current project, look for
 
 1. **Problem Investigation**
    - Use `mcp__zen__debug` for systematic debugging
-   - Track hypotheses and findings in memory
+   - Track hypotheses and findings with TodoWrite
 
 2. **Browser Testing**
    - Navigate → Snapshot → Interact → Verify
@@ -291,7 +287,7 @@ To check which MCP tools are actually available in the current project, look for
 
 3. **Security Analysis**
    - Use `mcp__zen__secaudit` with appropriate focus
-   - Search for patterns with Serena
+   - Search for patterns with Grep/Glob
    - Document vulnerabilities
 
 ---
@@ -321,19 +317,17 @@ To check which MCP tools are actually available in the current project, look for
 ### 🔄 Memory Workflow
 
 1. **At Task Start**
-   ```
-   mcp__serena__list_memories
-   mcp__serena__read_memory (relevant ones)
-   ```
+   - Check existing TodoWrite for ongoing tasks
+   - Review project patterns and conventions
 
 2. **During Execution**
-   - Update plan progress
-   - Store important discoveries
-   - Track decision rationale
+   - Update TodoWrite with progress
+   - Track important discoveries in notes
+   - Document decision rationale
 
 3. **At Task End**
+   - Mark completed tasks in TodoWrite
    - Summarize what was done
-   - Store reusable patterns
    - Update project knowledge
 
 ---
@@ -342,15 +336,16 @@ To check which MCP tools are actually available in the current project, look for
 
 | Task Type | Primary Tool | Supporting Tools |
 |-----------|--------------|------------------|
-| Code editing | Serena | Zen (analysis) |
-| Debugging | Zen (debug) | Serena (code search) |
-| Code review | Zen (codereview) | Serena (analysis) |
-| Research | Tavily | Zen (synthesis) |
-| Planning | Zen (planner) | Serena (memory) |
+| Code editing | Edit/MultiEdit | Git MCP, TodoWrite |
+| Debugging | Zen (debug) | Grep/Glob (code search) |
+| Code review | Zen (codereview) | Grep/Glob (analysis) |
+| Research | MCP_DOCKER (tavily) | Zen (synthesis) |
+| Planning | Zen (planner) | TodoWrite |
 | Testing | Playwright | Zen (testgen) |
-| Documentation | Context7 | Tavily (examples) |
-| Security | Zen (secaudit) | Serena (patterns) |
+| Documentation | MCP_DOCKER (library docs) | MCP_DOCKER (tavily) |
+| Security | Zen (secaudit) | Grep/Glob (patterns) |
 | Database work | Database MCP | Zen (analysis) |
+| Version control | Git MCP | TodoWrite |
 
 ---
 
@@ -368,10 +363,10 @@ To check which MCP tools are actually available in the current project, look for
    - Combine tools for best results
    - Follow tool-specific best practices
 
-3. **Maintain context through memory**
-   - Write meaningful memory entries
-   - Read relevant memories before starting
-   - Update memories with learnings
+3. **Maintain context through TodoWrite**
+   - Track progress with meaningful todo entries
+   - Update todos before starting new tasks
+   - Mark todos complete only when fully verified
 
 4. **Think systematically**
    - Use thinking tools at key decision points
@@ -386,9 +381,9 @@ To check which MCP tools are actually available in the current project, look for
    - Plan comprehensively to avoid rework
 
 2. **Leverage tool strengths**
-   - Serena for language-aware editing
-   - Zen for structured analysis
-   - Tavily for current information
+   - Git MCP for all version control operations
+   - Zen for structured analysis and workflows
+   - MCP_DOCKER for research and documentation
    - Playwright for visual verification
 
 3. **Progressive refinement**
@@ -402,17 +397,19 @@ To check which MCP tools are actually available in the current project, look for
 
 ### 🚀 Starting Points
 
-- **Any coding task**: `mcp__serena__initial_instructions`
+- **Any coding task**: Create feature branch with Git MCP
 - **Complex analysis**: `mcp__zen__thinkdeep` or `mcp__zen__planner`
-- **Web research**: `mcp__tavily__tavily-search`
-- **Library docs**: `mcp__context7__resolve-library-id`
+- **Web research**: `mcp__MCP_DOCKER__tavily-search`
+- **Library docs**: `mcp__MCP_DOCKER__resolve-library-id`
 - **Browser automation**: `mcp__playwright__browser_navigate` (if available)
 - **Database queries**: Check if database MCP is available first
+- **Version control**: Use Git MCP instead of bash git commands
 
 ### 💡 Remember
 
-- Serena's `initial_instructions` contains comprehensive coding guidance
-- Use memory to maintain context across sessions
+- Use Git MCP for all version control operations
+- Use TodoWrite to maintain context and track progress
 - Combine tools for powerful workflows
 - Think before acting, plan before executing
+- Never push unless explicitly instructed
 - Check tool availability before use - not all projects have all MCP servers
