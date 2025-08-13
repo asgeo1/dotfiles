@@ -98,6 +98,48 @@ get_mono_repo_path() {
     fi
 }
 
+# Helper function to find a file in current or parent directories up to git root
+find_project_file() {
+    local filename="$1"
+    local current_dir=$(pwd)
+    
+    # Check if we're in a git repo by trying to get the git root
+    local git_root
+    git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+    
+    if [[ -z "$git_root" ]]; then
+        # Not in a git repo, just check current directory
+        if [[ -f "$filename" ]]; then
+            echo "$(pwd)/$filename"
+            return 0
+        fi
+        return 1
+    fi
+    
+    # We're in a git repo, search upwards to git root
+    while [[ "$current_dir" != "/" ]]; do
+        if [[ -f "$current_dir/$filename" ]]; then
+            echo "$current_dir/$filename"
+            return 0
+        fi
+        
+        # Stop at git root
+        if [[ "$current_dir" == "$git_root" ]]; then
+            # Check git root itself
+            if [[ -f "$git_root/$filename" ]]; then
+                echo "$git_root/$filename"
+                return 0
+            fi
+            break
+        fi
+        
+        # Move to parent directory
+        current_dir=$(dirname "$current_dir")
+    done
+    
+    return 1  # File not found
+}
+
 # Helper function to check if we're in a Ruby project context
 is_ruby_project_context() {
     local current_dir=$(pwd)
@@ -170,9 +212,9 @@ detect_project_type() {
         fi
     fi
 
-    # JavaScript/TypeScript project - only if package.json exists (definitive marker)
+    # JavaScript/TypeScript project - search upwards for package.json
     # Note: tsconfig.json alone doesn't make it a JS project, package.json is required
-    if [[ -f "package.json" ]]; then
+    if find_project_file "package.json" >/dev/null; then
         types+=("javascript")
     fi
 
@@ -189,8 +231,8 @@ detect_project_type() {
         fi
     fi
 
-    # PHP project
-    if [[ -f "composer.json" ]] || [[ -f "composer.lock" ]] || [[ -n "$(find_with_excludes '-name "*.php"')" ]]; then
+    # PHP project - search upwards for composer.json
+    if find_project_file "composer.json" >/dev/null || find_project_file "composer.lock" >/dev/null || [[ -n "$(find_with_excludes '-name "*.php"')" ]]; then
         types+=("php")
     fi
 
@@ -432,14 +474,27 @@ lint_javascript() {
 
     log_info "Running JavaScript/TypeScript linters..."
 
+    # Find package.json in current or parent directories
+    local package_json_path=$(find_project_file "package.json")
+    if [[ -z "$package_json_path" ]]; then
+        log_debug "No package.json found"
+        return 0
+    fi
+
+    # Get the directory containing package.json
+    local project_dir=$(dirname "$package_json_path")
+    
     # Helper function to check if npm script exists
     npm_script_exists() {
         local script_name="$1"
-        [[ -f "package.json" ]] && jq -e ".scripts.\"$script_name\"" package.json >/dev/null 2>&1
+        jq -e ".scripts.\"$script_name\"" "$package_json_path" >/dev/null 2>&1
     }
 
-    # Check for Prettier FIRST (formatting before linting)
-    if [[ -f "package.json" ]]; then
+    # Run npm commands from the project directory
+    (
+        cd "$project_dir" || return 1
+        
+        # Check for Prettier FIRST (formatting before linting)
         if command_exists npm; then
             # Try prettier:dirty:fix first, then prettier:dirty, then prettier:fix, then prettier
             if npm_script_exists "prettier:dirty:fix"; then
@@ -491,12 +546,10 @@ lint_javascript() {
                 fi
             fi
         fi
-    fi
 
-    # Check for ESLint AFTER Prettier (lint after formatting)
-    if [[ -f "package.json" ]] && grep -q "eslint" package.json 2>/dev/null; then
-        if command_exists npm; then
-            # Try lint:dirty:fix first, then lint:dirty, then fallback to lint
+        # Check for ESLint AFTER Prettier (lint after formatting)
+        if grep -q "eslint" "$package_json_path" 2>/dev/null; then
+            # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
             if npm_script_exists "lint:dirty:fix"; then
                 log_info "Running npm run lint:dirty:fix"
                 if npm run lint:dirty:fix 2>&1; then
@@ -511,28 +564,29 @@ lint_javascript() {
                 else
                     add_summary "error" "ESLint found issues"
                 fi
-            elif npm run lint --if-present 2>&1; then
-                add_summary "success" "ESLint check passed"
-            else
-                add_summary "error" "ESLint found issues"
+            elif npm_script_exists "lint:fix"; then
+                log_info "Running npm run lint:fix"
+                if npm run lint:fix 2>&1; then
+                    add_summary "success" "ESLint check passed (fix)"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
+            elif npm_script_exists "lint"; then
+                log_info "Running npm run lint"
+                if npm run lint 2>&1; then
+                    add_summary "success" "ESLint check passed"
+                else
+                    add_summary "error" "ESLint found issues"
+                fi
             fi
         fi
-    fi
 
-    # Check for TypeScript type checking AFTER linting
-    if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
-        if command_exists npm; then
+        # Check for TypeScript type checking AFTER linting
+        if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
             # Try npm run typecheck first
             if npm_script_exists "typecheck"; then
                 log_info "Running npm run typecheck"
                 if npm run typecheck 2>&1; then
-                    add_summary "success" "TypeScript typecheck passed"
-                else
-                    add_summary "error" "TypeScript typecheck found issues"
-                fi
-            elif command_exists tsc; then
-                log_info "Running tsc --noEmit"
-                if tsc --noEmit 2>&1; then
                     add_summary "success" "TypeScript typecheck passed"
                 else
                     add_summary "error" "TypeScript typecheck found issues"
@@ -544,6 +598,20 @@ lint_javascript() {
                 else
                     add_summary "error" "TypeScript typecheck found issues"
                 fi
+            elif command_exists tsc; then
+                log_info "Running tsc --noEmit"
+                if tsc --noEmit 2>&1; then
+                    add_summary "success" "TypeScript typecheck passed"
+                else
+                    add_summary "error" "TypeScript typecheck found issues"
+                fi
+            fi
+        elif command_exists npx; then
+            log_info "Running npx tsc --noEmit"
+            if npx tsc --noEmit 2>&1; then
+                add_summary "success" "TypeScript typecheck passed"
+            else
+                add_summary "error" "TypeScript typecheck found issues"
             fi
         elif command_exists tsc; then
             log_info "Running tsc --noEmit"
@@ -553,7 +621,7 @@ lint_javascript() {
                 add_summary "error" "TypeScript typecheck found issues"
             fi
         fi
-    fi
+    )  # Close the subshell
 
     return 0
 }
@@ -723,14 +791,27 @@ lint_php() {
 
     log_info "Running PHP linters..."
 
+    # Find composer.json in current or parent directories
+    local composer_json_path=$(find_project_file "composer.json")
+    if [[ -z "$composer_json_path" ]]; then
+        log_debug "No composer.json found"
+        return 0
+    fi
+
+    # Get the directory containing composer.json
+    local project_dir=$(dirname "$composer_json_path")
+    
     # Helper function to check if composer script exists
     composer_script_exists() {
         local script_name="$1"
-        [[ -f "composer.json" ]] && jq -e ".scripts.\"$script_name\"" composer.json >/dev/null 2>&1
+        jq -e ".scripts.\"$script_name\"" "$composer_json_path" >/dev/null 2>&1
     }
 
-    # Check for composer formatting commands
-    if [[ -f "composer.json" ]]; then
+    # Run composer commands from the project directory
+    (
+        cd "$project_dir" || return 1
+        
+        # Check for composer formatting commands
         if command_exists composer; then
             # Try format:dirty:fix first, then format:dirty, then format:fix, then format
             if composer_script_exists "format:dirty:fix"; then
@@ -761,11 +842,13 @@ lint_php() {
                 else
                     add_summary "error" "PHP found formatting issues"
                 fi
+            else
+                log_debug "No composer format scripts found"
             fi
         else
             log_debug "Composer not found, skipping PHP formatting checks"
         fi
-    fi
+    )  # Close the subshell
 
     return 0
 }
