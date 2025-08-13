@@ -189,6 +189,11 @@ detect_project_type() {
         fi
     fi
 
+    # PHP project
+    if [[ -f "composer.json" ]] || [[ -f "composer.lock" ]] || [[ -n "$(find_with_excludes '-name "*.php"')" ]]; then
+        types+=("php")
+    fi
+
     # Nix project
     if [[ -f "flake.nix" ]] || [[ -f "default.nix" ]] || [[ -f "shell.nix" ]]; then
         types+=("nix")
@@ -260,6 +265,7 @@ load_config() {
     export CLAUDE_HOOKS_JS_ENABLED="${CLAUDE_HOOKS_JS_ENABLED:-true}"
     export CLAUDE_HOOKS_RUST_ENABLED="${CLAUDE_HOOKS_RUST_ENABLED:-true}"
     export CLAUDE_HOOKS_RUBY_ENABLED="${CLAUDE_HOOKS_RUBY_ENABLED:-true}"
+    export CLAUDE_HOOKS_PHP_ENABLED="${CLAUDE_HOOKS_PHP_ENABLED:-true}"
     export CLAUDE_HOOKS_NIX_ENABLED="${CLAUDE_HOOKS_NIX_ENABLED:-true}"
 
     # Project-specific overrides
@@ -709,6 +715,61 @@ lint_ruby() {
     return 0
 }
 
+lint_php() {
+    if [[ "${CLAUDE_HOOKS_PHP_ENABLED:-true}" != "true" ]]; then
+        log_debug "PHP linting disabled"
+        return 0
+    fi
+
+    log_info "Running PHP linters..."
+
+    # Helper function to check if composer script exists
+    composer_script_exists() {
+        local script_name="$1"
+        [[ -f "composer.json" ]] && jq -e ".scripts.\"$script_name\"" composer.json >/dev/null 2>&1
+    }
+
+    # Check for composer formatting commands
+    if [[ -f "composer.json" ]]; then
+        if command_exists composer; then
+            # Try format:dirty:fix first, then format:dirty, then format:fix, then format
+            if composer_script_exists "format:dirty:fix"; then
+                log_info "Running composer format:dirty:fix"
+                if composer format:dirty:fix 2>&1; then
+                    add_summary "success" "PHP formatting applied (dirty:fix)"
+                else
+                    add_summary "error" "PHP formatting failed"
+                fi
+            elif composer_script_exists "format:dirty"; then
+                log_info "Running composer format:dirty"
+                if composer format:dirty 2>&1; then
+                    add_summary "success" "PHP formatting applied (dirty)"
+                else
+                    add_summary "error" "PHP formatting failed"
+                fi
+            elif composer_script_exists "format:fix"; then
+                log_info "Running composer format:fix"
+                if composer format:fix 2>&1; then
+                    add_summary "success" "PHP formatting applied"
+                else
+                    add_summary "error" "PHP formatting failed"
+                fi
+            elif composer_script_exists "format"; then
+                log_info "Running composer format"
+                if composer format 2>&1; then
+                    add_summary "success" "PHP format check passed"
+                else
+                    add_summary "error" "PHP found formatting issues"
+                fi
+            fi
+        else
+            log_debug "Composer not found, skipping PHP formatting checks"
+        fi
+    fi
+
+    return 0
+}
+
 lint_nix() {
     if [[ "${CLAUDE_HOOKS_NIX_ENABLED:-true}" != "true" ]]; then
         log_debug "Nix linting disabled"
@@ -806,6 +867,7 @@ main() {
                 "javascript") lint_javascript ;;
                 "rust") lint_rust ;;
                 "ruby") lint_ruby ;;
+                "php") lint_php ;;
                 "nix") lint_nix ;;
             esac
 
@@ -822,6 +884,7 @@ main() {
             "javascript") lint_javascript ;;
             "rust") lint_rust ;;
             "ruby") lint_ruby ;;
+            "php") lint_php ;;
             "nix") lint_nix ;;
             "unknown")
                 log_info "No recognized project type, skipping checks"
