@@ -98,6 +98,54 @@ get_mono_repo_path() {
     fi
 }
 
+# Helper function to check if we're in a Ruby project context
+is_ruby_project_context() {
+    local current_dir=$(pwd)
+    
+    # Check current directory and all parent directories up to git root or filesystem root
+    while [[ "$current_dir" != "/" ]]; do
+        # Only Gemfile is a definitive Ruby project marker
+        # .ruby-version alone doesn't make it a Ruby project
+        if [[ -f "$current_dir/Gemfile" ]]; then
+            return 0  # Found Ruby project marker
+        fi
+        
+        # Stop at git root if we're in a git repo
+        if [[ -d "$current_dir/.git" ]]; then
+            break
+        fi
+        
+        # Move to parent directory
+        current_dir=$(dirname "$current_dir")
+    done
+    
+    return 1  # No Ruby project markers found
+}
+
+# Helper function to check if we're in a Python project context
+is_python_project_context() {
+    local current_dir=$(pwd)
+    
+    # Check current directory and all parent directories up to git root or filesystem root
+    while [[ "$current_dir" != "/" ]]; do
+        # Check for definitive Python project markers
+        # Note: .python-version alone doesn't make it a Python project
+        if [[ -f "$current_dir/pyproject.toml" ]] || [[ -f "$current_dir/setup.py" ]] || [[ -f "$current_dir/requirements.txt" ]]; then
+            return 0  # Found Python project marker
+        fi
+        
+        # Stop at git root if we're in a git repo
+        if [[ -d "$current_dir/.git" ]]; then
+            break
+        fi
+        
+        # Move to parent directory
+        current_dir=$(dirname "$current_dir")
+    done
+    
+    return 1  # No Python project markers found
+}
+
 detect_project_type() {
     local project_type="unknown"
     local types=()
@@ -114,13 +162,17 @@ detect_project_type() {
         types+=("go")
     fi
 
-    # Python project
-    if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find_with_excludes '-name "*.py"')" ]]; then
-        types+=("python")
+    # Python project - only detect if we have Python project markers in current or parent directories
+    if is_python_project_context; then
+        # We're in a Python project context, now check if there are actual Python files to lint
+        if [[ -f "pyproject.toml" ]] || [[ -f "setup.py" ]] || [[ -f "requirements.txt" ]] || [[ -n "$(find_with_excludes '-name "*.py"')" ]]; then
+            types+=("python")
+        fi
     fi
 
-    # JavaScript/TypeScript project - only if package.json or tsconfig.json exists
-    if [[ -f "package.json" ]] || [[ -f "tsconfig.json" ]]; then
+    # JavaScript/TypeScript project - only if package.json exists (definitive marker)
+    # Note: tsconfig.json alone doesn't make it a JS project, package.json is required
+    if [[ -f "package.json" ]]; then
         types+=("javascript")
     fi
 
@@ -129,9 +181,12 @@ detect_project_type() {
         types+=("rust")
     fi
 
-    # Ruby project
-    if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find_with_excludes '-name "*.rb"')" ]]; then
-        types+=("ruby")
+    # Ruby project - only detect if we have Ruby project markers in current or parent directories
+    if is_ruby_project_context; then
+        # We're in a Ruby project context, now check if there are actual Ruby files to lint
+        if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find_with_excludes '-name "*.rb"')" ]]; then
+            types+=("ruby")
+        fi
     fi
 
     # Nix project
@@ -506,48 +561,30 @@ lint_rust() {
     log_info "Running Rust linters..."
 
     if command_exists cargo; then
-        # Check if we're actually in a Rust project (cargo can find Cargo.toml)
-        if ! cargo locate-project >/dev/null 2>&1; then
-            log_info "Not in a Rust project directory (no Cargo.toml found in parent directories)"
-            log_info "Rust files detected in repo, but cargo commands must be run from within a Rust project"
-            return 0
-        fi
-
-        local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
-
-        if cargo fmt -- --check 2>/dev/null; then
-            add_summary "success" "Rust formatting correct"
+        # Check if there's a Cargo.toml in the current directory (direct Rust project)
+        if [[ -f "Cargo.toml" ]]; then
+            # We're in a single Rust project, run the checks directly
+            lint_rust_single_project
         else
-            cargo fmt 2>/dev/null
-            add_summary "error" "Rust files need formatting"
-        fi
-
-        # Note: We run clippy but not cargo check because clippy includes compilation checks
-        # Running both would be redundant - clippy will fail if there are type errors
-        if cargo clippy --quiet -- -D warnings 2>&1; then
-            add_summary "success" "Clippy check passed"
-        else
-            add_summary "error" "Clippy found issues"
-        fi
-
-        # Run project-specific checks only if no Rust errors so far
-        local rust_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
-        if [[ $rust_errors_after -eq $rust_errors_before && -f "bin/project-checks" ]]; then
-            log_info "Running project-specific checks..."
-            # Capture both stdout and stderr
-            local project_output
-            project_output=$(bash bin/project-checks 2>&1)
-            local project_exit_code=$?
-
-            # Always show the output if non-empty (errors or verbose mode)
-            if [[ -n "$project_output" ]]; then
-                echo "$project_output" >&2
-            fi
-
-            if [[ $project_exit_code -eq 0 ]]; then
-                add_summary "success" "Project checks passed"
+            # Check if this is a monorepo with Rust sub-projects
+            local rust_subprojects=($(find . -maxdepth 3 -name "Cargo.toml" -type f 2>/dev/null | sed 's|/Cargo.toml||' | sort))
+            
+            if [[ ${#rust_subprojects[@]} -gt 0 ]]; then
+                log_info "Found ${#rust_subprojects[@]} Rust sub-project(s) in monorepo, running checks on each:"
+                
+                for project_dir in "${rust_subprojects[@]}"; do
+                    log_info "  → Checking $project_dir"
+                    
+                    # Run linting in each sub-project directory
+                    (
+                        cd "$project_dir" || return 1
+                        lint_rust_single_project
+                    )
+                done
+                return 0
             else
-                add_summary "error" "Project checks failed"
+                log_info "Rust files detected in repo, but cargo commands must be run from within a Rust project"
+                return 0
             fi
         fi
     else
@@ -555,6 +592,50 @@ lint_rust() {
     fi
 
     return 0
+}
+
+# Helper function to run Rust linting in a single project directory
+lint_rust_single_project() {
+    local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
+
+    if cargo fmt -- --check 2>/dev/null; then
+        add_summary "success" "Rust formatting correct"
+    else
+        cargo fmt 2>/dev/null
+        add_summary "error" "Rust files need formatting"
+    fi
+
+    # Note: We run clippy but not cargo check because clippy includes compilation checks
+    # Running both would be redundant - clippy will fail if there are type errors
+    if cargo clippy --quiet -- -D warnings 2>&1; then
+        add_summary "success" "Clippy check passed"
+    else
+        add_summary "error" "Clippy found issues"
+    fi
+
+    # Run project-specific checks only if no Rust errors so far
+    local rust_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
+    if [[ $rust_errors_after -eq $rust_errors_before && -f "bin/project-checks" ]]; then
+        log_info "Running project-specific checks..."
+        # Capture both stdout and stderr
+        local project_output
+        project_output=$(bash bin/project-checks 2>&1)
+        local project_exit_code=$?
+
+        if [[ $project_exit_code -eq 0 ]]; then
+            # Success - only show output if in debug mode
+            if [[ "$CLAUDE_HOOKS_DEBUG" == "1" ]] && [[ -n "$project_output" ]]; then
+                echo "$project_output" >&2
+            fi
+            add_summary "success" "Project checks passed"
+        else
+            # Failure - always show output
+            if [[ -n "$project_output" ]]; then
+                echo "$project_output" >&2
+            fi
+            add_summary "error" "Project checks failed"
+        fi
+    fi
 }
 
 lint_ruby() {
@@ -570,15 +651,15 @@ lint_ruby() {
         local mono_path=$(get_mono_repo_path)
         local git_root=$(find_git_root)
 
-        # Get dirty Ruby files
+        # Get dirty Ruby files, NOTE excluding .erb files, because sorbet and rubocop don't handle them
         local dirty_files=""
         if [[ -n "$mono_path" ]]; then
             # In a mono-repo subdirectory
             log_debug "Detected mono-repo structure with path: $mono_path"
-            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake|erb)$' | tr '\n' ' ')
+            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake)$' | tr '\n' ' ')
         else
             # In repo root or no git
-            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake|erb)$' | tr '\n' ' ')
+            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake)$' | tr '\n' ' ')
         fi
 
         if [[ -n "$dirty_files" ]]; then
