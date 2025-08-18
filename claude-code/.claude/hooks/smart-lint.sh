@@ -958,6 +958,7 @@ done
 # Print header
 echo "" >&2
 echo "🔍 Style Check - Validating code formatting..." >&2
+echo "📁 Working directory: $(pwd)" >&2
 echo "────────────────────────────────────────────" >&2
 
 # Load configuration
