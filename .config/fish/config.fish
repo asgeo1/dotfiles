@@ -65,6 +65,11 @@ set -x PATH "/opt/homebrew/opt/mysql-client/bin" $PATH
 set -x ANDROID_SDK_ROOT "$HOME/Library/Android/sdk" # new
 set -x ANDROID_HOME "$HOME/Library/Android/sdk" # deprecated
 
+# Set NDK_HOME to the latest NDK version if NDK directory exists
+if test -d "$ANDROID_HOME/ndk"
+    set -x NDK_HOME "$ANDROID_HOME/ndk/"(ls -1 "$ANDROID_HOME/ndk/" | sort -V | tail -1)
+end
+
 # Use jdk bundled by Android Studio, has less issues
 # set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jre/Contents/Home"
 set -x JAVA_HOME "/Applications/Android Studio.app/Contents/jbr/Contents/Home"

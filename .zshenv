@@ -13,6 +13,11 @@ export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
 export ANDROID_HOME="$HOME/Library/Android/sdk" # deprecated
 export ANDROID_SDK_ROOT="$HOME/Library/Android/sdk" # new
 
+# Set NDK_HOME to the latest NDK version if NDK directory exists
+if [ -d "$ANDROID_HOME/ndk" ]; then
+    export NDK_HOME="$ANDROID_HOME/ndk/$(ls -1 "$ANDROID_HOME/ndk/" | sort -V | tail -1)"
+fi
+
 export EDITOR=vim
 export OPENSSL_ROOT_DIR="/usr/local/Cellar/openssl/1.0.2l"
 
