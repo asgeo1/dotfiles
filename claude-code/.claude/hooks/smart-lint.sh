@@ -845,8 +845,42 @@ lint_php() {
             else
                 log_debug "No composer format scripts found"
             fi
+        
+            # Check for PHP linting AFTER formatting
+            # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
+            if composer_script_exists "lint:dirty:fix"; then
+                log_info "Running composer lint:dirty:fix"
+                if composer lint:dirty:fix 2>&1; then
+                    add_summary "success" "PHP linting passed (dirty:fix)"
+                else
+                    add_summary "error" "PHP linting found issues"
+                fi
+            elif composer_script_exists "lint:dirty"; then
+                log_info "Running composer lint:dirty"
+                if composer lint:dirty 2>&1; then
+                    add_summary "success" "PHP linting passed (dirty)"
+                else
+                    add_summary "error" "PHP linting found issues"
+                fi
+            elif composer_script_exists "lint:fix"; then
+                log_info "Running composer lint:fix"
+                if composer lint:fix 2>&1; then
+                    add_summary "success" "PHP linting passed (fix)"
+                else
+                    add_summary "error" "PHP linting found issues"
+                fi
+            elif composer_script_exists "lint"; then
+                log_info "Running composer lint"
+                if composer lint 2>&1; then
+                    add_summary "success" "PHP linting passed"
+                else
+                    add_summary "error" "PHP linting found issues"
+                fi
+            else
+                log_debug "No composer lint scripts found"
+            fi
         else
-            log_debug "Composer not found, skipping PHP formatting checks"
+            log_debug "Composer not found, skipping PHP formatting and linting checks"
         fi
     )  # Close the subshell
 
