@@ -490,9 +490,12 @@ lint_javascript() {
         jq -e ".scripts.\"$script_name\"" "$package_json_path" >/dev/null 2>&1
     }
 
-    # Run npm commands from the project directory
-    (
-        cd "$project_dir" || return 1
+    # CRITICAL: DO NOT USE A SUBSHELL HERE!
+    # We need add_summary() to update the global CLAUDE_HOOKS_ERROR_COUNT
+    # If you use ( ... ) subshell, the error count won't be visible to the parent!
+    # This was a major bug that caused errors to be ignored!
+    local original_dir=$(pwd)
+    cd "$project_dir" || return 1
         
         # Check for Prettier FIRST (formatting before linting)
         if command_exists npm; then
@@ -586,10 +589,19 @@ lint_javascript() {
             # Try npm run typecheck first
             if npm_script_exists "typecheck"; then
                 log_info "Running npm run typecheck"
-                if npm run typecheck 2>&1; then
-                    add_summary "success" "TypeScript typecheck passed"
-                else
+                # IMPORTANT: We must capture BOTH output AND exit code
+                # The command substitution $(...) will hide the exit code if we don't save it
+                # This ensures TypeScript errors are properly detected and reported
+                local typecheck_output
+                typecheck_output=$(npm run typecheck 2>&1)
+                local typecheck_exit=$?
+                
+                # Always show output if there's an error so the user sees what failed
+                if [[ $typecheck_exit -ne 0 ]]; then
+                    echo "$typecheck_output" >&2
                     add_summary "error" "TypeScript typecheck found issues"
+                else
+                    add_summary "success" "TypeScript typecheck passed"
                 fi
             elif command_exists npx; then
                 log_info "Running npx tsc --noEmit"
@@ -621,7 +633,9 @@ lint_javascript() {
                 add_summary "error" "TypeScript typecheck found issues"
             fi
         fi
-    )  # Close the subshell
+    
+    # Return to original directory
+    cd "$original_dir" || return 1
 
     return 0
 }
@@ -649,11 +663,13 @@ lint_rust() {
                 for project_dir in "${rust_subprojects[@]}"; do
                     log_info "  → Checking $project_dir"
                     
-                    # Run linting in each sub-project directory
-                    (
-                        cd "$project_dir" || return 1
-                        lint_rust_single_project
-                    )
+                    # CRITICAL: DO NOT USE A SUBSHELL HERE!
+                    # We need add_summary() to update the global CLAUDE_HOOKS_ERROR_COUNT
+                    # Save current directory and change to project directory
+                    local saved_dir=$(pwd)
+                    cd "$project_dir" || continue
+                    lint_rust_single_project
+                    cd "$saved_dir" || return 1
                 done
                 return 0
             else
@@ -807,9 +823,11 @@ lint_php() {
         jq -e ".scripts.\"$script_name\"" "$composer_json_path" >/dev/null 2>&1
     }
 
-    # Run composer commands from the project directory
-    (
-        cd "$project_dir" || return 1
+    # CRITICAL: DO NOT USE A SUBSHELL HERE!
+    # We need add_summary() to update the global CLAUDE_HOOKS_ERROR_COUNT
+    # Save current directory and change to project directory
+    local original_dir=$(pwd)
+    cd "$project_dir" || return 1
         
         # Check for composer formatting commands
         if command_exists composer; then
@@ -882,7 +900,9 @@ lint_php() {
         else
             log_debug "Composer not found, skipping PHP formatting and linting checks"
         fi
-    )  # Close the subshell
+    
+    # Return to original directory
+    cd "$original_dir" || return 1
 
     return 0
 }
@@ -1029,15 +1049,25 @@ main
 exit_code=$?
 
 # Final message and exit
+# CRITICAL: We check BOTH exit_code AND CLAUDE_HOOKS_ERROR_COUNT
+# This dual check ensures we catch errors even if something goes wrong with the return value
 if [[ $exit_code -eq 2 ]]; then
+    # Main function returned 2, indicating errors were found
     echo -e "\n${RED}🛑 FAILED - Fix all issues above! 🛑${NC}" >&2
     echo -e "${YELLOW}📋 NEXT STEPS:${NC}" >&2
     echo -e "${YELLOW}  1. Fix the issues listed above${NC}" >&2
     echo -e "${YELLOW}  2. Verify the fix by running the lint command again${NC}" >&2
     echo -e "${YELLOW}  3. Continue with your original task${NC}" >&2
     exit 2
+elif [[ $CLAUDE_HOOKS_ERROR_COUNT -gt 0 ]]; then
+    # Belt-and-suspenders check: if somehow exit_code isn't 2 but we have errors
+    # This should never happen if the script is working correctly, but better safe than sorry
+    echo -e "\n${RED}🛑 FAILED - Found $CLAUDE_HOOKS_ERROR_COUNT issue(s)! 🛑${NC}" >&2
+    exit 2
 else
-    # Always exit with 2 so Claude sees the continuation message
-    echo -e "\n${YELLOW}👉 Style clean. Continue with your task.${NC}" >&2
+    # ONLY say "Style clean" when there are ACTUALLY no errors
+    echo -e "\n${GREEN}✅ All checks passed - Style clean!${NC}" >&2
+    # Still exit with 2 to let Claude continue (hooks always exit 2 for continuation)
+    echo -e "\n${YELLOW}👉 Continue with your task.${NC}" >&2
     exit 2
 fi
