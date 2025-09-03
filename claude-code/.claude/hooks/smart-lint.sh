@@ -116,6 +116,16 @@ find_project_file() {
         return 1
     fi
     
+    # Normalize paths to handle case-insensitive filesystems (like macOS)
+    # Use realpath if available, otherwise fallback to pwd -P
+    if command -v realpath &> /dev/null; then
+        current_dir=$(realpath "$current_dir")
+        git_root=$(realpath "$git_root")
+    else
+        current_dir=$(cd "$current_dir" && pwd -P)
+        git_root=$(cd "$git_root" && pwd -P)
+    fi
+    
     # We're in a git repo, search upwards to git root
     while [[ "$current_dir" != "/" ]]; do
         if [[ -f "$current_dir/$filename" ]]; then
