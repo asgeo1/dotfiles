@@ -85,6 +85,36 @@ find_git_root() {
     git rev-parse --show-toplevel 2>/dev/null || echo "."
 }
 
+# Helper function to get list of modified files, handling renames properly
+# This function extracts only the actual existing files from git status
+get_dirty_files() {
+    local file_pattern="${1:-.*}"  # Optional file pattern filter
+
+    # Process git status output to handle different status codes
+    git status --porcelain 2>/dev/null | while read -r line; do
+        local status="${line:0:2}"
+        local file_info="${line:3}"
+
+        case "$status" in
+            "R "|"RM")
+                # Renamed file - extract the new name (after the ->)
+                echo "$file_info" | sed 's/.* -> //'
+                ;;
+            "A "|"AM"|"M "|"MM"|" M"|"??")
+                # Added, modified, or untracked - use the filename as-is
+                echo "$file_info"
+                ;;
+            "D "|" D")
+                # Deleted file - skip it
+                ;;
+            *)
+                # Default: include the file
+                echo "$file_info"
+                ;;
+        esac
+    done | grep -E "$file_pattern" | sort -u
+}
+
 # Helper function to get the relative path from git root to current directory
 get_mono_repo_path() {
     local git_root=$(find_git_root)
@@ -102,11 +132,11 @@ get_mono_repo_path() {
 find_project_file() {
     local filename="$1"
     local current_dir=$(pwd)
-    
+
     # Check if we're in a git repo by trying to get the git root
     local git_root
     git_root=$(git rev-parse --show-toplevel 2>/dev/null)
-    
+
     if [[ -z "$git_root" ]]; then
         # Not in a git repo, just check current directory
         if [[ -f "$filename" ]]; then
@@ -115,7 +145,7 @@ find_project_file() {
         fi
         return 1
     fi
-    
+
     # Normalize paths to handle case-insensitive filesystems (like macOS)
     # Use realpath if available, otherwise fallback to pwd -P
     if command -v realpath &> /dev/null; then
@@ -125,14 +155,14 @@ find_project_file() {
         current_dir=$(cd "$current_dir" && pwd -P)
         git_root=$(cd "$git_root" && pwd -P)
     fi
-    
+
     # We're in a git repo, search upwards to git root
     while [[ "$current_dir" != "/" ]]; do
         if [[ -f "$current_dir/$filename" ]]; then
             echo "$current_dir/$filename"
             return 0
         fi
-        
+
         # Stop at git root
         if [[ "$current_dir" == "$git_root" ]]; then
             # Check git root itself
@@ -142,18 +172,18 @@ find_project_file() {
             fi
             break
         fi
-        
+
         # Move to parent directory
         current_dir=$(dirname "$current_dir")
     done
-    
+
     return 1  # File not found
 }
 
 # Helper function to check if we're in a Ruby project context
 is_ruby_project_context() {
     local current_dir=$(pwd)
-    
+
     # Check current directory and all parent directories up to git root or filesystem root
     while [[ "$current_dir" != "/" ]]; do
         # Only Gemfile is a definitive Ruby project marker
@@ -161,23 +191,23 @@ is_ruby_project_context() {
         if [[ -f "$current_dir/Gemfile" ]]; then
             return 0  # Found Ruby project marker
         fi
-        
+
         # Stop at git root if we're in a git repo
         if [[ -d "$current_dir/.git" ]]; then
             break
         fi
-        
+
         # Move to parent directory
         current_dir=$(dirname "$current_dir")
     done
-    
+
     return 1  # No Ruby project markers found
 }
 
 # Helper function to check if we're in a Python project context
 is_python_project_context() {
     local current_dir=$(pwd)
-    
+
     # Check current directory and all parent directories up to git root or filesystem root
     while [[ "$current_dir" != "/" ]]; do
         # Check for definitive Python project markers
@@ -185,16 +215,16 @@ is_python_project_context() {
         if [[ -f "$current_dir/pyproject.toml" ]] || [[ -f "$current_dir/setup.py" ]] || [[ -f "$current_dir/requirements.txt" ]]; then
             return 0  # Found Python project marker
         fi
-        
+
         # Stop at git root if we're in a git repo
         if [[ -d "$current_dir/.git" ]]; then
             break
         fi
-        
+
         # Move to parent directory
         current_dir=$(dirname "$current_dir")
     done
-    
+
     return 1  # No Python project markers found
 }
 
@@ -236,7 +266,9 @@ detect_project_type() {
     # Ruby project - only detect if we have Ruby project markers in current or parent directories
     if is_ruby_project_context; then
         # We're in a Ruby project context, now check if there are actual Ruby files to lint
-        if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$(find_with_excludes '-name "*.rb"')" ]]; then
+        # Exclude Cocoapods .podspec files which are Ruby but not part of the actual project
+        local ruby_files=$(find_with_excludes '-name "*.rb"' | grep -v '\.podspec$' || true)
+        if [[ -f "Gemfile" ]] || [[ -f ".ruby-version" ]] || [[ -f "Rakefile" ]] || [[ -n "$ruby_files" ]]; then
             types+=("ruby")
         fi
     fi
@@ -493,7 +525,7 @@ lint_javascript() {
 
     # Get the directory containing package.json
     local project_dir=$(dirname "$package_json_path")
-    
+
     # Helper function to check if npm script exists
     npm_script_exists() {
         local script_name="$1"
@@ -506,23 +538,43 @@ lint_javascript() {
     # This was a major bug that caused errors to be ignored!
     local original_dir=$(pwd)
     cd "$project_dir" || return 1
-        
+
         # Check for Prettier FIRST (formatting before linting)
         if command_exists npm; then
-            # Try prettier:dirty:fix first, then prettier:dirty, then prettier:fix, then prettier
-            if npm_script_exists "prettier:dirty:fix"; then
-                log_info "Running npm run prettier:dirty:fix"
-                if npm run prettier:dirty:fix 2>&1; then
-                    add_summary "success" "Prettier formatting applied (dirty:fix)"
+            # Try prettier check first (quiet), then fix only if needed
+            if npm_script_exists "prettier"; then
+                log_info "Running npm run prettier"
+                if npm run prettier 2>&1; then
+                    add_summary "success" "Prettier check passed"
                 else
-                    add_summary "error" "Prettier formatting failed"
+                    # Check failed, try to fix
+                    if npm_script_exists "prettier:fix"; then
+                        log_info "Running npm run prettier:fix to auto-fix"
+                        if npm run prettier:fix 2>&1; then
+                            add_summary "success" "Prettier formatting applied"
+                        else
+                            add_summary "error" "Prettier formatting failed"
+                        fi
+                    else
+                        add_summary "error" "Prettier found formatting issues"
+                    fi
                 fi
             elif npm_script_exists "prettier:dirty"; then
                 log_info "Running npm run prettier:dirty"
                 if npm run prettier:dirty 2>&1; then
-                    add_summary "success" "Prettier formatting applied (dirty)"
+                    add_summary "success" "Prettier check passed (dirty)"
                 else
-                    add_summary "error" "Prettier formatting failed"
+                    # Check failed, try to fix
+                    if npm_script_exists "prettier:dirty:fix"; then
+                        log_info "Running npm run prettier:dirty:fix to auto-fix"
+                        if npm run prettier:dirty:fix 2>&1; then
+                            add_summary "success" "Prettier formatting applied (dirty:fix)"
+                        else
+                            add_summary "error" "Prettier formatting failed"
+                        fi
+                    else
+                        add_summary "error" "Prettier found formatting issues"
+                    fi
                 fi
             elif npm_script_exists "prettier:fix"; then
                 log_info "Running npm run prettier:fix"
@@ -530,13 +582,6 @@ lint_javascript() {
                     add_summary "success" "Prettier formatting applied"
                 else
                     add_summary "error" "Prettier formatting failed"
-                fi
-            elif npm_script_exists "prettier"; then
-                log_info "Running npm run prettier"
-                if npm run prettier 2>&1; then
-                    add_summary "success" "Prettier check passed"
-                else
-                    add_summary "error" "Prettier found formatting issues"
                 fi
             else
                 # Fallback to direct prettier commands if config files exist
@@ -605,7 +650,7 @@ lint_javascript() {
                 local typecheck_output
                 typecheck_output=$(npm run typecheck 2>&1)
                 local typecheck_exit=$?
-                
+
                 # Always show output if there's an error so the user sees what failed
                 if [[ $typecheck_exit -ne 0 ]]; then
                     echo "$typecheck_output" >&2
@@ -643,7 +688,7 @@ lint_javascript() {
                 add_summary "error" "TypeScript typecheck found issues"
             fi
         fi
-    
+
     # Return to original directory
     cd "$original_dir" || return 1
 
@@ -666,13 +711,13 @@ lint_rust() {
         else
             # Check if this is a monorepo with Rust sub-projects
             local rust_subprojects=($(find . -maxdepth 3 -name "Cargo.toml" -type f 2>/dev/null | sed 's|/Cargo.toml||' | sort))
-            
+
             if [[ ${#rust_subprojects[@]} -gt 0 ]]; then
                 log_info "Found ${#rust_subprojects[@]} Rust sub-project(s) in monorepo, running checks on each:"
-                
+
                 for project_dir in "${rust_subprojects[@]}"; do
                     log_info "  → Checking $project_dir"
-                    
+
                     # CRITICAL: DO NOT USE A SUBSHELL HERE!
                     # We need add_summary() to update the global CLAUDE_HOOKS_ERROR_COUNT
                     # Save current directory and change to project directory
@@ -747,19 +792,27 @@ lint_ruby() {
     log_info "Running Ruby linters..."
 
     # RuboCop formatting and linting
-    if command_exists rubocop; then
+    # Only run if RuboCop is in the Gemfile (not just globally installed)
+    local has_rubocop=false
+    if [[ -f "Gemfile" ]] && grep -q "rubocop" Gemfile; then
+        has_rubocop=true
+    fi
+
+    if command_exists rubocop && [[ "$has_rubocop" == "true" ]]; then
         local mono_path=$(get_mono_repo_path)
         local git_root=$(find_git_root)
 
-        # Get dirty Ruby files, NOTE excluding .erb files, because sorbet and rubocop don't handle them
+        # Get dirty Ruby files, NOTE excluding .erb and .podspec files
+        # .erb files: sorbet and rubocop don't handle them
+        # .podspec files: Cocoapods Ruby DSL files, not part of the actual project
         local dirty_files=""
         if [[ -n "$mono_path" ]]; then
             # In a mono-repo subdirectory
             log_debug "Detected mono-repo structure with path: $mono_path"
-            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake)$' | tr '\n' ' ')
+            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
         else
             # In repo root or no git
-            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake)$' | tr '\n' ' ')
+            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
         fi
 
         if [[ -n "$dirty_files" ]]; then
@@ -783,8 +836,13 @@ lint_ruby() {
         log_debug "RuboCop not found, skipping Ruby style checks"
     fi
 
-    # Sorbet type checking
-    if command_exists srb; then
+    # Sorbet type checking - only if sorbet/ directory exists AND sorbet is in Gemfile
+    local has_sorbet=false
+    if [[ -f "Gemfile" ]] && grep -q "sorbet" Gemfile; then
+        has_sorbet=true
+    fi
+
+    if command_exists srb && [[ -d "sorbet" ]] && [[ "$has_sorbet" == "true" ]]; then
         if [[ -n "$dirty_files" ]]; then
             log_info "Running Sorbet on dirty files only"
             # Run sorbet on dirty files
@@ -803,7 +861,11 @@ lint_ruby() {
             fi
         fi
     else
-        log_debug "Sorbet not found, skipping type checks"
+        if command_exists srb; then
+            log_debug "Sorbet found but no sorbet/ directory, skipping type checks"
+        else
+            log_debug "Sorbet not found, skipping type checks"
+        fi
     fi
 
     return 0
@@ -826,7 +888,7 @@ lint_php() {
 
     # Get the directory containing composer.json
     local project_dir=$(dirname "$composer_json_path")
-    
+
     # Helper function to check if composer script exists
     composer_script_exists() {
         local script_name="$1"
@@ -838,7 +900,7 @@ lint_php() {
     # Save current directory and change to project directory
     local original_dir=$(pwd)
     cd "$project_dir" || return 1
-        
+
         # Check for composer formatting commands
         if command_exists composer; then
             # Try format:dirty:fix first, then format:dirty, then format:fix, then format
@@ -873,7 +935,7 @@ lint_php() {
             else
                 log_debug "No composer format scripts found"
             fi
-        
+
             # Check for PHP linting AFTER formatting
             # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
             if composer_script_exists "lint:dirty:fix"; then
@@ -910,7 +972,7 @@ lint_php() {
         else
             log_debug "Composer not found, skipping PHP formatting and linting checks"
         fi
-    
+
     # Return to original directory
     cd "$original_dir" || return 1
 
