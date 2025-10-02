@@ -37,6 +37,33 @@ return {
           },
         },
 
+        -- Exclude __generated__ directories from search
+        find_engine = {
+          ['rg'] = {
+            cmd = 'rg',
+            args = {
+              '--color=never',
+              '--no-heading',
+              '--with-filename',
+              '--line-number',
+              '--column',
+              '--glob=!**/__generated__/**',
+            },
+            options = {
+              ['ignore-case'] = {
+                value = '--ignore-case',
+                icon = '[I]',
+                desc = 'ignore case',
+              },
+              ['hidden'] = {
+                value = '--hidden',
+                desc = 'hidden file',
+                icon = '[H]',
+              },
+            },
+          },
+        },
+
         -- Fix for sed issue on OSX, see https://github.com/nvim-pack/nvim-spectre/issues/118
         replace_engine = {
           ['sed'] = {
