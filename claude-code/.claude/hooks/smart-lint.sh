@@ -283,6 +283,11 @@ detect_project_type() {
         types+=("nix")
     fi
 
+    # Objective-C project - search upwards for .clang-format
+    if find_project_file ".clang-format" >/dev/null && [[ -n "$(find_with_excludes '-name "*.m" -o -name "*.h"')" ]]; then
+        types+=("objc")
+    fi
+
     # Return primary type or "mixed" if multiple
     if [[ ${#types[@]} -eq 1 ]]; then
         project_type="${types[0]}"
@@ -351,6 +356,7 @@ load_config() {
     export CLAUDE_HOOKS_RUBY_ENABLED="${CLAUDE_HOOKS_RUBY_ENABLED:-true}"
     export CLAUDE_HOOKS_PHP_ENABLED="${CLAUDE_HOOKS_PHP_ENABLED:-true}"
     export CLAUDE_HOOKS_NIX_ENABLED="${CLAUDE_HOOKS_NIX_ENABLED:-true}"
+    export CLAUDE_HOOKS_OBJC_ENABLED="${CLAUDE_HOOKS_OBJC_ENABLED:-true}"
 
     # Project-specific overrides
     if [[ -f ".claude-hooks-config.sh" ]]; then
@@ -1024,6 +1030,100 @@ lint_nix() {
     return 0
 }
 
+lint_objc() {
+    if [[ "${CLAUDE_HOOKS_OBJC_ENABLED:-true}" != "true" ]]; then
+        log_debug "Objective-C linting disabled"
+        return 0
+    fi
+
+    log_info "Running Objective-C linters..."
+
+    # Find .clang-format file by searching upwards
+    local clang_format_path=$(find_project_file ".clang-format")
+    if [[ -z "$clang_format_path" ]]; then
+        log_debug "No .clang-format file found, skipping Objective-C formatting"
+        return 0
+    fi
+
+    # Get the directory containing .clang-format
+    local format_dir=$(dirname "$clang_format_path")
+    log_debug "Found .clang-format in: $format_dir"
+
+    # Check if clang-format is available
+    if ! command_exists clang-format; then
+        echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" >&2
+        echo -e "${RED}❌ clang-format is required but not installed${NC}" >&2
+        echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" >&2
+        echo "" >&2
+        echo -e "${YELLOW}Your project has a .clang-format file at:${NC}" >&2
+        echo -e "${CYAN}  $clang_format_path${NC}" >&2
+        echo "" >&2
+        echo -e "${YELLOW}To install clang-format:${NC}" >&2
+        echo "" >&2
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            echo -e "${GREEN}  # macOS (Homebrew):${NC}" >&2
+            echo -e "${CYAN}  brew install clang-format${NC}" >&2
+            echo "" >&2
+            echo -e "${GREEN}  # Or via Xcode command line tools:${NC}" >&2
+            echo -e "${CYAN}  xcode-select --install${NC}" >&2
+        elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+            echo -e "${GREEN}  # Ubuntu/Debian:${NC}" >&2
+            echo -e "${CYAN}  sudo apt-get install clang-format${NC}" >&2
+            echo "" >&2
+            echo -e "${GREEN}  # Fedora/RHEL:${NC}" >&2
+            echo -e "${CYAN}  sudo dnf install clang-tools-extra${NC}" >&2
+            echo "" >&2
+            echo -e "${GREEN}  # Arch Linux:${NC}" >&2
+            echo -e "${CYAN}  sudo pacman -S clang${NC}" >&2
+        else
+            echo -e "${GREEN}  # Install via your package manager or from:${NC}" >&2
+            echo -e "${CYAN}  https://releases.llvm.org/download.html${NC}" >&2
+        fi
+        echo "" >&2
+        echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}" >&2
+        add_summary "error" "clang-format not installed (required for Objective-C formatting)"
+        return 0
+    fi
+
+    # Get git root to properly construct file list
+    local git_root=$(find_git_root)
+    if [[ -z "$git_root" ]]; then
+        log_debug "Not in a git repository, skipping Objective-C formatting"
+        return 0
+    fi
+
+    # CRITICAL: DO NOT USE A SUBSHELL HERE!
+    # We need add_summary() to update the global CLAUDE_HOOKS_ERROR_COUNT
+    local original_dir=$(pwd)
+    cd "$git_root" || return 1
+
+        # Get list of .h and .m files using git ls-files
+        local objc_files=$(git ls-files '*.h' '*.m' 2>/dev/null | tr '\n' ' ')
+
+        if [[ -z "$objc_files" ]]; then
+            log_debug "No Objective-C files found in git"
+            cd "$original_dir" || return 1
+            return 0
+        fi
+
+        log_debug "Found Objective-C files: $objc_files"
+
+        # Check formatting first (dry-run)
+        if echo "$objc_files" | xargs clang-format --dry-run --Werror 2>&1; then
+            add_summary "success" "Objective-C formatting correct"
+        else
+            # Auto-format the files
+            log_info "Auto-formatting Objective-C files..."
+            echo "$objc_files" | xargs clang-format -i 2>&1
+            add_summary "success" "Objective-C files formatted"
+        fi
+
+    # Return to original directory
+    cd "$original_dir" || return 1
+
+    return 0
+}
+
 # ============================================================================
 # MAIN EXECUTION
 # ============================================================================
@@ -1079,6 +1179,7 @@ main() {
                 "ruby") lint_ruby ;;
                 "php") lint_php ;;
                 "nix") lint_nix ;;
+                "objc") lint_objc ;;
             esac
 
             # Fail fast if configured
@@ -1096,6 +1197,7 @@ main() {
             "ruby") lint_ruby ;;
             "php") lint_php ;;
             "nix") lint_nix ;;
+            "objc") lint_objc ;;
             "unknown")
                 log_info "No recognized project type, skipping checks"
                 ;;
