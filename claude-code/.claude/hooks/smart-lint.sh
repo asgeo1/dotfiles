@@ -1097,24 +1097,26 @@ lint_objc() {
     local original_dir=$(pwd)
     cd "$git_root" || return 1
 
-        # Get list of .h and .m files using git ls-files
-        local objc_files=$(git ls-files '*.h' '*.m' 2>/dev/null | tr '\n' ' ')
+        # Check if there are any Objective-C files
+        # Use -z for null-terminated output to handle spaces in filenames
+        local has_objc_files=$(git ls-files '*.h' '*.m' 2>/dev/null | head -1)
 
-        if [[ -z "$objc_files" ]]; then
+        if [[ -z "$has_objc_files" ]]; then
             log_debug "No Objective-C files found in git"
             cd "$original_dir" || return 1
             return 0
         fi
 
-        log_debug "Found Objective-C files: $objc_files"
+        log_debug "Found Objective-C files in repository"
 
         # Check formatting first (dry-run)
-        if echo "$objc_files" | xargs clang-format --dry-run --Werror 2>&1; then
+        # Use -z and xargs -0 to properly handle filenames with spaces
+        if git ls-files -z '*.h' '*.m' 2>/dev/null | xargs -0 clang-format --dry-run --Werror 2>&1; then
             add_summary "success" "Objective-C formatting correct"
         else
             # Auto-format the files
             log_info "Auto-formatting Objective-C files..."
-            echo "$objc_files" | xargs clang-format -i 2>&1
+            git ls-files -z '*.h' '*.m' 2>/dev/null | xargs -0 clang-format -i 2>&1
             add_summary "success" "Objective-C files formatted"
         fi
 
