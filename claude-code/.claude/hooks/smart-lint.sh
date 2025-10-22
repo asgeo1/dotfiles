@@ -695,6 +695,23 @@ lint_javascript() {
             fi
         fi
 
+        # Check for dead code detection AFTER all other checks
+        if npm_script_exists "find-dead-code:branch"; then
+            log_info "Running npm run find-dead-code:branch"
+            # Capture both stdout and stderr
+            local deadcode_output
+            deadcode_output=$(npm run find-dead-code:branch 2>&1)
+            local deadcode_exit=$?
+
+            # Always show output if there's an error so the user sees what failed
+            if [[ $deadcode_exit -ne 0 ]]; then
+                echo "$deadcode_output" >&2
+                add_summary "error" "Dead code found in branch"
+            else
+                add_summary "success" "Dead code check passed"
+            fi
+        fi
+
     # Return to original directory
     cd "$original_dir" || return 1
 
