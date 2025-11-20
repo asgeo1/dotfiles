@@ -696,19 +696,27 @@ lint_javascript() {
         fi
 
         # Check for dead code detection AFTER all other checks
+        # Only run if Objective-C files (.h/.m) were modified (including untracked files)
         if npm_script_exists "find-dead-code:branch"; then
-            log_info "Running npm run find-dead-code:branch"
-            # Capture both stdout and stderr
-            local deadcode_output
-            deadcode_output=$(npm run find-dead-code:branch 2>&1)
-            local deadcode_exit=$?
+            # Get all dirty files (tracked and untracked) and filter for Objective-C files
+            local dirty_objc_files=$(get_dirty_files '\.(h|m)$')
 
-            # Always show output if there's an error so the user sees what failed
-            if [[ $deadcode_exit -ne 0 ]]; then
-                echo "$deadcode_output" >&2
-                add_summary "error" "Dead code found in branch"
+            if [[ -n "$dirty_objc_files" ]]; then
+                log_info "Running npm run find-dead-code:branch"
+                # Capture both stdout and stderr
+                local deadcode_output
+                deadcode_output=$(npm run find-dead-code:branch 2>&1)
+                local deadcode_exit=$?
+
+                # Always show output if there's an error so the user sees what failed
+                if [[ $deadcode_exit -ne 0 ]]; then
+                    echo "$deadcode_output" >&2
+                    add_summary "error" "Dead code found in branch"
+                else
+                    add_summary "success" "Dead code check passed"
+                fi
             else
-                add_summary "success" "Dead code check passed"
+                log_debug "No Objective-C files modified, skipping dead code check"
             fi
         fi
 
@@ -1260,7 +1268,6 @@ elif [[ $CLAUDE_HOOKS_ERROR_COUNT -gt 0 ]]; then
 else
     # ONLY say "Style clean" when there are ACTUALLY no errors
     echo -e "\n${GREEN}✅ All checks passed - Style clean!${NC}" >&2
-    # Still exit with 2 to let Claude continue (hooks always exit 2 for continuation)
     echo -e "\n${YELLOW}👉 Continue with your task.${NC}" >&2
-    exit 2
+    exit 0
 fi
