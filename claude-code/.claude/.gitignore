@@ -1,6 +1,7 @@
 projects/*
 statsig/*
 todos/*
+debug/*
 file-history/*
 __store.db
 history.jsonl
