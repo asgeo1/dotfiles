@@ -173,6 +173,8 @@ Would you like me to [specific improvement]?"
 
 Avoid complex abstractions or "clever" code. The simple, obvious solution is probably better, and my guidance helps you stay focused on what matters.
 
+NEVER drop or reset the database without explicit confirmation. Always check with me first.
+
 ---
 
 # MCP Tools Guide
