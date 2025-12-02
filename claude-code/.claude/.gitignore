@@ -2,6 +2,8 @@ projects/*
 statsig/*
 todos/*
 debug/*
+plans/*
+shell-snapshots/*
 file-history/*
 __store.db
 history.jsonl
