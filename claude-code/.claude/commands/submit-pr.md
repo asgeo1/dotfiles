@@ -1,3 +1,9 @@
+# Submit PR
+
+Use the Task tool to spawn a subagent that handles PR submission. Pass the following prompt:
+
+---
+
 Automate the creation and submission of a GitHub pull request with comprehensive quality checks.
 
 ## CRITICAL SAFETY RULES
@@ -12,7 +18,7 @@ Automate the creation and submission of a GitHub pull request with comprehensive
 
 ## Step 1: Parse Arguments
 
-Parse `$ARGUMENTS` for the following optional flags:
+Parse the arguments for the following optional flags:
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -60,10 +66,27 @@ Analyze the output:
   > - Discard them: `git checkout -- <file>`
   > Files: {list files}
 
-- **Staged changes (`M `, `A `, `D `)** → Run `/commit` command first:
-  > **Found staged changes.** Running `/commit` to commit them first...
+- **Staged changes (`M `, `A `, `D `)** → Spawn a nested subagent to handle the commit:
+  > **Found staged changes.** Spawning commit subagent to commit them first...
 
-  After commit completes, re-run `git status --porcelain` to verify clean.
+  Use the Task tool with subagent_type="general-purpose" to spawn a commit subagent with this prompt:
+
+  ```
+  You are a git commit assistant. Review staged changes and create a commit.
+
+  SAFETY: Only work with staged changes (git diff --cached). Never run git add.
+
+  WORKFLOW:
+  1. Run `git diff --cached --stat` - if empty, report "No staged changes" and stop
+  2. Run `git diff --cached` for full diff
+  3. Run `git log --oneline -10` for commit style
+  4. Analyze: change type (feat/fix/refactor/etc), scope, the WHY
+  5. Craft commit message (subject ~50 chars + body wrapped at 72)
+  6. Execute commit with HEREDOC format
+  7. Report: commit hash and one-line summary
+  ```
+
+  After commit subagent completes, re-run `git status --porcelain` to verify clean.
 
 - **Empty output** → Working directory is clean, proceed.
 
@@ -171,7 +194,7 @@ Run smart-lint in each changed subproject sequentially.
    - Do NOT add `eslint-disable` or `rubocop:disable` comments
    - Do NOT ignore or suppress errors
    - Fix the actual underlying issue
-4. **Stage and commit fixes** - Use `/commit` with message like "fix: address linting issues"
+4. **Stage and commit fixes** - Spawn a nested commit subagent with message like "fix: address linting issues"
 5. **Re-run smart-lint** - Verify all checks pass
 
 **If you cannot fix an issue, ASK THE USER:**
@@ -424,3 +447,7 @@ Possible causes:
 Please resolve the issue and try again.
 ═══════════════════════════════════════════════════════════════════
 ```
+
+---
+
+After the subagent completes, report the PR result to the user.
