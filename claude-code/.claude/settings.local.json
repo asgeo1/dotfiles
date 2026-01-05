@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(textutil:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
