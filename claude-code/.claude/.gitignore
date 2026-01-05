@@ -5,5 +5,8 @@ debug/*
 plans/*
 shell-snapshots/*
 file-history/*
+chrome/
+image-cache/
 __store.db
 history.jsonl
+stats-cache.json
