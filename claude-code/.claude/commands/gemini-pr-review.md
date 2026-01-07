@@ -6,9 +6,9 @@ Use the command line interface with the `-p` flag and Gemini will return it's re
 
  - `gemini -p "YOUR PROMPT"`
 
- - `gemini -p "Review PR #5 and provide feedback using the get_pull_request tool, e.g. get_pull_request (MCP_DOCKER MCP Server) {"pullNumber":5,"owner":"xxxx","repo":"yyyy"} get_pull_request_diff (MCP_DOCKER MCP Server) {"pullNumber":5,"owner":"xxxx","repo":"yyyy"}. There is no need to submit the PR review, just provide the feedback directly."`
+ - `gemini -p "Review PR #5 in owner/repo and provide feedback. Use 'gh pr view 5 -R owner/repo --json title,body,author,baseRefName,headRefName,files,commits' to get PR details and 'gh pr diff 5 -R owner/repo' to get the diff. There is no need to submit the PR review, just provide the feedback directly."`
 
-Make sure you instruct Gemini to use the `get_pull_request` and `get_pull_request` tools to fetch the PR details, passing in the correct PR number and owner and repo variables.
+Make sure you instruct Gemini to use `gh pr view` and `gh pr diff` commands with the `-R owner/repo` flag to fetch the PR details.
 
 If Gemini responds with an error about `Quota exceeded for quota metric 'Gemini 2.5 Pro Requests'`, or similar error, it means we can't use that model and need to specify a different model.
 

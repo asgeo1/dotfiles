@@ -26,15 +26,15 @@ If URL is missing or invalid, ask for a valid GitHub PR URL.
 
 ## Step 2: Fetch PR Data
 
-Use `mcp__MCP_DOCKER__pull_request_read` to gather data.
+Use `gh` CLI commands to gather data.
 
 ### For Format A (All Feedback):
 Fetch everything:
-1. `method: "get"` - PR details and description
-2. `method: "get_diff"` - The actual code changes
-3. `method: "get_reviews"` - All PR reviews
-4. `method: "get_review_comments"` - All line-by-line code comments
-5. `method: "get_comments"` - All general discussion comments
+1. PR details: `gh pr view {pullNumber} -R {owner}/{repo} --json title,body,author,state,baseRefName,headRefName`
+2. PR diff: `gh pr diff {pullNumber} -R {owner}/{repo}`
+3. PR reviews: `gh pr view {pullNumber} -R {owner}/{repo} --json reviews`
+4. Review comments: `gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments`
+5. General comments: `gh api repos/{owner}/{repo}/issues/{pullNumber}/comments`
 
 **Skip previously addressed feedback**: Check `~/.claude/plans/` for existing plan files matching this PR (e.g., `pr-feedback-{owner}-{repo}-{pullNumber}*.md`). If found:
 - Read the existing plan(s)
@@ -44,10 +44,10 @@ Fetch everything:
 
 ### For Format B (Specific Review):
 Fetch selectively:
-1. `method: "get"` - PR details and description
-2. `method: "get_diff"` - The actual code changes
-3. `method: "get_reviews"` - Find the specific review matching `reviewId`
-4. `method: "get_review_comments"` - Filter to ONLY comments from that review
+1. PR details: `gh pr view {pullNumber} -R {owner}/{repo} --json title,body,author,state,baseRefName,headRefName`
+2. PR diff: `gh pr diff {pullNumber} -R {owner}/{repo}`
+3. Specific review: `gh api repos/{owner}/{repo}/pulls/{pullNumber}/reviews/{reviewId}`
+4. Review comments: `gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments` - Filter to ONLY comments from that review
 
 **Important for Format B**: After fetching, filter the results to include only feedback from the specific `reviewId`. Ignore all other reviews and comments not associated with that review.
 
@@ -176,9 +176,10 @@ For each ✅ Valid item:
 ### 6b. Post Resolution Comments
 For each feedback item (valid, invalid, or partial), post a reply comment to the PR:
 
-**Use these MCP tools:**
-- `mcp__MCP_DOCKER__add_issue_comment` - For general PR comments
-- `mcp__MCP_DOCKER__pull_request_review_write` with `method: "create"` - For review responses
+**Use these gh CLI commands:**
+- General PR comments: `gh pr comment {pullNumber} -R {owner}/{repo} -b "message"`
+- Reply to review comments: `gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments/{comment_id}/replies -f body="message"`
+- Submit a review: `gh pr review {pullNumber} -R {owner}/{repo} --comment -b "message"`
 
 **Reply format by category:**
 - ✅ **Valid**: "Fixed - [description of what was changed]"

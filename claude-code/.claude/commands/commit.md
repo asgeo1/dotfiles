@@ -1,6 +1,10 @@
 # Git Commit Assistant
 
-Use the Task tool to spawn a subagent that handles this commit. Pass the following prompt:
+Use the Task tool to spawn a subagent that handles this commit.
+
+⚠️ **CRITICAL: Pass the prompt below VERBATIM to the subagent. DO NOT summarize, paraphrase, or truncate. Every detail matters.**
+
+Pass the following prompt:
 
 ---
 

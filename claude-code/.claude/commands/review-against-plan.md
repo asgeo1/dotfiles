@@ -4,6 +4,8 @@ Review uncommitted changes against the current implementation plan to catch inco
 
 Use the Task tool to spawn a subagent that handles this review. **You should already know what plan you're working on** - include its path in the prompt below, or pass it via $ARGUMENTS.
 
+⚠️ **CRITICAL: Pass the prompt below VERBATIM to the subagent. DO NOT summarize, paraphrase, or truncate. Every detail matters.**
+
 Pass the following prompt (replace `[PLAN_PATH]` with the actual plan file path):
 
 ---

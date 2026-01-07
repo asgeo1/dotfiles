@@ -1,6 +1,10 @@
 # Resolve Git Conflict
 
-Use the Task tool to spawn a subagent that handles conflict resolution. Pass the following prompt:
+Use the Task tool to spawn a subagent that handles conflict resolution.
+
+⚠️ **CRITICAL: Pass the prompt below VERBATIM to the subagent. DO NOT summarize, paraphrase, or truncate. Every detail matters.**
+
+Pass the following prompt:
 
 ---
 

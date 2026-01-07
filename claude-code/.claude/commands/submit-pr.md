@@ -1,6 +1,10 @@
 # Submit PR
 
-Use the Task tool to spawn a subagent that handles PR submission. Pass the following prompt:
+Use the Task tool to spawn a subagent that handles PR submission.
+
+⚠️ **CRITICAL: Pass the prompt below VERBATIM to the subagent. DO NOT summarize, paraphrase, or truncate. Every detail matters.**
+
+Pass the following prompt:
 
 ---
 
@@ -122,11 +126,9 @@ Run: `git push -u origin HEAD`
 
 ### 3b. Check for Existing PR
 
-Use: `mcp__MCP_DOCKER__list_pull_requests`
-- `owner`: Extract from `git remote get-url origin`
-- `repo`: Extract from `git remote get-url origin`
-- `head`: Current branch name (format: `owner:branch` or just `branch`)
-- `state`: "open"
+Run: `gh pr list -R {owner}/{repo} --head {current_branch} --state open --json number,title,url`
+
+Extract `owner` and `repo` from `git remote get-url origin`.
 
 If a PR exists for this branch:
 > **ABORT**: A pull request already exists for this branch.
@@ -169,6 +171,8 @@ Group the changed files by their top-level directory (subproject). For example:
 Create a list of unique subprojects that need linting.
 
 ### 4b. Run Smart-Lint on Each Subproject
+
+⚠️ **CRITICAL: `smart-lint.sh` is a shell script at `~/.claude/hooks/smart-lint.sh` - it is NOT a package.json script or Justfile command!**
 
 For each subproject with changes, run smart-lint from that directory:
 
@@ -372,30 +376,23 @@ From `git remote get-url origin`, parse:
 
 ### 7c. Create Pull Request
 
-Use: `mcp__MCP_DOCKER__create_pull_request`
+Run:
+```bash
+gh pr create -R {owner}/{repo} \
+  --title "{generated_or_custom_title}" \
+  --base {base_branch} \
+  --head {current_branch} \
+  --body "{generated_description}" \
+  {--draft if is_draft}
+```
 
-Parameters:
-- `owner`: {extracted_owner}
-- `repo`: {extracted_repo}
-- `title`: {generated_or_custom_title}
-- `head`: {current_branch}
-- `base`: {base_branch}
-- `body`: {generated_description}
-- `draft`: {is_draft}
-
-Capture the returned PR URL and number.
+Capture the returned PR URL and number from the output.
 
 ### 7d. Request AI Reviewers
 
 After PR is created, request AI reviewers if available:
 
-Use: `mcp__MCP_DOCKER__update_pull_request`
-
-Parameters:
-- `owner`: {owner}
-- `repo`: {repo}
-- `pullNumber`: {pr_number}
-- `reviewers`: ["github-copilot[bot]"]
+Run: `gh pr edit {pr_number} -R {owner}/{repo} --add-reviewer "github-copilot[bot]"`
 
 Note: Reviewer assignment may fail if bots aren't configured on the repo - this is not a blocking error. Log it and continue.
 
