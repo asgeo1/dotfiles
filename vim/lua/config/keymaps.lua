@@ -144,4 +144,22 @@ map(
   { noremap = true, silent = true }
 )
 
+-- =============================================================================
+-- Copy file path to clipboard
+
+map('n', leader .. 'yp', [[:lua require('util.utils').copy_file_path('relative')<CR>]], {
+  noremap = true,
+  silent = true,
+})
+
+map('n', leader .. 'yP', [[:lua require('util.utils').copy_file_path('absolute')<CR>]], {
+  noremap = true,
+  silent = true,
+})
+
+map('n', leader .. 'yf', [[:lua require('util.utils').copy_file_path('filename')<CR>]], {
+  noremap = true,
+  silent = true,
+})
+
 return M

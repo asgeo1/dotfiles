@@ -108,6 +108,25 @@ M.ansi_codes = {
   end,
 }
 
+M.copy_file_path = function(path_type)
+  local path
+  if path_type == 'relative' then
+    path = vim.fn.expand('%')
+  elseif path_type == 'absolute' then
+    path = vim.fn.expand('%:p')
+  elseif path_type == 'filename' then
+    path = vim.fn.expand('%:t')
+  end
+
+  if path == '' then
+    vim.notify('No file in current buffer', vim.log.levels.WARN)
+    return
+  end
+
+  vim.fn.setreg('+', path)
+  vim.notify('Copied: ' .. path)
+end
+
 M.shorten_string = function(string, length)
   if #string < length then
     return string
