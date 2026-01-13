@@ -11,3 +11,6 @@ plugins/
 __store.db
 history.jsonl
 stats-cache.json
+cache
+paste-cache
+telemetry
