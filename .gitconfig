@@ -65,3 +65,5 @@
 
 [credential "https://github.com"]
   username = asgeo1
+[mergetool]
+	keepBackup = false
