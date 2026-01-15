@@ -9,17 +9,24 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 - `branch [base]` - Review current branch vs base (default: master). Requires clean working directory.
 - `pr <number>` - Review a specific PR
 
+**Flags:**
+- `--no-context` - Skip context gathering for a "blind" review
+
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
 ---
 
-## Step 1: Parse Scope from Arguments
+## Step 1: Parse Scope and Flags from Arguments
 
-Parse `$ARGUMENTS` to determine scope:
+Parse `$ARGUMENTS` to determine scope and flags:
 
 ```
 $ARGUMENTS = "$ARGUMENTS"
 ```
+
+**Flag detection:**
+- Check for `--no-context` flag anywhere in arguments
+- Remove flag from arguments before parsing scope
 
 **Scope detection logic:**
 1. If starts with `all` → scope = all
@@ -45,13 +52,33 @@ If output is non-empty, ABORT with:
 > "Working directory has uncommitted changes. Please commit or stash first, or use `all`/`uncommitted` scope to review working directory changes."
 
 ### For all other scopes
-No validation needed. Proceed directly to spawning subagent.
+No validation needed. Proceed to context gathering.
 
-## Step 3: Spawn Subagent
+## Step 3: Gather Context (unless --no-context)
 
-Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass the scope information. The subagent will instruct Gemini to fetch its own context.
+**Skip this step if `--no-context` flag was provided.**
 
-Pass the following prompt VERBATIM (fill in [SCOPE] and [BASE] placeholders only):
+Gather context to help Gemini understand the INTENT of changes (do NOT fetch diffs!):
+
+1. **Plan file path**: Check if you're in plan mode or have a plan file in context. Note the PATH only - don't read the content. Each agent will read it themselves if needed.
+
+2. **Supplementary context**: From your conversation, extract relevant info that is NOT in the plan file:
+   - Specific user concerns mentioned
+   - Design decisions discussed verbally
+   - Areas of uncertainty
+   - Constraints or requirements mentioned but not documented
+
+   Scale detail to the task size - bigger task = more detail is appropriate.
+
+Store these as:
+- `[PLAN_FILE_PATH]` - Path to plan file, or "none"
+- `[SUPPLEMENTARY_CONTEXT]` - Additional context from conversation, or "none"
+
+## Step 4: Spawn Subagent
+
+Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass scope and context. The subagent will instruct Gemini to fetch its own diffs.
+
+Pass the following prompt VERBATIM (fill in placeholders):
 
 ---
 
@@ -70,6 +97,14 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 **Scope:** [SCOPE]
 **Base (if branch scope):** [BASE]
 
+### Context
+
+**Plan file path:** [PLAN_FILE_PATH]
+If a path is provided, you and Gemini can read this file to understand the intent of the changes. Don't just blindly accept feedback that contradicts the plan.
+
+**Supplementary context:** [SUPPLEMENTARY_CONTEXT]
+This is additional relevant information from the main conversation that isn't in the plan file.
+
 **Git commands Gemini should run based on scope:**
 - `all`: `git diff` (unstaged) + `git diff --cached` (staged) + `git ls-files --others --exclude-standard` (untracked)
 - `uncommitted`: `git diff` (unstaged) + `git ls-files --others --exclude-standard` (untracked)
@@ -79,13 +114,23 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 
 ### Step 1: Start Gemini Session
 
-Tell Gemini to fetch the changes itself based on the scope:
+Tell Gemini to fetch the changes itself based on the scope. Include context if provided:
 
 ```bash
 gemini "Review the code changes for scope: [SCOPE].
 
 First, fetch the changes by running the appropriate git commands:
 [GIT_COMMANDS_FOR_SCOPE]
+
+[IF PLAN_FILE_PATH != 'none']
+Read the plan file at: [PLAN_FILE_PATH]
+This describes the intent of the changes. Consider this when reviewing.
+[END IF]
+
+[IF SUPPLEMENTARY_CONTEXT != 'none']
+Additional context:
+[SUPPLEMENTARY_CONTEXT]
+[END IF]
 
 Then review the changes. For each issue you find, provide:
 1. What the issue is
@@ -164,7 +209,7 @@ Structure the validated feedback as follows:
 
 ---
 
-## Step 4: Present Results
+## Step 5: Present Results
 
 After the subagent returns, present the structured feedback to the user.
 
