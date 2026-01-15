@@ -5,6 +5,7 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
 - `uncommitted` - Review untracked + unstaged only (ignore staged)
+- `staged` - Review staged changes only (what would be committed)
 - `branch [base]` - Review current branch vs base (default: master). Requires clean working directory.
 - `pr <number>` - Review a specific PR
 
@@ -23,8 +24,9 @@ $ARGUMENTS = "$ARGUMENTS"
 **Scope detection logic:**
 1. If starts with `all` → scope = all
 2. If starts with `uncommitted` → scope = uncommitted
-3. If starts with `branch` → scope = branch, parse optional base (default: master)
-4. If starts with `pr` → scope = pr, parse PR number (required)
+3. If starts with `staged` → scope = staged
+4. If starts with `branch` → scope = branch, parse optional base (default: master)
+5. If starts with `pr` → scope = pr, parse PR number (required)
 5. If empty → smart default:
    - Run `git branch --show-current`
    - If not `master` or `main` → scope = branch (base = master)
@@ -59,6 +61,12 @@ git ls-files --others --exclude-standard  # untracked files
 git status --short
 git diff                    # unstaged changes only
 git ls-files --others --exclude-standard  # untracked files
+```
+
+### For scope = `staged`
+```bash
+git diff --cached           # staged changes only
+git diff --cached --stat    # summary of staged files
 ```
 
 ### For scope = `pr`
