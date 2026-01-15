@@ -90,7 +90,7 @@ When your review is complete, explicitly say 'REVIEW COMPLETE' at the end." 2>/d
 After each Codex response:
 
 1. **Check for completion signal**: If Codex says "REVIEW COMPLETE" (or similar), proceed to Step 3
-2. **If not complete**, resume the session with follow-up:
+2. **If not complete**, resume the session with `--last`:
    ```bash
    echo "Continue your review. If you have more concerns, suggestions, or questions, share them. Read additional files if needed. Say 'REVIEW COMPLETE' when done." | codex exec --skip-git-repo-check resume --last 2>/dev/null
    ```
