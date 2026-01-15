@@ -32,52 +32,26 @@ $ARGUMENTS = "$ARGUMENTS"
    - If not `master` or `main` → scope = branch (base = master)
    - Else → scope = all
 
-## Step 2: Validate and Gather Changes
+## Step 2: Validate Scope (Minimal - No Diffs!)
+
+**IMPORTANT: Do NOT run git diff or fetch any diff content. That pollutes your context.**
 
 ### For scope = `branch`
-First, check for dirty working directory:
+Only check for dirty working directory:
 ```bash
 git status --porcelain
 ```
 If output is non-empty, ABORT with:
 > "Working directory has uncommitted changes. Please commit or stash first, or use `all`/`uncommitted` scope to review working directory changes."
 
-Then gather branch diff:
-```bash
-git diff <base>...HEAD
-git log <base>...HEAD --oneline
-```
-
-### For scope = `all`
-```bash
-git status --short
-git diff                    # unstaged changes
-git diff --cached           # staged changes
-git ls-files --others --exclude-standard  # untracked files
-```
-
-### For scope = `uncommitted`
-```bash
-git status --short
-git diff                    # unstaged changes only
-git ls-files --others --exclude-standard  # untracked files
-```
-
-### For scope = `staged`
-```bash
-git diff --cached           # staged changes only
-git diff --cached --stat    # summary of staged files
-```
-
-### For scope = `pr`
-```bash
-gh pr view <number> --json title,body,author,baseRefName,headRefName,files,additions,deletions
-gh pr diff <number>
-```
+### For all other scopes
+No validation needed. Proceed directly to spawning subagent.
 
 ## Step 3: Spawn Subagent
 
-Use the Task tool to spawn a subagent. Pass the following prompt VERBATIM (fill in the placeholders):
+Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass the scope information. The subagent will instruct Gemini to fetch its own context.
+
+Pass the following prompt VERBATIM (fill in [SCOPE] and [BASE] placeholders only):
 
 ---
 
@@ -89,29 +63,31 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 2. **VALIDATE FEEDBACK** - Don't just relay Gemini's feedback. Challenge vague or questionable points.
 3. **ITERATE** - Keep conversing with Gemini until feedback is complete and validated.
 4. **ACTIONABLE OUTPUT** - Return structured feedback that an AI agent could act on.
+5. **GEMINI FETCHES CONTEXT** - Gemini will run git commands itself to get the diff. Do NOT fetch diffs yourself.
 
-### Context
+### Scope
 
 **Scope:** [SCOPE]
-**What's being reviewed:** [SCOPE_DESCRIPTION]
+**Base (if branch scope):** [BASE]
 
-**Changes to review:**
-```
-[DIFF_CONTENT]
-```
-
-**Changed files:**
-[FILE_LIST]
+**Git commands Gemini should run based on scope:**
+- `all`: `git diff` (unstaged) + `git diff --cached` (staged) + `git ls-files --others --exclude-standard` (untracked)
+- `uncommitted`: `git diff` (unstaged) + `git ls-files --others --exclude-standard` (untracked)
+- `staged`: `git diff --cached`
+- `branch [base]`: `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`
+- `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
 
 ### Step 1: Start Gemini Session
 
+Tell Gemini to fetch the changes itself based on the scope:
+
 ```bash
-gemini "Review the following code changes. Analyze them in the context of this codebase.
+gemini "Review the code changes for scope: [SCOPE].
 
-Changes:
-[DIFF_CONTENT]
+First, fetch the changes by running the appropriate git commands:
+[GIT_COMMANDS_FOR_SCOPE]
 
-For each issue you find, provide:
+Then review the changes. For each issue you find, provide:
 1. What the issue is
 2. Where it is (file and line if possible)
 3. Why it matters
