@@ -10,6 +10,14 @@
       "Bash(gh pr list:*)",
       "Bash(gh api repos/*/pulls/*:*)",
       "Bash(gh api repos/*/issues/*:*)"
+    ],
+    "deny": [
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(git push --force:*)",
+      "Bash(git rebase:*)"
     ]
   },
   "hooks": {
