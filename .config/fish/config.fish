@@ -1,3 +1,11 @@
+# Set TERM based on terminal emulator (before tmux starts)
+# Each terminal has its own terminfo for proper key handling
+if test -n "$GHOSTTY_RESOURCES_DIR"
+    set -gx TERM xterm-ghostty
+else if test -n "$KITTY_PID"
+    set -gx TERM xterm-kitty
+end
+
 # use neovim
 alias vim="nvim"
 

@@ -1,0 +1,15 @@
+# Font configuration
+font-family = Hack Nerd Font Mono
+font-size = 14
+
+# Copy on select - automatically copy selected text to clipboard
+copy-on-select = clipboard
+
+# Disable audio bell
+bell-features = no-audio
+
+# Hide titlebar (removes all tab chrome, use cmd+1-9 to switch tabs)
+# macos-titlebar-style = hidden
+
+# Start in fullscreen mode
+fullscreen = true

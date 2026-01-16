@@ -138,8 +138,8 @@ function _proj_stop_session -a session_name current_kitty_window
         end
     end
 
-    # Find and close the kitty window running this tmux session (if not current)
-    _proj_close_kitty_window $session_name $current_kitty_window
+    # Find and close the terminal tab running this tmux session (if not current)
+    _proj_close_terminal_tab $session_name $current_kitty_window
 
     # Kill the tmux session
     echo "Killing tmux session: $session_name"
@@ -188,10 +188,33 @@ function _proj_get_docker_env -a docker_line docker_dir
     return
 end
 
-function _proj_close_kitty_window -a session_name current_kitty_window
-    # Try to find and close the kitty window/tab running this tmux session
-    # Skip if it's the current kitty window
+function _proj_close_terminal_tab -a session_name current_kitty_window
+    # Try to find and close the terminal tab running this tmux session
+    # Supports: Kitty (full support), Ghostty (no remote API yet)
 
+    # Detect terminal by checking environment or running processes
+    set terminal_app ""
+    if test -n "$KITTY_PID"
+        set terminal_app "kitty"
+    else if test -n "$GHOSTTY_RESOURCES_DIR"
+        set terminal_app "ghostty"
+    else if pgrep -q ghostty 2>/dev/null
+        set terminal_app "ghostty"
+    end
+
+    switch $terminal_app
+        case kitty
+            _proj_close_kitty_tab $session_name $current_kitty_window
+        case ghostty
+            # Ghostty doesn't have remote control API yet
+            # See: https://github.com/ghostty-org/ghostty/discussions/2353
+            echo "  (Ghostty tab must be closed manually - no remote API yet)"
+        case '*'
+            # Unknown terminal, skip
+    end
+end
+
+function _proj_close_kitty_tab -a session_name current_kitty_window
     if not command -q kitty
         return
     end
@@ -203,7 +226,6 @@ function _proj_close_kitty_window -a session_name current_kitty_window
     end
 
     # Find tab ID by looking for windows where last_reported_cmdline contains "tmuxinator start <session>"
-    # This is more reliable than matching on title
     set tab_id (echo $kitty_info | jq -r "
         .[] | .tabs[] |
         select(.windows[]?.last_reported_cmdline | contains(\"tmuxinator start $session_name\")) |
