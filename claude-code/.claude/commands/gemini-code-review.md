@@ -8,6 +8,7 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 - `staged` - Review staged changes only (what would be committed)
 - `branch [base]` - Review current branch vs base (default: master). Requires clean working directory.
 - `pr <number>` - Review a specific PR
+- `./path` or `/path` - Review files at specified path(s). Use `./` for relative paths, `/` for absolute. Comma-separated for multiple.
 
 **Flags:**
 - `--no-context` - Skip context gathering for a "blind" review
@@ -34,7 +35,8 @@ $ARGUMENTS = "$ARGUMENTS"
 3. If starts with `staged` → scope = staged
 4. If starts with `branch` → scope = branch, parse optional base (default: master)
 5. If starts with `pr` → scope = pr, parse PR number (required)
-5. If empty → smart default:
+6. If starts with `./` or `/` → scope = path, store path string
+7. If empty → smart default:
    - Run `git branch --show-current`
    - If not `master` or `main` → scope = branch (base = master)
    - Else → scope = all
@@ -50,6 +52,10 @@ git status --porcelain
 ```
 If output is non-empty, ABORT with:
 > "Working directory has uncommitted changes. Please commit or stash first, or use `all`/`uncommitted` scope to review working directory changes."
+
+### For scope = `path`
+Parse the comma-separated paths into a list (trim whitespace from each path). No filesystem validation needed - the AI will explore and report.
+Store as `[PATHS]` for the subagent.
 
 ### For all other scopes
 No validation needed. Proceed to context gathering.
@@ -96,6 +102,7 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 
 **Scope:** [SCOPE]
 **Base (if branch scope):** [BASE]
+**Paths (if path scope):** [PATHS]
 
 ### Context
 
@@ -105,12 +112,13 @@ If a path is provided, you and Gemini can read this file to understand the inten
 **Supplementary context:** [SUPPLEMENTARY_CONTEXT]
 This is additional relevant information from the main conversation that isn't in the plan file.
 
-**Git commands Gemini should run based on scope:**
+**Commands Gemini should run based on scope:**
 - `all`: `git diff` (unstaged) + `git diff --cached` (staged) + `git ls-files --others --exclude-standard` (untracked)
 - `uncommitted`: `git diff` (unstaged) + `git ls-files --others --exclude-standard` (untracked)
 - `staged`: `git diff --cached`
 - `branch [base]`: `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`
 - `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
+- `path`: No git commands. Read and explore the paths directly.
 
 ### Step 1: Start Gemini Session
 
@@ -147,6 +155,43 @@ Consider:
 - Test coverage gaps
 
 Read any additional files you need for context.
+When your review is complete, say 'REVIEW COMPLETE'."
+```
+
+**For scope = path, use this prompt instead:**
+
+```bash
+gemini "Review the code at the following path(s): [PATHS]
+
+For each path:
+- If it's a directory, explore its structure and review key files
+- If it's a file, read and review its contents
+- Follow imports and references as needed for context
+
+[IF PLAN_FILE_PATH != 'none']
+Read the plan file at: [PLAN_FILE_PATH]
+This describes the intent of the changes. Consider this when reviewing.
+[END IF]
+
+[IF SUPPLEMENTARY_CONTEXT != 'none']
+Additional context:
+[SUPPLEMENTARY_CONTEXT]
+[END IF]
+
+For each issue you find, provide:
+1. What the issue is
+2. Where it is (file and line if possible)
+3. Why it matters
+4. How to fix it
+
+Consider:
+- Code correctness and logic errors
+- Security vulnerabilities
+- Performance issues
+- Code style and maintainability
+- Missing error handling
+- Test coverage gaps
+
 When your review is complete, say 'REVIEW COMPLETE'."
 ```
 
