@@ -196,14 +196,19 @@ function _proj_close_kitty_window -a session_name current_kitty_window
         return
     end
 
-    # Get kitty window info - look for windows with this session name in title
+    # Get kitty window info
     set kitty_info (kitty @ ls 2>/dev/null)
     if test -z "$kitty_info"
         return
     end
 
-    # Find tab ID that has this session name in its title
-    set tab_id (echo $kitty_info | jq -r ".[] | .tabs[] | select(.title | contains(\"$session_name\")) | .id" 2>/dev/null | head -1)
+    # Find tab ID by looking for windows where last_reported_cmdline contains "tmuxinator start <session>"
+    # This is more reliable than matching on title
+    set tab_id (echo $kitty_info | jq -r "
+        .[] | .tabs[] |
+        select(.windows[]?.last_reported_cmdline | contains(\"tmuxinator start $session_name\")) |
+        .id
+    " 2>/dev/null | head -1)
 
     if test -n "$tab_id" -a "$tab_id" != "$current_kitty_window"
         echo "Closing kitty tab for $session_name..."
