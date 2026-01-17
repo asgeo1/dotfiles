@@ -9,7 +9,8 @@
       "Bash(gh pr edit:*)",
       "Bash(gh pr list:*)",
       "Bash(gh api repos/*/pulls/*:*)",
-      "Bash(gh api repos/*/issues/*:*)"
+      "Bash(gh api repos/*/issues/*:*)",
+      "Bash(cat ~/.claude/projects/*/*/tool-results/*.txt:*)"
     ],
     "deny": [
       "Bash(git stash:*)",
