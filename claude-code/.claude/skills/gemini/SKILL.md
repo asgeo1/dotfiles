@@ -9,7 +9,8 @@ source: Created locally, modeled after skill-codex pattern
 ## Running a Task
 
 1. Select the model if needed (default is usually fine):
-   - `-m gemini-2.5-pro` (default, most capable)
+   - `-m gemini-3-pro-preview` (default, most capable)
+   - `-m gemini-2.5-pro` (next best)
    - `-m gemini-2.5-flash` (faster, cheaper)
    - `-m gemini-2.0-flash` (legacy)
 
