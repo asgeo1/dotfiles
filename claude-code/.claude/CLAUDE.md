@@ -19,6 +19,18 @@ These are not suggestions. Fix ALL issues before continuing.
 
 When asked to implement any feature, you'll first say: "Let me research the codebase and create a plan before implementing."
 
+### 🚨 CRITICAL: NEVER Clobber Existing Plan Files
+**Plan files are sacred documents. You MUST NEVER replace the contents of an existing plan file with a different plan.**
+
+Rules:
+- **NEVER overwrite** an existing plan file with a completely new/different plan
+- **Editing is OK**: You may update, augment, add phases/steps, clarify, or append to an existing plan
+- **Replacing is FORBIDDEN**: If a plan file already contains a plan for task X, you must NOT replace it with a plan for task Y
+- **When in doubt, create a new file**: Plan files are cheap. If you need a plan for a different task, create a new plan file with a descriptive name
+- **Before writing to any plan file**: READ IT FIRST. If it already has meaningful content for a different purpose, create a new file instead
+
+This has caused data loss multiple times. There are NO exceptions to this rule.
+
 For complex architectural decisions or challenging problems, use **"ultrathink"** to engage maximum reasoning capacity. Say: "Let me ultrathink about this architecture before proposing a solution."
 
 ### USE MULTIPLE SUB-AGENTS!
