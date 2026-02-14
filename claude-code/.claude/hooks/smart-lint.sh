@@ -546,26 +546,9 @@ lint_javascript() {
     cd "$project_dir" || return 1
 
         # Check for Prettier FIRST (formatting before linting)
+        # Priority: dirty variants first (faster), then full-project variants
         if command_exists npm; then
-            # Try prettier check first (quiet), then fix only if needed
-            if npm_script_exists "prettier"; then
-                log_info "Running npm run prettier"
-                if npm run prettier 2>&1; then
-                    add_summary "success" "Prettier check passed"
-                else
-                    # Check failed, try to fix
-                    if npm_script_exists "prettier:fix"; then
-                        log_info "Running npm run prettier:fix to auto-fix"
-                        if npm run prettier:fix 2>&1; then
-                            add_summary "success" "Prettier formatting applied"
-                        else
-                            add_summary "error" "Prettier formatting failed"
-                        fi
-                    else
-                        add_summary "error" "Prettier found formatting issues"
-                    fi
-                fi
-            elif npm_script_exists "prettier:dirty"; then
+            if npm_script_exists "prettier:dirty"; then
                 log_info "Running npm run prettier:dirty"
                 if npm run prettier:dirty 2>&1; then
                     add_summary "success" "Prettier check passed (dirty)"
@@ -575,6 +558,23 @@ lint_javascript() {
                         log_info "Running npm run prettier:dirty:fix to auto-fix"
                         if npm run prettier:dirty:fix 2>&1; then
                             add_summary "success" "Prettier formatting applied (dirty:fix)"
+                        else
+                            add_summary "error" "Prettier formatting failed"
+                        fi
+                    else
+                        add_summary "error" "Prettier found formatting issues"
+                    fi
+                fi
+            elif npm_script_exists "prettier"; then
+                log_info "Running npm run prettier"
+                if npm run prettier 2>&1; then
+                    add_summary "success" "Prettier check passed"
+                else
+                    # Check failed, try to fix
+                    if npm_script_exists "prettier:fix"; then
+                        log_info "Running npm run prettier:fix to auto-fix"
+                        if npm run prettier:fix 2>&1; then
+                            add_summary "success" "Prettier formatting applied"
                         else
                             add_summary "error" "Prettier formatting failed"
                         fi
