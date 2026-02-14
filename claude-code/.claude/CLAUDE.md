@@ -9,6 +9,16 @@ When you seem stuck or overly complex, I'll redirect you - my guidance helps you
 No errors. No formatting issues. No linting problems. Zero tolerance.
 These are not suggestions. Fix ALL issues before continuing.
 
+### 🚨 CRITICAL: NO "Pre-Existing Issues" Excuse
+**There is NO SUCH THING as a "pre-existing issue" you can ignore.**
+
+If ANY automated tool reports a problem — linters, formatters, type checkers, tests, custom project checks — that is YOUR issue to fix, regardless of whether you caused it. You MUST:
+- Add it to the scope of your current work
+- Fix it before declaring your task complete
+- NEVER dismiss it as "pre-existing" or "not related to my current work"
+
+This applies to: linters, formatters, type checkers, test suites, custom project checks, CI/CD failures, and ANY other automated validation tool.
+
 ## CRITICAL WORKFLOW - ALWAYS FOLLOW THIS!
 
 ### Research → Plan → Implement
@@ -122,6 +132,19 @@ Your code must be 100% clean. No exceptions.
 > **AUTOMATED ENFORCEMENT**: The smart-lint hook will BLOCK commits that violate these rules.  
 > When you see `❌ FORBIDDEN PATTERN`, you MUST fix it immediately!
 
+### 🚨 CRITICAL: NEVER Add Backwards Compatibility Without Permission
+**You MUST ask the user before adding ANY backwards compatibility code.**
+
+This includes:
+- `#[serde(alias = "old_name")]` for old field names
+- Migration functions for old data formats
+- Fallback logic that handles "old" vs "new" formats
+- Compatibility shims, adapters, or wrappers
+
+**Why:** Adding backwards compatibility without permission is wasteful and creates technical debt. But MISSING it when it's actually needed can also be very bad. The decision has real trade-offs that only the user can evaluate.
+
+**Rule:** ALWAYS STOP AND ASK. Every single time. No exceptions. No "I'll just add it to be safe."
+
 ### Required Standards:
 - **Delete** old code when replacing it
 - **Meaningful names**: `userID` not `id`
@@ -176,6 +199,15 @@ My insights on better approaches are valued - please ask for them!
 ### Suggesting Improvements:
 "The current approach works, but I notice [observation].
 Would you like me to [specific improvement]?"
+
+## Git Commands
+
+### 🚨 CRITICAL: Run git commands normally
+**NEVER use `git -C <path>` syntax.** Just `cd` into the directory and run git commands directly.
+- ✅ `cd /path/to/repo && git diff --cached`
+- ❌ `git -C /path/to/repo diff --cached`
+
+The `-C` flag triggers security warnings in Claude Code. There is never a reason to use it.
 
 ## Working Together
 
