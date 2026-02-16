@@ -23,11 +23,16 @@ Use the Task tool to spawn a subagent that handles the Gemini interaction. The s
    - The plan content itself
    - Any file paths mentioned in the plan
 
-4. **Construct the subagent prompt** using the template below, filling in:
+4. **Determine model:**
+   - If user specified `--model X` in arguments, use that as `[REQUESTED_MODEL]`
+   - Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
+   - This ensures we always explicitly request the best available model
+
+5. **Construct the subagent prompt** using the template below, filling in:
    - `[PLAN_CONTENT]` - The actual plan markdown
    - `[GIT_STATUS]` - Output from git status
    - `[RELEVANT_FILES]` - List of file paths mentioned in the plan
-   - `[MODEL_OVERRIDE]` - Only if user specified `--model X` in arguments
+   - `[REQUESTED_MODEL]` - The model to use (user-specified or default)
 
 ---
 
@@ -37,6 +42,7 @@ You are a plan review assistant. Your job is to get feedback on an implementatio
 
 ### CRITICAL RULES
 
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `gemini` commands shown below - nothing else.
 1. **DEFAULT APPROVAL MODE** - Use default approval mode (Gemini will read files as needed)
 2. **ITERATE UNTIL COMPLETE** - Keep conversing with Gemini until it signals the review is done
 3. **STRUCTURED OUTPUT** - Return feedback in the exact format specified
@@ -61,7 +67,7 @@ You are a plan review assistant. Your job is to get feedback on an implementatio
 Run the initial Gemini command:
 
 ```bash
-gemini [MODEL_OVERRIDE] "Review the following implementation plan. Analyze it in the context of this codebase.
+gemini -m [REQUESTED_MODEL] "Review the following implementation plan. Analyze it in the context of this codebase.
 
 Plan:
 [PLAN_CONTENT]
@@ -74,8 +80,17 @@ Consider:
 5. Any security, performance, or maintainability concerns?
 
 Read any files you need from the codebase to give informed feedback.
+
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When your review is complete, explicitly say 'REVIEW COMPLETE' at the end."
 ```
+
+### Step 1b: Capture Model Info
+
+After receiving Gemini's initial response:
+- Look for a `MODEL_ID: ...` line in the output
+- Store the reported model as `[CONFIRMED_MODEL]`
+- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Iterate Until Complete
 
@@ -111,11 +126,19 @@ Once Gemini completes the review, synthesize ALL feedback from the entire conver
 [Brief 2-3 sentence summary of Gemini's overall opinion on the plan]
 
 **Recommendation:** [proceed | revise | needs-discussion]
+
+## Models Used
+- **Gemini requested:** [REQUESTED_MODEL]
+- **Gemini confirmed:** [CONFIRMED_MODEL]
+- **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
 
-- If Gemini encounters an error or quota issues, try with `-m gemini-2.5-flash`
+- If Gemini hits quota errors or the requested model is unavailable:
+  1. Retry with `-m gemini-2.5-flash`
+  2. Note in Models Used: "gemini-2.5-flash (fallback from [REQUESTED_MODEL] due to quota)"
+  3. Still capture MODEL_ID from Gemini's response
 - If Gemini CLI is not installed or fails version check, abort with clear error message
 - Do NOT make any file modifications - this is a read-only review
 - Capture the essence of ALL Gemini feedback across iterations, not just the final response
@@ -124,7 +147,11 @@ Once Gemini completes the review, synthesize ALL feedback from the entire conver
 
 ## After Subagent Returns
 
-Present the structured feedback to the user and ask:
+Present the structured feedback to the user. **Always include the "Models Used" section** so the user can see what models were used.
+
+If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
+
+Then ask:
 
 1. Would you like to **incorporate** any of this feedback into the plan?
 2. Would you like to **discuss** specific points in more detail?

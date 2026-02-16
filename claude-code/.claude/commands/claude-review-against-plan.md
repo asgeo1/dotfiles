@@ -1,6 +1,6 @@
-# Gemini Review Against Plan
+# Claude Review Against Plan
 
-Review code changes against an implementation plan using Google Gemini. Uses a subagent to iterate with Gemini and validate feedback before presenting results.
+Review code changes against an implementation plan using a separate Claude Code instance. Uses a subagent to iterate with Claude and validate feedback before presenting results.
 
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
@@ -12,9 +12,9 @@ Review code changes against an implementation plan using Google Gemini. Uses a s
 
 **Flags:**
 - `--no-context` - Skip supplementary context gathering
-- `--model X` - Override the Gemini model (default: gemini-3-pro-preview)
+- `--model X` - Override the Claude model (default: opus)
 
-**Usage:** `/gemini-review-against-plan [scope] <plan_path> [--flags]`
+**Usage:** `/claude-review-against-plan [scope] <plan_path> [--flags]`
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -36,13 +36,13 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Model determination:**
 - If user specified `--model X`, use that as `[REQUESTED_MODEL]`
-- Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
-- This ensures we always explicitly request the best available model
+- Otherwise, default to `opus` as `[REQUESTED_MODEL]`
+- Valid models: `opus`, `sonnet`, `haiku`, or full model IDs
 
 **Plan file detection:**
 - If argument contains a path → use that
 - Else check if you're in plan mode with a plan file in context
-- If neither → ABORT: "Cannot review without a plan file. Usage: /gemini-review-against-plan [scope] <plan_path>"
+- If neither → ABORT: "Cannot review without a plan file. Usage: /claude-review-against-plan [scope] <plan_path>"
 
 **Scope detection (from remaining args):**
 1. If starts with `all` → scope = all
@@ -97,16 +97,16 @@ Fill placeholders and pass this prompt VERBATIM:
 
 ---
 
-You are a plan-based code review assistant. Your job is to get feedback on code changes from Google Gemini, **validate** that feedback against the actual code, then return actionable results.
+You are a plan-based code review assistant. Your job is to get feedback on code changes from an external Claude Code instance, **validate** that feedback against the actual code, then return actionable results.
 
 ### CRITICAL RULES
 
-0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `gemini` commands shown below - nothing else.
-1. **READ-ONLY** - This is a review only. You may read files to verify but make NO changes.
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `env -u CLAUDECODE claude` commands shown below - nothing else.
+1. **READ-ONLY** - The external Claude runs with write tools disabled. You may read files to verify but make NO changes.
 2. **VALIDATE FEEDBACK** - Don't relay blindly. Challenge vague or questionable points.
-3. **ITERATE** - Keep conversing with Gemini until review is complete and validated.
+3. **ITERATE** - Keep conversing with Claude until review is complete and validated.
 4. **ACTIONABLE OUTPUT** - Return structured feedback that could become a fix plan.
-5. **GEMINI FETCHES DATA** - Gemini runs git commands itself. Do NOT fetch diffs yourself.
+5. **CLAUDE FETCHES DATA** - The external Claude runs git commands itself. Do NOT fetch diffs yourself.
 
 ### Scope & Context
 
@@ -115,11 +115,11 @@ You are a plan-based code review assistant. Your job is to get feedback on code 
 **Paths (if path):** [PATHS]
 
 **Plan file path:** [PLAN_FILE_PATH]
-Gemini MUST read this file to understand the intended implementation.
+The external Claude MUST read this file to understand the intended implementation.
 
 **Supplementary context:** [SUPPLEMENTARY_CONTEXT]
 
-**Git commands Gemini should run based on scope:**
+**Git commands Claude should run based on scope:**
 - `all`: `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard`
 - `uncommitted`: `git diff` + `git ls-files --others --exclude-standard`
 - `staged`: `git diff --cached`
@@ -127,10 +127,14 @@ Gemini MUST read this file to understand the intended implementation.
 - `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
 - `path`: No git commands. Read and explore the paths directly.
 
-### Step 1: Start Gemini Session
+### Step 1: Start Claude Session
 
 ```bash
-gemini -m [REQUESTED_MODEL] "Review code changes against an implementation plan.
+env -u CLAUDECODE claude -p \
+  --model [REQUESTED_MODEL] \
+  --dangerously-skip-permissions \
+  --disallowedTools "Edit,Write,NotebookEdit" \
+  "Review code changes against an implementation plan.
 
 STEP 1: Fetch the code changes
 Run these git commands based on scope '[SCOPE]':
@@ -172,10 +176,16 @@ Before your review, state: 'MODEL_ID: [your model name/version]'
 When done, say 'REVIEW COMPLETE'."
 ```
 
+**IMPORTANT:** `env -u CLAUDECODE` unsets the nesting-detection env var so Claude Code CLI can run from within Claude Code.
+
 **For scope = path, use this prompt instead:**
 
 ```bash
-gemini -m [REQUESTED_MODEL] "Review code at specific paths against an implementation plan.
+env -u CLAUDECODE claude -p \
+  --model [REQUESTED_MODEL] \
+  --dangerously-skip-permissions \
+  --disallowedTools "Edit,Write,NotebookEdit" \
+  "Review code at specific paths against an implementation plan.
 
 STEP 1: Read the plan file
 Read: [PLAN_FILE_PATH]
@@ -219,18 +229,18 @@ When done, say 'REVIEW COMPLETE'."
 
 ### Step 1b: Capture Model Info
 
-After receiving Gemini's initial response:
+After receiving Claude's initial response:
 - Look for a `MODEL_ID: ...` line in the output
 - Store the reported model as `[CONFIRMED_MODEL]`
 - If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Validate Feedback
 
-For each piece of feedback from Gemini:
+For each piece of feedback from Claude:
 
 1. **Is it specific?** If vague (e.g., "could be improved"), ask: "What specifically should be improved and how?"
 
-2. **Is it correct?** If Gemini claims something about the code, read the file yourself to verify. Discard incorrect feedback.
+2. **Is it correct?** If Claude claims something about the code, read the file yourself to verify. Discard incorrect feedback.
 
 3. **Is it relevant?** Does it relate to the actual changes and plan? Discard tangential feedback.
 
@@ -238,14 +248,17 @@ For each piece of feedback from Gemini:
 
 Resume session to challenge questionable feedback:
 ```bash
-gemini --resume latest "Regarding [X]: Can you clarify [specific question]? I need to verify this before including it."
+CLAUDECODE= claude -p --continue \
+  --dangerously-skip-permissions \
+  --disallowedTools "Edit,Write,NotebookEdit" \
+  "Regarding [X]: Can you clarify [specific question]? I need to verify this before including it."
 ```
 
 ### Step 3: Iterate Until Complete
 
 Continue until:
 - All feedback validated or discarded
-- Gemini has no more issues
+- Claude has no more issues
 - Max 5 iterations to prevent runaway
 
 ### Step 4: Synthesize Output
@@ -285,8 +298,8 @@ Structure ALL validated feedback:
 **Recommendation:** ready-to-commit | needs-fixes | needs-discussion
 
 ## Models Used
-- **Gemini requested:** [REQUESTED_MODEL]
-- **Gemini confirmed:** [CONFIRMED_MODEL]
+- **Claude (external) requested:** [REQUESTED_MODEL]
+- **Claude (external) confirmed:** [CONFIRMED_MODEL]
 - **Claude subagent:** [self-report your model name/version]
 ```
 
@@ -302,20 +315,20 @@ All plan items implemented. No quality issues found.
 **Recommendation:** ready-to-commit
 
 ## Models Used
-- **Gemini requested:** [REQUESTED_MODEL]
-- **Gemini confirmed:** [CONFIRMED_MODEL]
+- **Claude (external) requested:** [REQUESTED_MODEL]
+- **Claude (external) confirmed:** [CONFIRMED_MODEL]
 - **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
 
 - Only include validated feedback
-- Discard anything Gemini couldn't justify
+- Discard anything Claude couldn't justify
 - Include enough detail in "Suggested fix" for another AI to act on it
-- If Gemini hits quota errors or the requested model is unavailable:
-  1. Retry with `-m gemini-2.5-flash`
-  2. Note in Models Used: "gemini-2.5-flash (fallback from [REQUESTED_MODEL] due to quota)"
-  3. Still capture MODEL_ID from Gemini's response
+- If the requested model is unavailable or errors occur:
+  1. Retry with `--model haiku` as fallback
+  2. Note in Models Used: "haiku (fallback from [REQUESTED_MODEL])"
+  3. Still capture MODEL_ID from Claude's response
 
 ---
 
@@ -323,7 +336,7 @@ All plan items implemented. No quality issues found.
 
 After subagent returns, present the structured feedback. **Always include the "Models Used" section** so the user can see what models were used.
 
-If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
+If the Claude confirmed model differs from what was requested, highlight this discrepancy.
 
 If issues were found, ask:
 1. Would you like me to **address** specific issues?

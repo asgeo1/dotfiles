@@ -12,6 +12,7 @@ Automate the creation and submission of a GitHub pull request with comprehensive
 
 ## CRITICAL SAFETY RULES
 
+0. **NO GIT -C** - You are already in the correct working directory. Do NOT use `git -C /path`. Just run git commands directly. (Note: `cd` into subproject directories for smart-lint is OK, but never `cd` to the project root - you're already there.)
 1. **NEVER force-push** - Use `git push` only, abort if it fails
 2. **NEVER create PR from master/main** - Abort immediately if on protected branch
 3. **ABORT if working directory is dirty** - All changes must be committed first

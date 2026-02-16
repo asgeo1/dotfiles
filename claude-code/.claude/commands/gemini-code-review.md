@@ -12,6 +12,7 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 
 **Flags:**
 - `--no-context` - Skip context gathering for a "blind" review
+- `--model X` - Override the Gemini model (default: gemini-3-pro-preview)
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -27,7 +28,13 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Flag detection:**
 - Check for `--no-context` flag anywhere in arguments
-- Remove flag from arguments before parsing scope
+- Check for `--model X` flag (X is the next token after --model)
+- Remove flags from arguments before parsing scope
+
+**Model determination:**
+- If user specified `--model X`, use that as `[REQUESTED_MODEL]`
+- Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
+- This ensures we always explicitly request the best available model
 
 **Scope detection logic:**
 1. If starts with `all` → scope = all
@@ -92,6 +99,7 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 
 ### CRITICAL RULES
 
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `gemini` commands shown below - nothing else.
 1. **READ-ONLY** - This is a review only. You may read files to verify claims but make NO changes.
 2. **VALIDATE FEEDBACK** - Don't just relay Gemini's feedback. Challenge vague or questionable points.
 3. **ITERATE** - Keep conversing with Gemini until feedback is complete and validated.
@@ -125,7 +133,7 @@ This is additional relevant information from the main conversation that isn't in
 Tell Gemini to fetch the changes itself based on the scope. Include context if provided:
 
 ```bash
-gemini "Review the code changes for scope: [SCOPE].
+gemini -m [REQUESTED_MODEL] "Review the code changes for scope: [SCOPE].
 
 First, fetch the changes by running the appropriate git commands:
 [GIT_COMMANDS_FOR_SCOPE]
@@ -155,13 +163,15 @@ Consider:
 - Test coverage gaps
 
 Read any additional files you need for context.
+
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When your review is complete, say 'REVIEW COMPLETE'."
 ```
 
 **For scope = path, use this prompt instead:**
 
 ```bash
-gemini "Review the code at the following path(s): [PATHS]
+gemini -m [REQUESTED_MODEL] "Review the code at the following path(s): [PATHS]
 
 For each path:
 - If it's a directory, explore its structure and review key files
@@ -192,8 +202,16 @@ Consider:
 - Missing error handling
 - Test coverage gaps
 
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When your review is complete, say 'REVIEW COMPLETE'."
 ```
+
+### Step 1b: Capture Model Info
+
+After receiving Gemini's initial response:
+- Look for a `MODEL_ID: ...` line in the output
+- Store the reported model as `[CONFIRMED_MODEL]`
+- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Validate Feedback
 
@@ -242,6 +260,11 @@ Structure the validated feedback as follows:
 - Z suggestions for improvement
 
 **Recommendation:** needs-fixes | minor-cleanup | looks-good
+
+## Models Used
+- **Gemini requested:** [REQUESTED_MODEL]
+- **Gemini confirmed:** [CONFIRMED_MODEL]
+- **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
@@ -250,13 +273,18 @@ Structure the validated feedback as follows:
 - Discard feedback that Gemini couldn't justify when challenged
 - If Gemini finds no issues, that's a valid outcome - return "looks-good"
 - Include enough detail in "Suggested fix" that another AI could implement it
-- If Gemini hits quota errors, retry with `-m gemini-2.5-flash`
+- If Gemini hits quota errors or the requested model is unavailable:
+  1. Retry with `-m gemini-2.5-flash`
+  2. Note in Models Used: "gemini-2.5-flash (fallback from [REQUESTED_MODEL] due to quota)"
+  3. Still capture MODEL_ID from Gemini's response
 
 ---
 
 ## Step 5: Present Results
 
-After the subagent returns, present the structured feedback to the user.
+After the subagent returns, present the structured feedback to the user. **Always include the "Models Used" section** so the user can see what models were used.
+
+If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
 
 If issues were found, ask:
 1. Would you like me to **address** any of these issues?

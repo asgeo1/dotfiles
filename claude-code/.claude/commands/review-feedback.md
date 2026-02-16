@@ -1,5 +1,8 @@
 Review and triage PR feedback, distinguishing valid suggestions from those based on incorrect assumptions (especially from Copilot).
 
+## CRITICAL: NO CD, NO GIT -C
+You are already in the correct working directory. Do NOT `cd` to the project root. Do NOT use `git -C /path`. Just run commands directly.
+
 ## Step 1: Parse PR URL
 
 Parse the GitHub PR URL from `$ARGUMENTS`. The URL can be in two formats:

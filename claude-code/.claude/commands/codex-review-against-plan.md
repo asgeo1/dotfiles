@@ -12,6 +12,8 @@ Review code changes against an implementation plan using OpenAI Codex. Uses a su
 
 **Flags:**
 - `--no-context` - Skip supplementary context gathering
+- `--model X` - Override the Codex model (default: Codex CLI's default)
+- `--reasoning X` - Set reasoning effort (xhigh|high|medium|low)
 
 **Usage:** `/codex-review-against-plan [scope] <plan_path> [--flags]`
 
@@ -29,8 +31,15 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Parsing logic:**
 1. Check for `--no-context` flag, remove from args
-2. Identify plan file path (contains `/` or ends with `.md`)
-3. Remaining text before plan path = scope
+2. Check for `--model X` flag (X is the next token after --model), remove from args
+3. Check for `--reasoning X` flag, remove from args
+4. Identify plan file path (contains `/` or ends with `.md`)
+5. Remaining text before plan path = scope
+
+**Model determination:**
+- If user specified `--model X`, store as `[REQUESTED_MODEL]` and set `[MODEL_FLAG]` to `--model X`
+- Otherwise, `[REQUESTED_MODEL]` = "default" and `[MODEL_FLAG]` = "" (empty, use Codex CLI's default)
+- If user specified `--reasoning X`, store as `[REASONING_OVERRIDE]` → `--config model_reasoning_effort="X"`
 
 **Plan file detection:**
 - If argument contains a path → use that
@@ -94,6 +103,7 @@ You are a plan-based code review assistant. Your job is to get feedback on code 
 
 ### CRITICAL RULES
 
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `codex exec` commands shown below - nothing else.
 1. **READ-ONLY** - Codex runs with `--sandbox read-only`. You may read files to verify but make NO changes.
 2. **VALIDATE FEEDBACK** - Don't relay blindly. Challenge vague or questionable points.
 3. **ITERATE** - Keep conversing with Codex until review is complete and validated.
@@ -126,6 +136,8 @@ codex exec \
   --sandbox read-only \
   --full-auto \
   --skip-git-repo-check \
+  [MODEL_FLAG] \
+  [REASONING_OVERRIDE] \
   "Review code changes against an implementation plan.
 
 STEP 1: Fetch the code changes
@@ -163,6 +175,8 @@ For each issue found, provide:
 5. How to fix it
 
 Read additional files as needed for context.
+
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When done, say 'REVIEW COMPLETE'." 2>/dev/null
 ```
 
@@ -173,6 +187,8 @@ codex exec \
   --sandbox read-only \
   --full-auto \
   --skip-git-repo-check \
+  [MODEL_FLAG] \
+  [REASONING_OVERRIDE] \
   "Review code at specific paths against an implementation plan.
 
 STEP 1: Read the plan file
@@ -211,8 +227,16 @@ For each issue found, provide:
 4. Why it matters
 5. How to fix it
 
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When done, say 'REVIEW COMPLETE'." 2>/dev/null
 ```
+
+### Step 1b: Capture Model Info
+
+After receiving Codex's initial response:
+- Look for a `MODEL_ID: ...` line in the output
+- Store the reported model as `[CONFIRMED_MODEL]`
+- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Validate Feedback
 
@@ -273,6 +297,11 @@ Structure ALL validated feedback:
 - Quality issues: X critical, Y warnings, Z suggestions
 
 **Recommendation:** ready-to-commit | needs-fixes | needs-discussion
+
+## Models Used
+- **Codex requested:** [REQUESTED_MODEL]
+- **Codex confirmed:** [CONFIRMED_MODEL]
+- **Claude subagent:** [self-report your model name/version]
 ```
 
 **If all plan items complete and no issues:**
@@ -285,6 +314,11 @@ All plan items implemented. No quality issues found.
 - Quality issues: None
 
 **Recommendation:** ready-to-commit
+
+## Models Used
+- **Codex requested:** [REQUESTED_MODEL]
+- **Codex confirmed:** [CONFIRMED_MODEL]
+- **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
@@ -292,13 +326,18 @@ All plan items implemented. No quality issues found.
 - Only include validated feedback
 - Discard anything Codex couldn't justify
 - Include enough detail in "Suggested fix" for another AI to act on it
-- If Codex encounters errors, report them and ask for guidance
+- If Codex encounters model errors or the requested model is unavailable:
+  1. Retry without --model flag (use CLI default)
+  2. Note in Models Used: "default (fallback from [REQUESTED_MODEL])"
+  3. Still capture MODEL_ID from Codex's response
 
 ---
 
 ## Step 5: Present Results
 
-After subagent returns, present the structured feedback.
+After subagent returns, present the structured feedback. **Always include the "Models Used" section** so the user can see what models were used.
+
+If the Codex confirmed model differs from what was requested, highlight this discrepancy.
 
 If issues were found, ask:
 1. Would you like me to **address** specific issues?

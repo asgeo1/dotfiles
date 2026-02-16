@@ -23,12 +23,18 @@ Use the Task tool to spawn a subagent that handles the Codex interaction. The su
    - The plan content itself
    - Any file paths mentioned in the plan
 
-4. **Construct the subagent prompt** using the template below, filling in:
+4. **Determine model:**
+   - If user specified `--model X` in arguments, store as `[REQUESTED_MODEL]` and set `[MODEL_FLAG]` to `--model X`
+   - Otherwise, `[REQUESTED_MODEL]` = "default" and `[MODEL_FLAG]` = "" (empty, use Codex CLI's default)
+   - If user specified `--reasoning X`, store as `[REASONING_OVERRIDE]`
+
+5. **Construct the subagent prompt** using the template below, filling in:
    - `[PLAN_CONTENT]` - The actual plan markdown
    - `[GIT_STATUS]` - Output from git status
    - `[RELEVANT_FILES]` - List of file paths mentioned in the plan
-   - `[MODEL_OVERRIDE]` - Only if user specified `--model X` in arguments
-   - `[REASONING_OVERRIDE]` - Only if user specified `--reasoning X` in arguments
+   - `[MODEL_FLAG]` - The --model flag (or empty if using default)
+   - `[REQUESTED_MODEL]` - The model name for reporting
+   - `[REASONING_OVERRIDE]` - The --reasoning flag if specified
 
 ---
 
@@ -38,6 +44,7 @@ You are a plan review assistant. Your job is to get feedback on an implementatio
 
 ### CRITICAL RULES
 
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `codex exec` commands shown below - nothing else.
 1. **READ-ONLY SANDBOX** - Always use `--sandbox read-only` with Codex
 2. **SUPPRESS THINKING** - Always append `2>/dev/null` to codex commands
 3. **ITERATE UNTIL COMPLETE** - Keep conversing with Codex until it signals the review is done
@@ -60,14 +67,14 @@ You are a plan review assistant. Your job is to get feedback on an implementatio
 
 ### Step 1: Start Codex Session
 
-Run the initial Codex command. Do NOT specify model unless user provided overrides.
+Run the initial Codex command:
 
 ```bash
 codex exec \
   --sandbox read-only \
   --full-auto \
   --skip-git-repo-check \
-  [MODEL_OVERRIDE] \
+  [MODEL_FLAG] \
   [REASONING_OVERRIDE] \
   "Review the following implementation plan. Analyze it in the context of this codebase.
 
@@ -82,8 +89,17 @@ Consider:
 5. Any security, performance, or maintainability concerns?
 
 Read any files you need from the codebase to give informed feedback.
+
+Before your review, state: 'MODEL_ID: [your model name/version]'
 When your review is complete, explicitly say 'REVIEW COMPLETE' at the end." 2>/dev/null
 ```
+
+### Step 1b: Capture Model Info
+
+After receiving Codex's initial response:
+- Look for a `MODEL_ID: ...` line in the output
+- Store the reported model as `[CONFIRMED_MODEL]`
+- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Iterate Until Complete
 
@@ -119,11 +135,19 @@ Once Codex completes the review, synthesize ALL feedback from the entire convers
 [Brief 2-3 sentence summary of Codex's overall opinion on the plan]
 
 **Recommendation:** [proceed | revise | needs-discussion]
+
+## Models Used
+- **Codex requested:** [REQUESTED_MODEL]
+- **Codex confirmed:** [CONFIRMED_MODEL]
+- **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
 
-- If Codex encounters an error, report the error and ask the user for guidance
+- If Codex encounters model errors or the requested model is unavailable:
+  1. Retry without --model flag (use CLI default)
+  2. Note in Models Used: "default (fallback from [REQUESTED_MODEL])"
+  3. Still capture MODEL_ID from Codex's response
 - If Codex CLI is not installed or fails version check, abort with clear error message
 - Do NOT make any file modifications - this is a read-only review
 - Capture the essence of ALL Codex feedback across iterations, not just the final response
@@ -132,7 +156,11 @@ Once Codex completes the review, synthesize ALL feedback from the entire convers
 
 ## After Subagent Returns
 
-Present the structured feedback to the user and ask:
+Present the structured feedback to the user. **Always include the "Models Used" section** so the user can see what models were used.
+
+If the Codex confirmed model differs from what was requested, highlight this discrepancy.
+
+Then ask:
 
 1. Would you like to **incorporate** any of this feedback into the plan?
 2. Would you like to **discuss** specific points in more detail?
