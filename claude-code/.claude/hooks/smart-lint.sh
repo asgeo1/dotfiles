@@ -71,6 +71,20 @@ time_end() {
     fi
 }
 
+# Per-check timing: call ck "label" before each check, add_summary auto-captures
+declare -a _TIMINGS=()
+_ck_label=""
+_ck_t=0
+ck() { _ck_label="$1"; _ck_t=$(date +%s); }
+print_timings() {
+    [[ ${#_TIMINGS[@]} -eq 0 ]] && return
+    local total=0
+    for t in "${_TIMINGS[@]}"; do local v="${t##*:}"; total=$((total + ${v%s})); done
+    local result
+    result=$(printf '%s | ' "${_TIMINGS[@]}")
+    echo "⏱ ${result% | } | total:${total}s" >&2
+}
+
 # Check if a command exists
 command_exists() {
     command -v "$1" &> /dev/null
@@ -310,6 +324,13 @@ add_summary() {
     local level="$1"
     local message="$2"
 
+    # Auto-capture timing from ck()
+    if [[ -n "$_ck_label" && $_ck_t -gt 0 ]]; then
+        _TIMINGS+=("$_ck_label:$(($(date +%s) - _ck_t))s")
+        _ck_label=""
+        _ck_t=0
+    fi
+
     if [[ "$level" == "error" ]]; then
         CLAUDE_HOOKS_ERROR_COUNT+=1
         CLAUDE_HOOKS_SUMMARY+=("${RED}❌${NC} $message")
@@ -393,12 +414,14 @@ lint_go() {
         if [[ -n "$has_fmt" && -n "$has_lint" ]]; then
             log_info "Using Makefile targets"
 
+            ck "go-fmt"
             if ! make fmt >/dev/null 2>&1; then
                 add_summary "error" "Go formatting failed (make fmt)"
             else
                 add_summary "success" "Go code formatted"
             fi
 
+            ck "go-lint"
             if ! make lint 2>&1; then
                 add_summary "error" "Go linting failed (make lint)"
             else
@@ -409,6 +432,7 @@ lint_go() {
             log_info "Using direct Go tools"
 
             # Format check
+            ck "go-fmt"
             local unformatted_files=$(gofmt -l . 2>/dev/null | grep -v vendor/ || true)
 
             if [[ -n "$unformatted_files" ]]; then
@@ -422,12 +446,14 @@ lint_go() {
 
             # Linting
             if command_exists golangci-lint; then
+                ck "go-lint"
                 if ! golangci-lint run --timeout=2m 2>&1; then
                     add_summary "error" "golangci-lint found issues"
                 else
                     add_summary "success" "golangci-lint passed"
                 fi
             elif command_exists go; then
+                ck "go-lint"
                 if ! go vet ./... 2>&1; then
                     add_summary "error" "go vet found issues"
                 else
@@ -442,6 +468,7 @@ lint_go() {
         log_info "Using direct Go tools"
 
         # Format check
+        ck "go-fmt"
         local unformatted_files=$(gofmt -l . 2>/dev/null | grep -v vendor/ || true)
 
         if [[ -n "$unformatted_files" ]]; then
@@ -455,6 +482,7 @@ lint_go() {
 
         # Linting
         if command_exists golangci-lint; then
+            ck "go-lint"
             if ! golangci-lint run --timeout=2m 2>&1; then
                 add_summary "error" "golangci-lint found issues"
                 exit_code=2
@@ -462,6 +490,7 @@ lint_go() {
                 add_summary "success" "golangci-lint passed"
             fi
         elif command_exists go; then
+            ck "go-lint"
             if ! go vet ./... 2>&1; then
                 add_summary "error" "go vet found issues"
                 exit_code=2
@@ -488,6 +517,7 @@ lint_python() {
 
     # Black formatting
     if command_exists black; then
+        ck "black"
         if black . --check --quiet 2>/dev/null; then
             add_summary "success" "Python formatting correct"
         else
@@ -498,12 +528,14 @@ lint_python() {
 
     # Linting
     if command_exists ruff; then
+        ck "ruff"
         if ! ruff check --fix . 2>&1; then
             add_summary "error" "Ruff found issues"
         else
             add_summary "success" "Ruff check passed"
         fi
     elif command_exists flake8; then
+        ck "flake8"
         if flake8 . 2>&1; then
             add_summary "success" "Flake8 check passed"
         else
@@ -548,6 +580,7 @@ lint_javascript() {
         # Check for Prettier FIRST (formatting before linting)
         # Priority: dirty variants first (faster), then full-project variants
         if command_exists npm; then
+            ck "prettier"
             if npm_script_exists "prettier:dirty"; then
                 log_info "Running npm run prettier:dirty"
                 if npm run prettier:dirty 2>&1; then
@@ -613,6 +646,7 @@ lint_javascript() {
 
         # Check for ESLint AFTER Prettier (lint after formatting)
         if grep -q "eslint" "$package_json_path" 2>/dev/null; then
+            ck "eslint"
             # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
             if npm_script_exists "lint:dirty:fix"; then
                 log_info "Running npm run lint:dirty:fix"
@@ -647,6 +681,7 @@ lint_javascript() {
 
         # Check for TypeScript type checking AFTER linting
         if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
+            ck "typecheck"
             # Try npm run typecheck first
             if npm_script_exists "typecheck"; then
                 log_info "Running npm run typecheck"
@@ -680,6 +715,7 @@ lint_javascript() {
                 fi
             fi
         elif command_exists npx; then
+            ck "typecheck"
             log_info "Running npx tsc --noEmit"
             if npx tsc --noEmit 2>&1; then
                 add_summary "success" "TypeScript typecheck passed"
@@ -687,6 +723,7 @@ lint_javascript() {
                 add_summary "error" "TypeScript typecheck found issues"
             fi
         elif command_exists tsc; then
+            ck "typecheck"
             log_info "Running tsc --noEmit"
             if tsc --noEmit 2>&1; then
                 add_summary "success" "TypeScript typecheck passed"
@@ -698,6 +735,7 @@ lint_javascript() {
         # Check for dead code detection AFTER all other checks
         # Only run if Objective-C files (.h/.m) were modified (including untracked files)
         if npm_script_exists "find-dead-code:recent"; then
+            ck "dead-code"
             # Get all dirty files (tracked and untracked) and filter for Objective-C files
             local dirty_objc_files=$(get_dirty_files '\.(h|m)$')
 
@@ -774,6 +812,7 @@ lint_rust() {
 lint_rust_single_project() {
     local rust_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
 
+    ck "rust-fmt"
     if cargo fmt -- --check 2>/dev/null; then
         add_summary "success" "Rust formatting correct"
     else
@@ -783,6 +822,7 @@ lint_rust_single_project() {
 
     # Note: We run clippy but not cargo check because clippy includes compilation checks
     # Running both would be redundant - clippy will fail if there are type errors
+    ck "clippy"
     if cargo clippy --quiet -- -D warnings 2>&1; then
         add_summary "success" "Clippy check passed"
     else
@@ -792,6 +832,7 @@ lint_rust_single_project() {
     # Run project-specific checks only if no Rust errors so far
     local rust_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
     if [[ $rust_errors_after -eq $rust_errors_before && -f "bin/project-checks" ]]; then
+        ck "project"
         log_info "Running project-specific checks..."
         # Capture both stdout and stderr
         local project_output
@@ -830,6 +871,7 @@ lint_ruby() {
     fi
 
     if command_exists rubocop && [[ "$has_rubocop" == "true" ]]; then
+        ck "rubocop"
         local mono_path=$(get_mono_repo_path)
         local git_root=$(find_git_root)
 
@@ -874,6 +916,7 @@ lint_ruby() {
     fi
 
     if command_exists srb && [[ -d "sorbet" ]] && [[ "$has_sorbet" == "true" ]]; then
+        ck "sorbet"
         if [[ -n "$dirty_files" ]]; then
             log_info "Running Sorbet on dirty files only"
             # Run sorbet on dirty files
@@ -934,6 +977,7 @@ lint_php() {
 
         # Check for composer formatting commands
         if command_exists composer; then
+            ck "php-fmt"
             # Try format:dirty:fix first, then format:dirty, then format:fix, then format
             if composer_script_exists "format:dirty:fix"; then
                 log_info "Running composer format:dirty:fix"
@@ -969,6 +1013,7 @@ lint_php() {
 
             # Check for PHP linting AFTER formatting
             # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
+            ck "php-lint"
             if composer_script_exists "lint:dirty:fix"; then
                 log_info "Running composer lint:dirty:fix"
                 if composer lint:dirty:fix 2>&1; then
@@ -1028,6 +1073,7 @@ lint_nix() {
 
     # Check formatting with nixpkgs-fmt or alejandra
     if command_exists nixpkgs-fmt; then
+        ck "nix-fmt"
         if echo "$nix_files" | xargs nixpkgs-fmt --check 2>/dev/null; then
             add_summary "success" "Nix formatting correct"
         else
@@ -1035,6 +1081,7 @@ lint_nix() {
             add_summary "error" "Nix files need formatting"
         fi
     elif command_exists alejandra; then
+        ck "nix-fmt"
         if echo "$nix_files" | xargs alejandra --check 2>/dev/null; then
             add_summary "success" "Nix formatting correct"
         else
@@ -1045,6 +1092,7 @@ lint_nix() {
 
     # Static analysis with statix
     if command_exists statix; then
+        ck "statix"
         if statix check 2>&1; then
             add_summary "success" "Statix check passed"
         else
@@ -1136,6 +1184,7 @@ lint_objc() {
 
         # Check formatting first (dry-run)
         # Use -z and xargs -0 to properly handle filenames with spaces
+        ck "clang-fmt"
         if git ls-files -z '*.h' '*.m' 2>/dev/null | xargs -0 clang-format --dry-run --Werror 2>&1; then
             add_summary "success" "Objective-C formatting correct"
         else
@@ -1233,6 +1282,9 @@ main() {
 
     # Show timing if enabled
     time_end "$START_TIME"
+
+    # Print per-check timings
+    print_timings
 
     # Print summary
     print_summary
