@@ -111,7 +111,7 @@ M.ansi_codes = {
 M.copy_file_path = function(path_type)
   local path
   if path_type == 'relative' then
-    path = vim.fn.expand('%')
+    path = vim.fn.expand('%:.')
   elseif path_type == 'absolute' then
     path = vim.fn.expand('%:p')
   elseif path_type == 'filename' then
