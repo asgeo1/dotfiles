@@ -10,7 +10,10 @@
       "Bash(gh pr list:*)",
       "Bash(gh api repos/*/pulls/*:*)",
       "Bash(gh api repos/*/issues/*:*)",
-      "Bash(cat ~/.claude/projects/*/*/tool-results/*.txt:*)"
+      "Bash(cat ~/.claude/projects/*/*/tool-results/*.txt:*)",
+      "Bash(codex exec:*)",
+      "Bash(gemini:*)",
+      "Bash(env -u CLAUDECODE claude -p:*)"
     ],
     "deny": [
       "Bash(git stash:*)",
