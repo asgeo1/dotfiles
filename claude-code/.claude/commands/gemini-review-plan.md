@@ -25,7 +25,7 @@ Use the Task tool to spawn a subagent that handles the Gemini interaction. The s
 
 4. **Determine model:**
    - If user specified `--model X` in arguments, use that as `[REQUESTED_MODEL]`
-   - Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
+   - Otherwise, default to `gemini-pro-latest` as `[REQUESTED_MODEL]`
    - This ensures we always explicitly request the best available model
 
 5. **Construct the subagent prompt** using the template below, filling in:

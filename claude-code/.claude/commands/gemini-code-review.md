@@ -12,7 +12,7 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 
 **Flags:**
 - `--no-context` - Skip context gathering for a "blind" review
-- `--model X` - Override the Gemini model (default: gemini-3-pro-preview)
+- `--model X` - Override the Gemini model (default: gemini-pro-latest)
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -33,7 +33,7 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Model determination:**
 - If user specified `--model X`, use that as `[REQUESTED_MODEL]`
-- Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
+- Otherwise, default to `gemini-pro-latest` as `[REQUESTED_MODEL]`
 - This ensures we always explicitly request the best available model
 
 **Scope detection logic:**

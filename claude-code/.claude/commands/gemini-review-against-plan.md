@@ -12,7 +12,7 @@ Review code changes against an implementation plan using Google Gemini. Uses a s
 
 **Flags:**
 - `--no-context` - Skip supplementary context gathering
-- `--model X` - Override the Gemini model (default: gemini-3-pro-preview)
+- `--model X` - Override the Gemini model (default: gemini-pro-latest)
 
 **Usage:** `/gemini-review-against-plan [scope] <plan_path> [--flags]`
 
@@ -36,7 +36,7 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Model determination:**
 - If user specified `--model X`, use that as `[REQUESTED_MODEL]`
-- Otherwise, default to `gemini-3-pro-preview` as `[REQUESTED_MODEL]`
+- Otherwise, default to `gemini-pro-latest` as `[REQUESTED_MODEL]`
 - This ensures we always explicitly request the best available model
 
 **Plan file detection:**
