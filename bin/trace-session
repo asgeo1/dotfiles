@@ -1,0 +1,712 @@
+#!/usr/bin/env python3
+"""Trace tool calls and subagent activity in Claude Code sessions.
+
+Parses JSONL transcript files from ~/.claude/projects/ to show a hierarchical
+view of what happened during a session: which tools were called, which subagents
+were spawned, and what those subagents did.
+
+Usage:
+    trace-session                      # latest session in current project
+    trace-session <session-id>         # specific session
+    trace-session --last 2             # 2nd most recent session
+    trace-session -v                   # verbose: show tool arguments
+    trace-session --stats              # show summary statistics
+    trace-session --filter Agent,Bash  # only show specific tool types
+    trace-session --project <path>     # override project directory detection
+    trace-session --agents-only        # only show Agent tool spawns
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Set, Tuple  # noqa: UP035
+
+
+# --- ANSI colors (disabled if not a tty) ---
+
+USE_COLOR = sys.stdout.isatty()
+
+
+def _c(code: str, text: str) -> str:
+    if not USE_COLOR:
+        return text
+    return f"\033[{code}m{text}\033[0m"
+
+
+def dim(text: str) -> str:
+    return _c("2", text)
+
+
+def bold(text: str) -> str:
+    return _c("1", text)
+
+
+def cyan(text: str) -> str:
+    return _c("36", text)
+
+
+def yellow(text: str) -> str:
+    return _c("33", text)
+
+
+def green(text: str) -> str:
+    return _c("32", text)
+
+
+def magenta(text: str) -> str:
+    return _c("35", text)
+
+
+def red(text: str) -> str:
+    return _c("31", text)
+
+
+# --- Data structures ---
+
+
+@dataclass
+class ToolCall:
+    timestamp: str
+    tool_name: str
+    summary: str
+    tool_use_id: str = ""
+    agent_id: Optional[str] = None  # populated for Agent tool calls
+    subagent_type: Optional[str] = None  # e.g. "code-reviewer", "Explore"
+    full_input: dict = field(default_factory=dict)
+
+
+@dataclass
+class AgentTrace:
+    agent_id: str
+    label: str  # short display label
+    agent_type: str  # subagent_type from Agent tool call
+    description: str  # description from Agent tool call
+    tool_calls: List[ToolCall] = field(default_factory=list)
+
+
+# --- Helpers ---
+
+HOME = str(Path.home())
+
+
+def collapse_home(path: str) -> str:
+    """Replace home directory with ~ for display."""
+    if path.startswith(HOME):
+        return "~" + path[len(HOME):]
+    return path
+
+
+def short_agent_id(agent_id: str) -> str:
+    """Shorten agent ID: a580ec34a6dea6fcf -> a580..fcf"""
+    if len(agent_id) <= 8:
+        return agent_id
+    return f"{agent_id[:4]}..{agent_id[-3:]}"
+
+
+def format_time(iso_timestamp: str) -> str:
+    """Extract HH:MM:SS from ISO timestamp."""
+    try:
+        dt = datetime.fromisoformat(iso_timestamp.replace("Z", "+00:00"))
+        return dt.strftime("%H:%M:%S")
+    except (ValueError, AttributeError):
+        return "??:??:??"
+
+
+def summarize_tool(name: str, tool_input: dict, max_len: int = 80) -> str:
+    """Create a brief summary of a tool call."""
+    if name == "Bash":
+        cmd = tool_input.get("command", "")
+        desc = tool_input.get("description", "")
+        display = cmd if len(cmd) <= max_len else cmd[:max_len] + "..."
+        if desc and not cmd:
+            display = desc
+        return display
+    elif name == "Read":
+        return collapse_home(tool_input.get("file_path", "???"))
+    elif name == "Write":
+        return collapse_home(tool_input.get("file_path", "???"))
+    elif name == "Edit":
+        return collapse_home(tool_input.get("file_path", "???"))
+    elif name == "Glob":
+        pattern = tool_input.get("pattern", "???")
+        path = tool_input.get("path", "")
+        if path:
+            return f"{collapse_home(path)}/{pattern}"
+        return pattern
+    elif name == "Grep":
+        pattern = tool_input.get("pattern", "???")
+        path = tool_input.get("path", "")
+        if path:
+            return f'"{pattern}" in {collapse_home(path)}'
+        return f'"{pattern}"'
+    elif name == "Agent":
+        subtype = tool_input.get("subagent_type", "???")
+        desc = tool_input.get("description", "")
+        model = tool_input.get("model", "")
+        parts = [subtype]
+        if desc:
+            parts.append(f"[{desc}]")
+        if model:
+            parts.append(f"({model})")
+        return " ".join(parts)
+    elif name == "Skill":
+        skill = tool_input.get("skill", "???")
+        args = tool_input.get("args", "")
+        if args:
+            return f"{skill} {args}"
+        return skill
+    elif name == "WebFetch":
+        return tool_input.get("url", "???")[:max_len]
+    elif name == "WebSearch":
+        return tool_input.get("query", "???")[:max_len]
+    elif name.startswith("mcp__"):
+        # MCP tool calls - show the tool name and key args
+        parts = name.split("__")
+        short_name = parts[-1] if len(parts) >= 3 else name
+        args_str = ", ".join(f"{k}={v}" for k, v in tool_input.items() if v)
+        if args_str:
+            return f"{short_name}({args_str[:max_len]})"
+        return short_name
+    else:
+        # Generic: show first key-value pair
+        for k, v in tool_input.items():
+            s = str(v)
+            if len(s) > max_len:
+                s = s[:max_len] + "..."
+            return f"{k}={s}"
+        return ""
+
+
+def color_tool_name(name: str) -> str:
+    """Color-code tool names by type."""
+    if name == "Bash":
+        return yellow(name)
+    elif name == "Agent":
+        return magenta(name)
+    elif name in ("Read", "Glob", "Grep"):
+        return cyan(name)
+    elif name in ("Edit", "Write", "NotebookEdit"):
+        return green(name)
+    elif name == "Skill":
+        return red(name)
+    elif name.startswith("mcp__"):
+        return cyan(name.split("__")[-1])
+    else:
+        return name
+
+
+# --- Project directory detection ---
+
+
+def path_to_slug(project_path: str) -> str:
+    """Convert project path to Claude project slug.
+
+    /Users/asgeo1/Projects/dotfiles -> -Users-asgeo1-Projects-dotfiles
+    """
+    return project_path.replace("/", "-")
+
+
+def find_project_dir(project_path: Optional[str] = None) -> Path:
+    """Find the Claude project directory for the given (or current) project."""
+    if project_path:
+        abs_path = os.path.abspath(project_path)
+    else:
+        try:
+            abs_path = os.getcwd()
+        except OSError:
+            print("Error: Current directory doesn't exist. Use --project <path> to specify.", file=sys.stderr)
+            sys.exit(1)
+
+    slug = path_to_slug(abs_path)
+    project_dir = Path.home() / ".claude" / "projects" / slug
+
+    if not project_dir.exists():
+        # Try parent directories (project root might be a parent)
+        parts = Path(abs_path).parts
+        for i in range(len(parts) - 1, 0, -1):
+            parent = "/".join(parts[:i])
+            parent_slug = path_to_slug(parent)
+            candidate = Path.home() / ".claude" / "projects" / parent_slug
+            if candidate.exists():
+                return candidate
+
+        print(f"Error: No Claude project directory found for {abs_path}", file=sys.stderr)
+        print(f"  Tried: {project_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    return project_dir
+
+
+# --- Session discovery ---
+
+
+def find_sessions(project_dir: Path) -> list[tuple[Path, float]]:
+    """Find all session JSONL files, sorted by mtime (newest first)."""
+    sessions = []
+    for f in project_dir.iterdir():
+        if f.suffix == ".jsonl" and f.is_file():
+            sessions.append((f, f.stat().st_mtime))
+    sessions.sort(key=lambda x: x[1], reverse=True)
+    return sessions
+
+
+def select_session(
+    project_dir: Path, session_id: Optional[str] = None, last_n: int = 1
+) -> Path:
+    """Select a session JSONL file."""
+    if session_id:
+        # Direct session ID
+        candidate = project_dir / f"{session_id}.jsonl"
+        if candidate.exists():
+            return candidate
+        # Try partial match
+        for f in project_dir.iterdir():
+            if f.suffix == ".jsonl" and session_id in f.stem:
+                return f
+        print(f"Error: Session '{session_id}' not found in {project_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    sessions = find_sessions(project_dir)
+    if not sessions:
+        print(f"Error: No sessions found in {project_dir}", file=sys.stderr)
+        sys.exit(1)
+
+    if last_n > len(sessions):
+        print(
+            f"Error: Only {len(sessions)} sessions found, requested --last {last_n}",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+    return sessions[last_n - 1][0]
+
+
+# --- JSONL parsing ---
+
+
+def parse_tool_calls_from_jsonl(jsonl_path: Path) -> Tuple[List[ToolCall], dict]:
+    """Parse a JSONL file and extract tool calls and metadata.
+
+    Returns (tool_calls, metadata) where metadata includes session info.
+    """
+    tool_calls = []
+    metadata = {"slug": None, "sessionId": None, "first_timestamp": None}
+    agent_progress_map = {}  # parentToolUseID -> agentId
+
+    with open(jsonl_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                entry = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+
+            # Capture metadata from early entries
+            if entry.get("slug") and not metadata["slug"]:
+                metadata["slug"] = entry["slug"]
+            if entry.get("sessionId") and not metadata["sessionId"]:
+                metadata["sessionId"] = entry["sessionId"]
+            if entry.get("timestamp") and not metadata["first_timestamp"]:
+                metadata["first_timestamp"] = entry["timestamp"]
+
+            # Track agent_progress entries to map tool_use_id -> agentId
+            if (
+                entry.get("type") == "progress"
+                and isinstance(entry.get("data"), dict)
+                and entry["data"].get("type") == "agent_progress"
+            ):
+                parent_id = entry.get("parentToolUseID")
+                agent_id = entry["data"].get("agentId")
+                if parent_id and agent_id:
+                    agent_progress_map[parent_id] = agent_id
+
+            # Extract tool calls from assistant messages
+            msg = entry.get("message", {})
+            if not isinstance(msg, dict):
+                continue
+            if msg.get("role") != "assistant":
+                continue
+
+            timestamp = entry.get("timestamp", "")
+            content = msg.get("content", [])
+            if not isinstance(content, list):
+                continue
+
+            for block in content:
+                if not isinstance(block, dict):
+                    continue
+                if block.get("type") != "tool_use":
+                    continue
+
+                tool_name = block.get("name", "???")
+                tool_input = block.get("input", {})
+                tool_use_id = block.get("id", "")
+
+                tc = ToolCall(
+                    timestamp=timestamp,
+                    tool_name=tool_name,
+                    summary=summarize_tool(tool_name, tool_input),
+                    tool_use_id=tool_use_id,
+                    full_input=tool_input,
+                )
+
+                # For Agent tool calls, extract subagent info
+                if tool_name == "Agent":
+                    tc.subagent_type = tool_input.get("subagent_type", "???")
+
+                tool_calls.append(tc)
+
+    # Second pass: link Agent tool calls to their agentIds
+    for tc in tool_calls:
+        if tc.tool_name == "Agent" and tc.tool_use_id in agent_progress_map:
+            tc.agent_id = agent_progress_map[tc.tool_use_id]
+
+    return tool_calls, metadata
+
+
+def parse_subagent_jsonl(jsonl_path: Path) -> List[ToolCall]:
+    """Parse a subagent JSONL and return its tool calls."""
+    tool_calls, _ = parse_tool_calls_from_jsonl(jsonl_path)
+    return tool_calls
+
+
+# --- Main trace logic ---
+
+
+def build_trace(session_path: Path) -> Tuple[List[ToolCall], Dict[str, AgentTrace], dict]:
+    """Build the full trace from a session JSONL + its subagent JSONLs."""
+    main_calls, metadata = parse_tool_calls_from_jsonl(session_path)
+
+    session_id = session_path.stem
+    subagents_dir = session_path.parent / session_id / "subagents"
+
+    agents: Dict[str, AgentTrace] = {}
+
+    # For each Agent tool call, find and parse the subagent JSONL
+    for tc in main_calls:
+        if tc.tool_name == "Agent" and tc.agent_id:
+            agent_jsonl = subagents_dir / f"agent-{tc.agent_id}.jsonl"
+            agent_calls = []
+            if agent_jsonl.exists():
+                agent_calls = parse_subagent_jsonl(agent_jsonl)
+
+            agents[tc.agent_id] = AgentTrace(
+                agent_id=tc.agent_id,
+                label=short_agent_id(tc.agent_id),
+                agent_type=tc.subagent_type or "???",
+                description=tc.full_input.get("description", ""),
+                tool_calls=agent_calls,
+            )
+
+    # Check for subagent JSONLs we didn't find via agent_progress
+    # (in case agent_progress entries were missed)
+    if subagents_dir.exists():
+        for agent_file in subagents_dir.iterdir():
+            if agent_file.suffix == ".jsonl" and agent_file.stem.startswith("agent-"):
+                agent_id = agent_file.stem[len("agent-"):]
+                if agent_id not in agents:
+                    agent_calls = parse_subagent_jsonl(agent_file)
+                    agents[agent_id] = AgentTrace(
+                        agent_id=agent_id,
+                        label=short_agent_id(agent_id),
+                        agent_type="unknown",
+                        description="(unlinked agent)",
+                        tool_calls=agent_calls,
+                    )
+
+    return main_calls, agents, metadata
+
+
+# --- Rendering ---
+
+
+def render_trace(
+    main_calls: List[ToolCall],
+    agents: Dict[str, AgentTrace],
+    metadata: dict,
+    verbose: bool = False,
+    tool_filter: Set[str] | None = None,
+    agents_only: bool = False,
+    show_stats: bool = False,
+) -> None:
+    """Render the trace to stdout."""
+    session_id = metadata.get("sessionId", "???")
+    slug = metadata.get("slug", "???")
+    first_ts = metadata.get("first_timestamp", "")
+
+    # Header
+    print(bold(f"Session: {session_id}"))
+    print(f"Slug:    {slug}")
+    if first_ts:
+        print(f"Started: {first_ts}")
+    print()
+
+    # Compute label widths for alignment
+    main_label = "[main]"
+    agent_labels = {aid: f"[{a.label}]" for aid, a in agents.items()}
+    all_labels = [main_label] + list(agent_labels.values())
+    max_label_len = max((len(l) for l in all_labels), default=6)
+
+    def pad_label(label: str) -> str:
+        return label.ljust(max_label_len)
+
+    def should_show(tool_name: str) -> bool:
+        if agents_only and tool_name != "Agent":
+            return False
+        if tool_filter and tool_name not in tool_filter:
+            return False
+        return True
+
+    # Stats tracking
+    stats_main = 0
+    stats_agents = 0
+    stats_by_tool: Dict[str, int] = {}
+    agents_spawned = 0
+    first_time = None
+    last_time = None
+
+    def track_stats(tc: ToolCall, is_agent: bool = False) -> None:
+        nonlocal stats_main, stats_agents, first_time, last_time, agents_spawned
+        if is_agent:
+            stats_agents += 1
+        else:
+            stats_main += 1
+        stats_by_tool[tc.tool_name] = stats_by_tool.get(tc.tool_name, 0) + 1
+        if tc.tool_name == "Agent":
+            agents_spawned += 1
+
+        ts = tc.timestamp
+        if ts:
+            if first_time is None or ts < first_time:
+                first_time = ts
+            if last_time is None or ts > last_time:
+                last_time = ts
+
+    def print_tool_call(tc: ToolCall, label: str, indent: str = "") -> None:
+        time_str = dim(format_time(tc.timestamp))
+        tool_display = color_tool_name(tc.tool_name)
+
+        # For Agent calls, append the arrow to spawned agent
+        summary = tc.summary
+        if tc.tool_name == "Agent" and tc.agent_id:
+            short_id = short_agent_id(tc.agent_id)
+            summary += f" -> {bold(short_id)}"
+
+        print(f"{indent}{dim(pad_label(label))} {time_str}  {tool_display}: {summary}")
+
+        if verbose and tc.full_input:
+            for k, v in tc.full_input.items():
+                if k == "prompt":
+                    # Truncate long prompts
+                    s = str(v)
+                    if len(s) > 200:
+                        s = s[:200] + "..."
+                    print(f"{indent}  {'':>{max_label_len}} {dim(f'{k}={s}')}")
+                elif k not in ("command", "file_path", "pattern", "skill"):
+                    # Skip keys already shown in summary
+                    s = str(v)
+                    if len(s) > 120:
+                        s = s[:120] + "..."
+                    print(f"{indent}  {'':>{max_label_len}} {dim(f'{k}={s}')}")
+
+    # Render main calls + inline subagent calls
+    for tc in main_calls:
+        track_stats(tc)
+
+        if not should_show(tc.tool_name):
+            # Still need to show subagent calls if this is an Agent call
+            if tc.tool_name == "Agent" and tc.agent_id and tc.agent_id in agents:
+                agent = agents[tc.agent_id]
+                for atc in agent.tool_calls:
+                    track_stats(atc, is_agent=True)
+            continue
+
+        print_tool_call(tc, main_label)
+
+        # If this is an Agent call, show the subagent's tool calls indented
+        if tc.tool_name == "Agent" and tc.agent_id and tc.agent_id in agents:
+            agent = agents[tc.agent_id]
+            agent_label = agent_labels[tc.agent_id]
+            for atc in agent.tool_calls:
+                track_stats(atc, is_agent=True)
+                if should_show(atc.tool_name):
+                    print_tool_call(atc, agent_label, indent="  ")
+
+    # Show any unlinked agents at the end
+    shown_agent_ids = {tc.agent_id for tc in main_calls if tc.agent_id}
+    for agent_id, agent in agents.items():
+        if agent_id not in shown_agent_ids and agent.tool_calls:
+            print()
+            print(
+                dim(f"  (unlinked agent: {agent.agent_type} [{agent.label}])")
+            )
+            agent_label = agent_labels[agent_id]
+            for atc in agent.tool_calls:
+                track_stats(atc, is_agent=True)
+                if should_show(atc.tool_name):
+                    print_tool_call(atc, agent_label, indent="  ")
+
+    # Stats
+    if show_stats:
+        print()
+        print(bold("--- Stats ---"))
+
+        total = stats_main + stats_agents
+        print(f"Tool calls: {total} (main: {stats_main}, subagents: {stats_agents})")
+
+        if stats_by_tool:
+            parts = [f"{name}: {count}" for name, count in sorted(stats_by_tool.items())]
+            print(f"  {', '.join(parts)}")
+
+        print(f"Agents spawned: {agents_spawned}")
+
+        if first_time and last_time:
+            try:
+                t1 = datetime.fromisoformat(first_time.replace("Z", "+00:00"))
+                t2 = datetime.fromisoformat(last_time.replace("Z", "+00:00"))
+                duration = t2 - t1
+                secs = int(duration.total_seconds())
+                if secs >= 60:
+                    print(f"Duration: {secs // 60}m {secs % 60}s")
+                else:
+                    print(f"Duration: {secs}s")
+            except (ValueError, AttributeError):
+                pass
+
+
+# --- CLI ---
+
+
+def list_sessions_cmd(project_dir: Path, count: int = 10) -> None:
+    """List recent sessions."""
+    sessions = find_sessions(project_dir)
+    if not sessions:
+        print("No sessions found.", file=sys.stderr)
+        return
+
+    print(bold(f"Recent sessions in {collapse_home(str(project_dir))}:"))
+    print()
+
+    for i, (path, mtime) in enumerate(sessions[:count]):
+        session_id = path.stem
+        dt = datetime.fromtimestamp(mtime)
+        time_str = dt.strftime("%Y-%m-%d %H:%M")
+
+        # Try to read slug from first few lines
+        slug = None
+        try:
+            with open(path) as f:
+                for line_num, line in enumerate(f):
+                    if line_num > 5:
+                        break
+                    entry = json.loads(line)
+                    if entry.get("slug"):
+                        slug = entry["slug"]
+                        break
+        except (json.JSONDecodeError, OSError):
+            pass
+
+        marker = " *" if i == 0 else ""
+        slug_display = f"  ({slug})" if slug else ""
+        print(f"  {dim(str(i + 1) + '.')} {session_id}  {dim(time_str)}{slug_display}{bold(marker)}")
+
+    print()
+    print(dim("  * = most recent"))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Trace tool calls and subagent activity in Claude Code sessions."
+    )
+    parser.add_argument(
+        "session_id",
+        nargs="?",
+        help="Session ID to trace (default: latest)",
+    )
+    parser.add_argument(
+        "--last",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Trace the Nth most recent session (default: 1 = latest)",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Show full tool arguments",
+    )
+    parser.add_argument(
+        "--stats",
+        action="store_true",
+        help="Show summary statistics",
+    )
+    parser.add_argument(
+        "--filter",
+        type=str,
+        metavar="TOOLS",
+        help="Comma-separated tool names to show (e.g., Agent,Bash)",
+    )
+    parser.add_argument(
+        "--agents-only",
+        action="store_true",
+        help="Only show Agent tool spawns",
+    )
+    parser.add_argument(
+        "--project",
+        type=str,
+        metavar="PATH",
+        help="Override project directory detection",
+    )
+    parser.add_argument(
+        "--list",
+        action="store_true",
+        help="List recent sessions instead of tracing",
+    )
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable colored output",
+    )
+
+    args = parser.parse_args()
+
+    if args.no_color:
+        global USE_COLOR
+        USE_COLOR = False
+
+    project_dir = find_project_dir(args.project)
+
+    if args.list:
+        list_sessions_cmd(project_dir)
+        return
+
+    session_path = select_session(project_dir, args.session_id, args.last)
+
+    tool_filter = None
+    if args.filter:
+        tool_filter = set(args.filter.split(","))
+
+    main_calls, agents, metadata = build_trace(session_path)
+
+    render_trace(
+        main_calls,
+        agents,
+        metadata,
+        verbose=args.verbose,
+        tool_filter=tool_filter,
+        agents_only=args.agents_only,
+        show_stats=args.stats,
+    )
+
+
+if __name__ == "__main__":
+    main()
