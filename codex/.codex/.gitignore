@@ -1,0 +1,12 @@
+auth.json
+history.jsonl
+sessions/
+log/
+tmp/
+shell_snapshots/
+skills/.system/
+version.json
+.personality_migration
+
+# mostly because it contains machine specific paths and leaking project information
+config.toml
