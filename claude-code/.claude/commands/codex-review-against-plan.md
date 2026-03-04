@@ -153,7 +153,8 @@ Run these git commands based on scope '[SCOPE]':
 [GIT_COMMANDS_FOR_SCOPE]
 
 STEP 2: Read the plan file
-Read: [PLAN_FILE_PATH]
+Use the plan-tools MCP read_plan tool to read: [PLAN_FILE_PATH]
+(If the MCP tool is unavailable, read the file directly.)
 This describes what SHOULD be implemented.
 
 [IF PHASE != 'all']
@@ -204,7 +205,8 @@ codex exec \
   "Review code at specific paths against an implementation plan.
 
 STEP 1: Read the plan file
-Read: [PLAN_FILE_PATH]
+Use the plan-tools MCP read_plan tool to read: [PLAN_FILE_PATH]
+(If the MCP tool is unavailable, read the file directly.)
 This describes what SHOULD be implemented.
 
 [IF PHASE != 'all']

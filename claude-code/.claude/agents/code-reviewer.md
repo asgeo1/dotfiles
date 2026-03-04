@@ -92,7 +92,7 @@ Based on the scope, run the appropriate git commands:
 ### Step 2: Read Context
 
 - Read any source files referenced in the diff that need surrounding context
-- If focus is `plan-compliance`, read the plan file at the provided path using the **Read tool** (NEVER use bash grep/cat/head for plan files — the Read tool has universal file access and avoids security prompts)
+- If focus is `plan-compliance`, read the plan file using the `mcp__plan-tools__read_plan` tool (NEVER use the Read tool or bash commands for plan files — they trigger security prompts. The MCP tool is whitelisted.)
 - If supplementary context is provided, factor it into your review
 
 ### Step 3: Review with Focus

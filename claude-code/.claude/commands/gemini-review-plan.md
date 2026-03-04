@@ -29,7 +29,7 @@ Use the Task tool to spawn a subagent that handles the Gemini interaction. The s
    git status --short
    ```
 
-3. **Read the plan file** and extract:
+3. **Read the plan file** using `mcp__plan-tools__read_plan` (pass the file path). **Do NOT use the Read tool or bash commands** — they trigger security prompts. Extract:
    - The plan content itself
    - Any file paths mentioned in the plan
 

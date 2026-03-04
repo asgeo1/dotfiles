@@ -39,8 +39,8 @@ Fetch everything:
 4. Review comments: `gh api repos/{owner}/{repo}/pulls/{pullNumber}/comments`
 5. General comments: `gh api repos/{owner}/{repo}/issues/{pullNumber}/comments`
 
-**Skip previously addressed feedback**: Check `~/.claude/plans/` for existing plan files matching this PR (e.g., `pr-feedback-{owner}-{repo}-{pullNumber}*.md`). If found:
-- Read the existing plan(s)
+**Skip previously addressed feedback**: Use `mcp__plan-tools__find_plan_by_title` to search for existing plan files matching this PR (search for `pr-feedback-{owner}-{repo}-{pullNumber}`). If found:
+- Read the existing plan(s) using `mcp__plan-tools__read_plan`
 - Skip any feedback items that were already categorized and addressed
 - Only analyze NEW feedback since the last analysis
 - Mention in the summary: "Skipped X items already addressed in previous analysis"
@@ -103,13 +103,15 @@ Each agent must:
 
 ## Step 4: Write Plan to File
 
-**IMPORTANT**: You MUST write the plan to a file. Use the standard Claude Code plans location:
+**IMPORTANT**: You MUST write the plan to a file using `mcp__plan-tools__write_plan`. Use the standard Claude Code plans location:
 
 ```
 ~/.claude/plans/pr-feedback-{owner}-{repo}-{pullNumber}.md
 ```
 
 Example: `~/.claude/plans/pr-feedback-bluefrogsoftware-guitarcharts-20.md`
+
+**Do NOT use the Write tool or bash commands for plan files** — they trigger security prompts. Use `mcp__plan-tools__write_plan` which is whitelisted.
 
 After sub-agents complete, synthesize their findings. If any feedback items are ambiguous or agents disagreed, use "ultrathink" to resolve.
 

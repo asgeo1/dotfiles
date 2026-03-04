@@ -37,7 +37,7 @@ SUPPLEMENTARY_CONTEXT: <additional context from the conversation, or "none">
 
 ### Step 1: Read the Plan
 
-Read the plan file at the provided path. Understand:
+Read the plan file using the `mcp__plan-tools__read_plan` tool (pass the file path from the input). **Do NOT use the Read tool or bash commands for plan files** — they trigger security prompts. Understand:
 - What is being built or changed
 - The proposed approach and architecture
 - The implementation phases and steps

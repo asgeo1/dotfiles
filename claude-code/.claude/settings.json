@@ -15,7 +15,9 @@
       "Bash(gemini:*)",
       "Bash(env -u CLAUDECODE claude -p:*)",
       "mcp__plan-tools__list_recent_plans",
-      "mcp__plan-tools__find_plan_by_title"
+      "mcp__plan-tools__find_plan_by_title",
+      "mcp__plan-tools__read_plan",
+      "mcp__plan-tools__write_plan"
     ],
     "deny": [
       "Bash(git stash:*)",
@@ -62,6 +64,7 @@
   },
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true
   }
 }

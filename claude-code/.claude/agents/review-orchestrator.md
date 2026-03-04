@@ -205,4 +205,4 @@ After all agents return, validate each finding:
 4. **No inflation** — If agents find no real issues, report "looks-good". Don't manufacture problems.
 5. **Structured output** — Always use the exact output format specified above. The command depends on parsing this.
 6. **Agent references** — Use `@code-reviewer` when describing findings from sub-agents.
-7. **Plan files** — When reading plan files (from `~/.claude/plans/` or elsewhere), ALWAYS use the **Read tool**, NEVER bash commands like grep/cat/head. The Read tool has universal file access and avoids security prompts that bash commands trigger on paths outside the project.
+7. **Plan files** — When reading plan files (from `~/.claude/plans/` or elsewhere), ALWAYS use the `mcp__plan-tools__read_plan` tool. NEVER use the Read tool or bash commands (grep/cat/head) for plan files — they trigger security prompts. The MCP tool is whitelisted and avoids permission dialogs.

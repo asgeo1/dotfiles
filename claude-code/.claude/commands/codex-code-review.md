@@ -147,7 +147,8 @@ First, fetch the changes by running the appropriate git commands:
 [GIT_COMMANDS_FOR_SCOPE]
 
 [IF PLAN_FILE_PATH != 'none']
-Read the plan file at: [PLAN_FILE_PATH]
+Use the plan-tools MCP read_plan tool to read the plan file at: [PLAN_FILE_PATH]
+(If the MCP tool is unavailable, read the file directly.)
 This describes the intent of the changes. Consider this when reviewing.
 [END IF]
 
@@ -193,7 +194,8 @@ For each path:
 - Follow imports and references as needed for context
 
 [IF PLAN_FILE_PATH != 'none']
-Read the plan file at: [PLAN_FILE_PATH]
+Use the plan-tools MCP read_plan tool to read the plan file at: [PLAN_FILE_PATH]
+(If the MCP tool is unavailable, read the file directly.)
 This describes the intent of the changes. Consider this when reviewing.
 [END IF]
 

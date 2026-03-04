@@ -13,6 +13,18 @@ import sys
 PLANS_DIR = os.path.expanduser("~/.claude/plans")
 
 
+def validate_plan_path(file_path):
+    """Validate and resolve a plan file path. Returns (resolved_path, error_msg)."""
+    expanded = os.path.expanduser(file_path)
+    resolved = os.path.realpath(expanded)
+    plans_real = os.path.realpath(PLANS_DIR)
+    if not resolved.startswith(plans_real + os.sep) and resolved != plans_real:
+        return None, f"Path must be under ~/.claude/plans/, got: {file_path}"
+    if not resolved.endswith(".md"):
+        return None, f"Only .md files are supported, got: {file_path}"
+    return resolved, None
+
+
 def list_recent_plans(count=5):
     """List the most recently modified plan files with their titles."""
     if not os.path.isdir(PLANS_DIR):
@@ -57,6 +69,33 @@ def find_plan_by_title(title):
     return f"No plan file found with title matching: {title}"
 
 
+def read_plan(file_path, offset=0, limit=0):
+    """Read a plan file's contents."""
+    resolved, err = validate_plan_path(file_path)
+    if err:
+        return err
+    if not os.path.isfile(resolved):
+        return f"File not found: {file_path}"
+    with open(resolved, "r") as fh:
+        lines = fh.readlines()
+    if offset > 0:
+        lines = lines[offset:]
+    if limit > 0:
+        lines = lines[:limit]
+    return "".join(lines)
+
+
+def write_plan(file_path, content):
+    """Write content to a plan file."""
+    resolved, err = validate_plan_path(file_path)
+    if err:
+        return err
+    os.makedirs(os.path.dirname(resolved), exist_ok=True)
+    with open(resolved, "w") as fh:
+        fh.write(content)
+    return f"Written to {file_path}"
+
+
 TOOLS = [
     {
         "name": "list_recent_plans",
@@ -84,6 +123,48 @@ TOOLS = [
                 }
             },
             "required": ["title"],
+        },
+    },
+    {
+        "name": "read_plan",
+        "description": "Read the contents of a plan file from ~/.claude/plans/. Accepts ~/... or absolute paths. Use this instead of the Read tool to avoid permission prompts.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to the plan file (e.g., ~/.claude/plans/my-plan.md or /Users/.../plans/my-plan.md)",
+                },
+                "offset": {
+                    "type": "number",
+                    "description": "Line offset to start reading from (0-based, default: 0)",
+                    "default": 0,
+                },
+                "limit": {
+                    "type": "number",
+                    "description": "Maximum number of lines to return (0 = all, default: 0)",
+                    "default": 0,
+                },
+            },
+            "required": ["file_path"],
+        },
+    },
+    {
+        "name": "write_plan",
+        "description": "Write content to a plan file in ~/.claude/plans/. Creates the file if it doesn't exist. Use this instead of the Write tool to avoid permission prompts.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "file_path": {
+                    "type": "string",
+                    "description": "Path to the plan file (e.g., ~/.claude/plans/my-plan.md)",
+                },
+                "content": {
+                    "type": "string",
+                    "description": "The content to write to the plan file",
+                },
+            },
+            "required": ["file_path", "content"],
         },
     },
 ]
@@ -123,6 +204,10 @@ def handle(msg):
             text = list_recent_plans(args.get("count", 5))
         elif name == "find_plan_by_title":
             text = find_plan_by_title(args["title"])
+        elif name == "read_plan":
+            text = read_plan(args["file_path"], args.get("offset", 0), args.get("limit", 0))
+        elif name == "write_plan":
+            text = write_plan(args["file_path"], args["content"])
         else:
             send(
                 {
