@@ -41,8 +41,12 @@ $ARGUMENTS = "$ARGUMENTS"
 
 **Plan file detection:**
 - If argument contains a path → use that
-- Else check if you're in plan mode with a plan file in context
-- If neither → ABORT: "Cannot review without a plan file. Usage: /claude-review-against-plan [scope] <plan_path>"
+- Else check if you're in plan mode with a plan file in context → use that path
+- If neither → **auto-detect** the most recent plan file:
+  1. Run: `ls -t ~/.claude/plans/*.md | head -5`
+  2. Use the Read tool to read the first 2 lines of the top result (to get the `# Title`)
+  3. Tell the user: "Auto-detected plan: **[title]** (`[path]`). Proceeding."
+  4. If the plans directory is empty or the command fails → ABORT: "No plan file found. Usage: /claude-review-against-plan [scope] <plan_path>"
 
 **Scope detection (from remaining args):**
 1. If starts with `all` → scope = all

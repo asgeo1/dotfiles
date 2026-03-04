@@ -44,14 +44,31 @@ REVIEWER_MODEL: <opus|sonnet|haiku or full model ID> (model for code-reviewer ag
 
 ### Step 1: Fetch the Diff
 
-Based on the scope, run the appropriate git commands to get the diff. You need this for validation in Step 4.
+Based on the scope, run the appropriate git command (ONE bash call per scope) to get the diff. You need this for validation in Step 4.
 
-- `all`: `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard`
-- `uncommitted`: `git diff` + `git ls-files --others --exclude-standard`
-- `staged`: `git diff --cached`
-- `branch <base>`: `git diff <base>...HEAD` + `git log <base>...HEAD --oneline`
-- `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
-- `path`: List and briefly scan the paths to understand scope.
+**IMPORTANT:** Use `===` separators (never `---` dashes) to avoid security prompts.
+
+- **all:**
+  ```bash
+  echo "=== STAT ===" && git diff --stat && git diff --cached --stat && echo "=== UNTRACKED ===" && git ls-files --others --exclude-standard && echo "=== DIFF ===" && git diff && git diff --cached
+  ```
+- **uncommitted:**
+  ```bash
+  echo "=== STAT ===" && git diff --stat && echo "=== UNTRACKED ===" && git ls-files --others --exclude-standard && echo "=== DIFF ===" && git diff
+  ```
+- **staged:**
+  ```bash
+  echo "=== STAT ===" && git diff --cached --stat && echo "=== DIFF ===" && git diff --cached
+  ```
+- **branch \<base\>:**
+  ```bash
+  echo "=== LOG ===" && git log <base>...HEAD --oneline && echo "=== STAT ===" && git diff <base>...HEAD --stat && echo "=== DIFF ===" && git diff <base>...HEAD
+  ```
+- **pr \<number\>:**
+  ```bash
+  echo "=== PR INFO ===" && gh pr view <number> --json title,body,files && echo "=== DIFF ===" && gh pr diff <number>
+  ```
+- **path:** List and briefly scan the paths to understand scope.
 
 ### Step 2: Determine Focus Areas
 
@@ -172,3 +189,4 @@ After all agents return, validate each finding:
 4. **No inflation** — If agents find no real issues, report "looks-good". Don't manufacture problems.
 5. **Structured output** — Always use the exact output format specified above. The command depends on parsing this.
 6. **Agent references** — Use `@code-reviewer` when describing findings from sub-agents.
+7. **Plan files** — When reading plan files (from `~/.claude/plans/` or elsewhere), ALWAYS use the **Read tool**, NEVER bash commands like grep/cat/head. The Read tool has universal file access and avoids security prompts that bash commands trigger on paths outside the project.

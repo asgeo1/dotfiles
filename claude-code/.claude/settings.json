@@ -13,7 +13,9 @@
       "Bash(cat ~/.claude/projects/*/*/tool-results/*.txt:*)",
       "Bash(codex exec:*)",
       "Bash(gemini:*)",
-      "Bash(env -u CLAUDECODE claude -p:*)"
+      "Bash(env -u CLAUDECODE claude -p:*)",
+      "Bash(ls*~/.claude/plans/*:*)",
+      "Bash(head*~/.claude/plans/*:*)"
     ],
     "deny": [
       "Bash(git stash:*)",
