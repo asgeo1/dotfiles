@@ -45,40 +45,24 @@ REVIEWER_MODEL: <opus|sonnet|haiku or full model ID> (model for code-reviewer ag
 
 ### Step 1: Fetch the Diff
 
-Based on the scope, run the appropriate git command (ONE bash call per scope) to get the diff. You need this for validation in Step 4.
+Use the `mcp__git-tools__git_diff` MCP tool to fetch the diff. **Do NOT use Bash git commands** — they trigger security prompts.
 
 **CRITICAL — FOLLOW EXACTLY:**
-- Run EXACTLY ONE bash command from the list below. Nothing else.
-- Do NOT run additional git commands (no `git diff --cached -- api/`, no `git diff | wc -l`, no splitting by directory)
+- Make EXACTLY ONE `mcp__git-tools__git_diff` call (except for PR scope). Nothing else.
+- Do NOT run additional git commands via Bash
 - Do NOT run `ls` on any directory
 - Do NOT use the Read tool on any source file
 - Do NOT explore the codebase in any way
-- The ONLY things you read in Steps 1-3 are: (1) the diff output from the ONE command below, and (2) the plan file
+- The ONLY things you read in Steps 1-3 are: (1) the diff output from the MCP tool, and (2) the plan file
 - Individual source files are the code-reviewers' job. You read files ONLY in Step 4, AFTER reviewers return.
 - If the diff output is large, that's fine. Just move to Step 2.
 
-**IMPORTANT:** Use `===` separators (never `---` dashes) to avoid security prompts.
-
-- **all:**
-  ```bash
-  echo "=== STAT ===" && git diff --stat && git diff --cached --stat && echo "=== UNTRACKED ===" && git ls-files --others --exclude-standard && echo "=== DIFF ===" && git diff && git diff --cached
-  ```
-- **uncommitted:**
-  ```bash
-  echo "=== STAT ===" && git diff --stat && echo "=== UNTRACKED ===" && git ls-files --others --exclude-standard && echo "=== DIFF ===" && git diff
-  ```
-- **staged:**
-  ```bash
-  echo "=== STAT ===" && git diff --cached --stat && echo "=== DIFF ===" && git diff --cached
-  ```
-- **branch \<base\>:**
-  ```bash
-  echo "=== LOG ===" && git log <base>...HEAD --oneline && echo "=== STAT ===" && git diff <base>...HEAD --stat && echo "=== DIFF ===" && git diff <base>...HEAD
-  ```
-- **pr \<number\>:**
-  ```bash
-  echo "=== PR INFO ===" && gh pr view <number> --json title,body,files && echo "=== DIFF ===" && gh pr diff <number>
-  ```
+**Scope mapping to MCP tool calls:**
+- **all:** `mcp__git-tools__git_diff` with `scope: "all"`
+- **uncommitted:** `mcp__git-tools__git_diff` with `scope: "unstaged"`
+- **staged:** `mcp__git-tools__git_diff` with `scope: "staged"`
+- **branch \<base\>:** `mcp__git-tools__git_diff` with `scope: "branch"`, `base: "<base>"`
+- **pr \<number\>:** Use Bash: `echo "=== PR INFO ===" && gh pr view <number> --json title,body,files && echo "=== DIFF ===" && gh pr diff <number>` (PR commands are already whitelisted)
 - **path:** List and briefly scan the paths to understand scope.
 
 ### Step 2: Determine Focus Areas

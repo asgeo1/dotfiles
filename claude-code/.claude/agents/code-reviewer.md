@@ -80,13 +80,13 @@ REVIEWER_MODEL: <model override or "default">
 
 ### Step 1: Fetch Changes
 
-Based on the scope, run the appropriate git commands:
+Use the `mcp__git-tools__git_diff` MCP tool to fetch changes. **Do NOT use Bash git commands** — they trigger security prompts.
 
-- `all`: `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard` (then read untracked files)
-- `uncommitted`: `git diff` + `git ls-files --others --exclude-standard`
-- `staged`: `git diff --cached`
-- `branch <base>`: `git diff <base>...HEAD` + `git log <base>...HEAD --oneline`
-- `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
+- `all`: `mcp__git-tools__git_diff` with `scope: "all"`
+- `uncommitted`: `mcp__git-tools__git_diff` with `scope: "unstaged"`
+- `staged`: `mcp__git-tools__git_diff` with `scope: "staged"`
+- `branch <base>`: `mcp__git-tools__git_diff` with `scope: "branch"`, `base: "<base>"`
+- `pr <number>`: Use Bash: `gh pr diff <number>` + `gh pr view <number> --json title,body,files` (PR commands are whitelisted)
 - `path`: No git commands. Read and explore the paths directly.
 
 ### Step 2: Read Context

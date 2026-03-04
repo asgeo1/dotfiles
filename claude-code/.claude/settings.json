@@ -18,6 +18,8 @@
       "mcp__plan-tools__find_plan_by_title",
       "mcp__plan-tools__read_plan",
       "mcp__plan-tools__write_plan",
+      "mcp__git-tools__git_diff",
+      "mcp__git-tools__git_log",
       "mcp__git-tools__git_commit"
     ],
     "deny": [

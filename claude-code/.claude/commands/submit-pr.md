@@ -79,16 +79,19 @@ Analyze the output:
   ```
   You are a git commit assistant. Review staged changes and create a commit.
 
-  SAFETY: Only work with staged changes (git diff --cached). Never run git add.
+  SAFETY: Only work with staged changes. Never run git add.
+
+  TOOL RESTRICTIONS:
+  - Use `mcp__git-tools__git_diff` and `mcp__git-tools__git_log` for context. Do NOT use Bash for git commands.
+  - Use `mcp__git-tools__git_commit` for the actual commit.
 
   WORKFLOW:
-  1. Run `git diff --cached --stat` - if empty, report "No staged changes" and stop
-  2. Run `git diff --cached` for full diff
-  3. Run `git log --oneline -10` for commit style
-  4. Analyze: change type (feat/fix/refactor/etc), scope, the WHY
-  5. Craft commit message (subject ~50 chars + body wrapped at 72)
-  6. Execute commit with HEREDOC format
-  7. Report: commit hash and one-line summary
+  1. Call `mcp__git-tools__git_diff` with `scope: "staged"` — if STAT and DIFF are empty, report "No staged changes" and stop
+  2. Call `mcp__git-tools__git_log` with `scope: "auto"` — smart branch-aware log for commit style
+  3. Analyze: change type (feat/fix/refactor/etc), scope, the WHY
+  4. Craft commit message (subject ~50 chars + body wrapped at 72)
+  5. Commit using `mcp__git-tools__git_commit` with the full message
+  6. Report: commit hash and one-line summary
   ```
 
   After commit subagent completes, re-run `git status --porcelain` to verify clean.
@@ -162,7 +165,7 @@ If the output contains conflict markers (`<<<<<<`, `======`, `>>>>>>`):
 
 First, determine which subprojects have changes relative to the base branch:
 
-Run: `git diff --name-only {base_branch}...HEAD`
+Use `mcp__git-tools__git_diff` with `scope: "branch"`, `base: "{base_branch}"`, `name_only: true` — returns just the list of changed file names.
 
 Group the changed files by their top-level directory (subproject). For example:
 - `api/src/controller.ts` → subproject: `api`
@@ -258,15 +261,13 @@ If tests fail:
 
 ### 5a. Gather Commit History
 
-Run: `git log {base_branch}..HEAD --oneline --no-merges`
+Use `mcp__git-tools__git_log` with `base: "{base_branch}"`, `no_merges: true` — shows non-merge commits between base and HEAD.
 
 This shows all commits that will be included in the PR.
 
 ### 5b. Get the Full Diff
 
-Run: `git diff {base_branch}...HEAD --stat`
-
-For detailed analysis if needed: `git diff {base_branch}...HEAD`
+Use `mcp__git-tools__git_diff` with `scope: "branch"`, `base: "{base_branch}"` — returns STAT and DIFF sections.
 
 ### 5c. Analyze and Categorize Changes
 

@@ -120,11 +120,11 @@ If a path is provided, you and Gemini can read this file to understand the inten
 **Supplementary context:** [SUPPLEMENTARY_CONTEXT]
 This is additional relevant information from the main conversation that isn't in the plan file.
 
-**Commands Gemini should run based on scope:**
-- `all`: `git diff` (unstaged) + `git diff --cached` (staged) + `git ls-files --others --exclude-standard` (untracked)
-- `uncommitted`: `git diff` (unstaged) + `git ls-files --others --exclude-standard` (untracked)
-- `staged`: `git diff --cached`
-- `branch [base]`: `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`
+**How Gemini should fetch changes based on scope (use git-tools MCP if available, fall back to git commands):**
+- `all`: `mcp__git-tools__git_diff` with `scope: "all"` (or `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard`)
+- `uncommitted`: `mcp__git-tools__git_diff` with `scope: "unstaged"` (or `git diff` + `git ls-files --others --exclude-standard`)
+- `staged`: `mcp__git-tools__git_diff` with `scope: "staged"` (or `git diff --cached`)
+- `branch [base]`: `mcp__git-tools__git_diff` with `scope: "branch"`, `base: "[base]"` (or `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`)
 - `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
 - `path`: No git commands. Read and explore the paths directly.
 

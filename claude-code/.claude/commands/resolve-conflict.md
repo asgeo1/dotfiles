@@ -238,7 +238,7 @@ Files resolved:
 - {file2}: {brief summary}
 
 Next steps:
-- Review the resolutions: `git diff --cached`
+- Review the resolutions: use `mcp__git-tools__git_diff` with `scope: "staged"`
 - Continue the operation: `git rebase --continue` or `git commit`
 - Or abort: `git rebase --abort` / `git merge --abort`
 ═══════════════════════════════════════════════════════════════════
