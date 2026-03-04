@@ -14,7 +14,7 @@ Review code changes against an implementation plan using parallel specialized re
 - `--no-context` - Skip supplementary context gathering
 - `--model X` - Override the Claude model (default: opus)
 
-**Usage:** `/claude-review-against-plan [scope] <plan_path> [--flags]`
+**Usage:** `/claude-review-against-plan [scope] [plan_path] [phase: N] [--flags]`
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -22,7 +22,7 @@ Review code changes against an implementation plan using parallel specialized re
 
 ## Step 1: Parse Arguments
 
-Parse `$ARGUMENTS` to extract scope, plan path, and flags:
+Parse `$ARGUMENTS` to extract scope, plan path, phase, and flags:
 
 ```
 $ARGUMENTS = "$ARGUMENTS"
@@ -31,8 +31,9 @@ $ARGUMENTS = "$ARGUMENTS"
 **Parsing logic:**
 1. Check for `--no-context` flag, remove from args
 2. Check for `--model X` flag (X is the next token after --model), remove from args
-3. Identify plan file path (contains `/` or ends with `.md`)
-4. Remaining text before plan path = scope
+3. Check for `phase: N` or `phase N` (N is a number) — extract as `[PHASE]`, remove from args
+4. Identify plan file path (contains `/` or ends with `.md`)
+5. Remaining text before plan path = scope
 
 **Model determination:**
 - If user specified `--model X`, use that as `[REQUESTED_MODEL]`
@@ -40,13 +41,15 @@ $ARGUMENTS = "$ARGUMENTS"
 - Valid models: `opus`, `sonnet`, `haiku`, or full model IDs
 
 **Plan file detection:**
-- If argument contains a path → use that
-- Else check if you're in plan mode with a plan file in context → use that path
-- If neither → **auto-detect** the most recent plan file:
-  1. Run: `ls -t ~/.claude/plans/*.md | head -5`
-  2. Use the Read tool to read the first 2 lines of the top result (to get the `# Title`)
+- If argument contains a plan file path → use that
+- Else if you're in plan mode with a plan file path in context → use that path
+- Else if plan content was injected into context (from "clear context and start working on the plan"):
+  1. Look at the injected plan content in your conversation context. Find the **first `#` heading** — this is the plan's title (e.g., "# Plan: Implement Free Tier Pricing"). This is NOT the phase number, NOT the scope, NOT any argument — it's the markdown heading from the plan document itself.
+  2. Use the `mcp__plan-tools__find_plan_by_title` tool with that heading text (without the `#`) to find the matching file
   3. Tell the user: "Auto-detected plan: **[title]** (`[path]`). Proceeding."
-  4. If the plans directory is empty or the command fails → ABORT: "No plan file found. Usage: /claude-review-against-plan [scope] <plan_path>"
+  4. If no match found → fall back to `mcp__plan-tools__list_recent_plans` and pick the most recent
+- Else → use `mcp__plan-tools__list_recent_plans` to show the 5 most recent plans, then ask the user which one
+- **IMPORTANT:** Do NOT use Bash commands (ls, head, cat, grep), Glob, or Grep for plan file detection — these trigger security prompts. Use only the `plan-tools` MCP server tools.
 
 **Scope detection (from remaining args):**
 1. If starts with `all` → scope = all
@@ -106,6 +109,7 @@ BASE: [BASE or "N/A"]
 PATHS: [PATHS or "N/A"]
 PR: [PR_NUMBER or "N/A"]
 PLAN_FILE: [PLAN_FILE_PATH]
+PHASE: [PHASE or "all"]
 SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
 REVIEWER_MODEL: [REQUESTED_MODEL]
 ```
@@ -113,7 +117,7 @@ REVIEWER_MODEL: [REQUESTED_MODEL]
 The orchestrator will:
 1. Fetch the diff itself based on the scope
 2. Spawn parallel `code-reviewer` agents (correctness, security, quality, **plan-compliance**) using the specified model
-3. The plan-compliance reviewer will read the plan file and check each item
+3. The plan-compliance reviewer will read the plan file and review against the specified phase (or the entire plan if "all")
 4. Validate all findings against actual source code
 5. Filter false positives and deduplicate
 6. Return structured feedback with plan coverage table

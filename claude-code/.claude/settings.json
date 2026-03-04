@@ -14,8 +14,8 @@
       "Bash(codex exec:*)",
       "Bash(gemini:*)",
       "Bash(env -u CLAUDECODE claude -p:*)",
-      "Bash(ls*~/.claude/plans/*:*)",
-      "Bash(head*~/.claude/plans/*:*)"
+      "mcp__plan-tools__list_recent_plans",
+      "mcp__plan-tools__find_plan_by_title"
     ],
     "deny": [
       "Bash(git stash:*)",

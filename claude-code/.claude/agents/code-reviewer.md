@@ -71,6 +71,7 @@ BASE: <base-branch> (if branch scope)
 PATHS: <comma-separated paths> (if path scope)
 PR: <number> (if pr scope)
 PLAN_FILE: <path> (if plan-compliance focus)
+PHASE: <number or "all"> (which phase of the plan to review against — if a number, only review items from that phase)
 SUPPLEMENTARY_CONTEXT: <additional context or "none">
 REVIEWER_MODEL: <model override or "default">
 ```

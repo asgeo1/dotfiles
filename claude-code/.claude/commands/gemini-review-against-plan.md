@@ -14,7 +14,7 @@ Review code changes against an implementation plan using Google Gemini. Uses a s
 - `--no-context` - Skip supplementary context gathering
 - `--model X` - Override the Gemini model (default: gemini-pro-latest)
 
-**Usage:** `/gemini-review-against-plan [scope] <plan_path> [--flags]`
+**Usage:** `/gemini-review-against-plan [scope] [plan_path] [phase: N] [--flags]`
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -31,8 +31,9 @@ $ARGUMENTS = "$ARGUMENTS"
 **Parsing logic:**
 1. Check for `--no-context` flag, remove from args
 2. Check for `--model X` flag (X is the next token after --model), remove from args
-3. Identify plan file path (contains `/` or ends with `.md`)
-4. Remaining text before plan path = scope
+3. Check for `phase: N` or `phase N` (N is a number) — extract as `[PHASE]`, remove from args
+4. Identify plan file path (contains `/` or ends with `.md`)
+5. Remaining text before plan path = scope
 
 **Model determination:**
 - If user specified `--model X`, use that as `[REQUESTED_MODEL]`
@@ -40,9 +41,15 @@ $ARGUMENTS = "$ARGUMENTS"
 - This ensures we always explicitly request the best available model
 
 **Plan file detection:**
-- If argument contains a path → use that
-- Else check if you're in plan mode with a plan file in context
-- If neither → ABORT: "Cannot review without a plan file. Usage: /gemini-review-against-plan [scope] <plan_path>"
+- If argument contains a plan file path → use that
+- Else if you're in plan mode with a plan file path in context → use that path
+- Else if plan content was injected into context (from "clear context and start working on the plan"):
+  1. Look at the injected plan content in your conversation context. Find the **first `#` heading** — this is the plan's title (e.g., "# Plan: Implement Free Tier Pricing"). This is NOT the phase number, NOT any argument — it's the markdown heading from the plan document itself.
+  2. Use the `mcp__plan-tools__find_plan_by_title` tool with that heading text (without the `#`) to find the matching file
+  3. Tell the user: "Auto-detected plan: **[title]** (`[path]`). Proceeding."
+  4. If no match found → fall back to `mcp__plan-tools__list_recent_plans` and pick the most recent
+- Else → use `mcp__plan-tools__list_recent_plans` to show the 5 most recent plans, then ask the user which one
+- **IMPORTANT:** Do NOT use Bash commands (ls, head, cat, grep), Glob, or Grep for plan file detection — these trigger security prompts. Use only the `plan-tools` MCP server tools.
 
 **Scope detection (from remaining args):**
 1. If starts with `all` → scope = all
@@ -115,7 +122,8 @@ You are a plan-based code review assistant. Your job is to get feedback on code 
 **Paths (if path):** [PATHS]
 
 **Plan file path:** [PLAN_FILE_PATH]
-Gemini MUST read this file to understand the intended implementation.
+**Phase:** [PHASE or "all"]
+Gemini MUST read this file to understand the intended implementation. If a specific phase is given, focus the review on that phase's items (but read the full plan for context).
 
 **Supplementary context:** [SUPPLEMENTARY_CONTEXT]
 
@@ -140,6 +148,10 @@ STEP 2: Read the plan file
 Read: [PLAN_FILE_PATH]
 This describes what SHOULD be implemented.
 
+[IF PHASE != 'all']
+IMPORTANT: Focus your review on **Phase [PHASE]** of the plan only. Read the full plan for context but only check items from Phase [PHASE].
+[END IF]
+
 [IF SUPPLEMENTARY_CONTEXT != 'none']
 STEP 3: Consider this additional context:
 [SUPPLEMENTARY_CONTEXT]
@@ -147,7 +159,7 @@ STEP 3: Consider this additional context:
 
 STEP 4: Review the changes AGAINST the plan
 
-For EACH item in the plan, check:
+For EACH item in the plan [IF PHASE != 'all'](Phase [PHASE] only)[END IF], check:
 - Is it implemented? (complete/partial/missing)
 - Does the implementation match the plan's intent?
 - Is the code quality acceptable?
@@ -181,6 +193,10 @@ STEP 1: Read the plan file
 Read: [PLAN_FILE_PATH]
 This describes what SHOULD be implemented.
 
+[IF PHASE != 'all']
+IMPORTANT: Focus your review on **Phase [PHASE]** of the plan only. Read the full plan for context but only check items from Phase [PHASE].
+[END IF]
+
 STEP 2: Explore the code paths
 Paths to review: [PATHS]
 For each path:
@@ -195,7 +211,7 @@ STEP 3: Consider this additional context:
 
 STEP 4: Review the code AGAINST the plan
 
-For EACH item in the plan, check:
+For EACH item in the plan [IF PHASE != 'all'](Phase [PHASE] only)[END IF], check:
 - Is it implemented in these files?
 - Does the implementation match the plan's intent?
 - Is the code quality acceptable?

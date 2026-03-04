@@ -8,10 +8,21 @@ Use the Task tool to spawn a subagent that handles the Codex interaction. The su
 
 ## Before Spawning the Subagent
 
-1. **Determine the plan file path:**
-   - If `$ARGUMENTS` contains a file path, use that
-   - Otherwise, check if you're in plan mode and have a plan file path in context
-   - If neither, ABORT with: "Cannot review without a plan. Please specify a plan file path."
+1. **Parse arguments from `$ARGUMENTS`:**
+   - Check for `--model X` flag, remove from args
+   - Check for `--reasoning X` flag, remove from args
+   - Check for `phase: N` or `phase N` (N is a number) — extract as `[PHASE]`, remove from args
+
+2. **Determine the plan file path:**
+   - If remaining argument contains a file path, use that
+   - Else if you're in plan mode with a plan file path in context → use that path
+   - Else if plan content was injected into context (from "clear context and start working on the plan"):
+     1. Look at the injected plan content in your conversation context. Find the **first `#` heading** — this is the plan's title. This is NOT the phase number, NOT any argument — it's the markdown heading from the plan document itself.
+     2. Use the `mcp__plan-tools__find_plan_by_title` tool with that heading text (without the `#`) to find the matching file
+     3. Tell the user: "Auto-detected plan: **[title]** (`[path]`). Proceeding."
+     4. If no match found → fall back to `mcp__plan-tools__list_recent_plans` and pick the most recent
+   - Else → use `mcp__plan-tools__list_recent_plans` to show the 5 most recent plans, then ask the user which one
+   - **IMPORTANT:** Do NOT use Bash commands (ls, head, cat, grep), Glob, or Grep for plan file detection — these trigger security prompts. Use only the `plan-tools` MCP server tools.
 
 2. **Gather context (do this BEFORE spawning):**
    ```bash
@@ -77,6 +88,10 @@ codex exec \
   [MODEL_FLAG] \
   [REASONING_OVERRIDE] \
   "Review the following implementation plan. Analyze it in the context of this codebase.
+
+[IF PHASE != 'all']
+Focus your review on **Phase [PHASE]** of the plan, but read the full plan for context.
+[END IF]
 
 Plan:
 [PLAN_CONTENT]

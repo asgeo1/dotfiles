@@ -36,6 +36,7 @@ BASE: <base-branch> (if branch scope)
 PATHS: <comma-separated paths> (if path scope)
 PR: <number> (if pr scope)
 PLAN_FILE: <path> (if review-against-plan mode)
+PHASE: <number or "all"> (which phase of the plan to review against)
 SUPPLEMENTARY_CONTEXT: <additional context or "none">
 REVIEWER_MODEL: <opus|sonnet|haiku or full model ID> (model for code-reviewer agents)
 ```
@@ -45,6 +46,16 @@ REVIEWER_MODEL: <opus|sonnet|haiku or full model ID> (model for code-reviewer ag
 ### Step 1: Fetch the Diff
 
 Based on the scope, run the appropriate git command (ONE bash call per scope) to get the diff. You need this for validation in Step 4.
+
+**CRITICAL — FOLLOW EXACTLY:**
+- Run EXACTLY ONE bash command from the list below. Nothing else.
+- Do NOT run additional git commands (no `git diff --cached -- api/`, no `git diff | wc -l`, no splitting by directory)
+- Do NOT run `ls` on any directory
+- Do NOT use the Read tool on any source file
+- Do NOT explore the codebase in any way
+- The ONLY things you read in Steps 1-3 are: (1) the diff output from the ONE command below, and (2) the plan file
+- Individual source files are the code-reviewers' job. You read files ONLY in Step 4, AFTER reviewers return.
+- If the diff output is large, that's fine. Just move to Step 2.
 
 **IMPORTANT:** Use `===` separators (never `---` dashes) to avoid security prompts.
 
@@ -72,6 +83,8 @@ Based on the scope, run the appropriate git command (ONE bash call per scope) to
 
 ### Step 2: Determine Focus Areas
 
+**Do NOT read any source files. Just decide focus areas and move to Step 3.**
+
 Based on the review mode and scope, decide which focus areas to use:
 
 **For `code-review` mode:**
@@ -84,6 +97,8 @@ Based on the review mode and scope, decide which focus areas to use:
 
 ### Step 3: Spawn Code Reviewers
 
+**Do NOT read any source files. Just spawn the agents immediately and wait for them to return.**
+
 Launch `@code-reviewer` agents in parallel using the Agent tool. Each agent gets this structured prompt:
 
 ```
@@ -93,6 +108,7 @@ BASE: <base> (if applicable)
 PATHS: <paths> (if applicable)
 PR: <number> (if applicable)
 PLAN_FILE: <plan-file> (if plan-compliance focus)
+PHASE: <number or "all"> (which phase to review against)
 SUPPLEMENTARY_CONTEXT: <context>
 REVIEWER_MODEL: <model>
 ```

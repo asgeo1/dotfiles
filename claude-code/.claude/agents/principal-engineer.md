@@ -29,6 +29,7 @@ The command will provide you with:
 
 ```
 PLAN_FILE: <path to the plan file>
+PHASE: <number or "all"> (which phase to focus on — if a number, focus review on that phase but read the full plan for context)
 SUPPLEMENTARY_CONTEXT: <additional context from the conversation, or "none">
 ```
 
