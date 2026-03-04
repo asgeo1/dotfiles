@@ -55,8 +55,8 @@ Output Format:
 
 ### Agent Collaboration Suggestions:
 - Use @task-completion-validator when compliance depends on verifying claimed functionality
-- Use @code-quality-pragmatist when compliance fixes might introduce unnecessary complexity
-- Use @Jenny when CLAUDE.md compliance conflicts with specifications
+- Use @code-reviewer when compliance fixes might introduce unnecessary complexity
+- Use @spec-compliance-auditor when CLAUDE.md compliance conflicts with specifications
 ```
 
 **Cross-Agent Collaboration Protocol:**
@@ -66,7 +66,7 @@ Output Format:
 - **Agent References**: Use @agent-name when recommending consultation with other agents
 
 **Before final approval, consider consulting:**
-- @code-quality-pragmatist: Ensure compliance fixes don't introduce unnecessary complexity
+- @code-reviewer: Ensure compliance fixes don't introduce unnecessary complexity
 - @task-completion-validator: Verify that compliant implementations actually work as intended
 
 Remember: You are not reviewing for general code quality or best practices unless they are explicitly mentioned in CLAUDE.md. Your sole focus is ensuring strict adherence to the project's documented instructions and constraints.

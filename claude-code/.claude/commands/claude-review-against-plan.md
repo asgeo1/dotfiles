@@ -1,6 +1,6 @@
 # Claude Review Against Plan
 
-Review code changes against an implementation plan using a separate Claude Code instance. Uses a subagent to iterate with Claude and validate feedback before presenting results.
+Review code changes against an implementation plan using parallel specialized review agents. An orchestrator coordinates focused reviewers (correctness, security, quality, plan-compliance), validates findings, and returns a plan coverage table alongside code quality issues.
 
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
@@ -89,254 +89,34 @@ Gather supplementary context (do NOT read diffs or plan content!):
 
 Store as `[SUPPLEMENTARY_CONTEXT]` or "none".
 
-## Step 4: Spawn Subagent
+## Step 4: Spawn Review Orchestrator
 
-Use the Task tool to spawn a subagent. **Pass metadata only, not diffs or plan content.**
+Use the Agent tool to spawn a `review-orchestrator` agent (subagent_type: `review-orchestrator`, model: `sonnet`). **Do NOT pass any diff content, file contents, or plan content** — only pass structured metadata. The orchestrator and its sub-agents will fetch everything themselves.
 
-Fill placeholders and pass this prompt VERBATIM:
+Pass the following prompt, filling in all placeholders with values from Steps 1-3:
 
----
-
-You are a plan-based code review assistant. Your job is to get feedback on code changes from an external Claude Code instance, **validate** that feedback against the actual code, then return actionable results.
-
-### CRITICAL RULES
-
-0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `env -u CLAUDECODE claude` commands shown below - nothing else.
-1. **READ-ONLY** - The external Claude runs with write tools disabled. You may read files to verify but make NO changes.
-2. **VALIDATE FEEDBACK** - Don't relay blindly. Challenge vague or questionable points.
-3. **ITERATE** - Keep conversing with Claude until review is complete and validated.
-4. **ACTIONABLE OUTPUT** - Return structured feedback that could become a fix plan.
-5. **CLAUDE FETCHES DATA** - The external Claude runs git commands itself. Do NOT fetch diffs yourself.
-
-### Scope & Context
-
-**Scope:** [SCOPE]
-**Base (if branch):** [BASE]
-**Paths (if path):** [PATHS]
-
-**Plan file path:** [PLAN_FILE_PATH]
-The external Claude MUST read this file to understand the intended implementation.
-
-**Supplementary context:** [SUPPLEMENTARY_CONTEXT]
-
-**Git commands Claude should run based on scope:**
-- `all`: `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard`
-- `uncommitted`: `git diff` + `git ls-files --others --exclude-standard`
-- `staged`: `git diff --cached`
-- `branch [base]`: `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`
-- `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
-- `path`: No git commands. Read and explore the paths directly.
-
-### Step 1: Start Claude Session
-
-```bash
-env -u CLAUDECODE claude -p \
-  --model [REQUESTED_MODEL] \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Review code changes against an implementation plan.
-
-STEP 1: Fetch the code changes
-Run these git commands based on scope '[SCOPE]':
-[GIT_COMMANDS_FOR_SCOPE]
-
-STEP 2: Read the plan file
-Read: [PLAN_FILE_PATH]
-This describes what SHOULD be implemented.
-
-[IF SUPPLEMENTARY_CONTEXT != 'none']
-STEP 3: Consider this additional context:
-[SUPPLEMENTARY_CONTEXT]
-[END IF]
-
-STEP 4: Review the changes AGAINST the plan
-
-For EACH item in the plan, check:
-- Is it implemented? (complete/partial/missing)
-- Does the implementation match the plan's intent?
-- Is the code quality acceptable?
-
-Also check for:
-- Code that doesn't relate to any plan item (scope creep)
-- Debug artifacts (console.log, debugger, TODO comments)
-- Code quality issues (deep nesting, poor naming, missing error handling)
-- Coding standard violations
-- Files in wrong locations
-
-For each issue found, provide:
-1. What plan item it relates to (or 'out-of-scope')
-2. What the issue is
-3. Where (file:line if possible)
-4. Why it matters
-5. How to fix it
-
-Read additional files as needed for context.
-
-Before your review, state: 'MODEL_ID: [your model name/version]'
-When done, say 'REVIEW COMPLETE'."
+```
+REVIEW_MODE: review-against-plan
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+PLAN_FILE: [PLAN_FILE_PATH]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
 ```
 
-**IMPORTANT:** `env -u CLAUDECODE` unsets the nesting-detection env var so Claude Code CLI can run from within Claude Code.
-
-**For scope = path, use this prompt instead:**
-
-```bash
-env -u CLAUDECODE claude -p \
-  --model [REQUESTED_MODEL] \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Review code at specific paths against an implementation plan.
-
-STEP 1: Read the plan file
-Read: [PLAN_FILE_PATH]
-This describes what SHOULD be implemented.
-
-STEP 2: Explore the code paths
-Paths to review: [PATHS]
-For each path:
-- If directory: explore structure and review key files
-- If file: read and review contents
-- Follow imports as needed
-
-[IF SUPPLEMENTARY_CONTEXT != 'none']
-STEP 3: Consider this additional context:
-[SUPPLEMENTARY_CONTEXT]
-[END IF]
-
-STEP 4: Review the code AGAINST the plan
-
-For EACH item in the plan, check:
-- Is it implemented in these files?
-- Does the implementation match the plan's intent?
-- Is the code quality acceptable?
-
-Also check for:
-- Code that doesn't relate to any plan item
-- Debug artifacts, TODO comments
-- Code quality issues
-- Coding standard violations
-
-For each issue found, provide:
-1. What plan item it relates to
-2. What the issue is
-3. Where (file:line)
-4. Why it matters
-5. How to fix it
-
-Before your review, state: 'MODEL_ID: [your model name/version]'
-When done, say 'REVIEW COMPLETE'."
-```
-
-### Step 1b: Capture Model Info
-
-After receiving Claude's initial response:
-- Look for a `MODEL_ID: ...` line in the output
-- Store the reported model as `[CONFIRMED_MODEL]`
-- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
-
-### Step 2: Validate Feedback
-
-For each piece of feedback from Claude:
-
-1. **Is it specific?** If vague (e.g., "could be improved"), ask: "What specifically should be improved and how?"
-
-2. **Is it correct?** If Claude claims something about the code, read the file yourself to verify. Discard incorrect feedback.
-
-3. **Is it relevant?** Does it relate to the actual changes and plan? Discard tangential feedback.
-
-4. **Is it actionable?** Could an AI agent implement the fix? If not, ask for clarification.
-
-Resume session to challenge questionable feedback:
-```bash
-CLAUDECODE= claude -p --continue \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Regarding [X]: Can you clarify [specific question]? I need to verify this before including it."
-```
-
-### Step 3: Iterate Until Complete
-
-Continue until:
-- All feedback validated or discarded
-- Claude has no more issues
-- Max 5 iterations to prevent runaway
-
-### Step 4: Synthesize Output
-
-Structure ALL validated feedback:
-
-```markdown
-## Review Against Plan: [Plan Title/Path]
-
-### Plan Coverage
-| Plan Item | Status | Issue | Location |
-|-----------|--------|-------|----------|
-| [Item from plan] | Complete | - | - |
-| [Item from plan] | Partial | [Specific gap] | `file:line` |
-| [Item from plan] | Missing | Not implemented | - |
-
-### Code Quality Issues
-
-#### Issue 1: [Descriptive Title]
-**Severity:** critical | warning | suggestion
-**Plan Item:** [Related plan item or "N/A - general quality"]
-**Location:** `path/to/file.ts:42`
-**Problem:** [Clear description]
-**Why it matters:** [Impact on correctness, security, maintainability]
-**Suggested fix:** [Concrete steps - enough for AI to implement]
-
-#### Issue 2: ...
-
-### Out-of-Scope Changes
-(Only if unexpected changes found)
-- `[file]` - [What it does, why it's not in plan]
-
-## Summary
-- Plan items: X complete, Y partial, Z missing out of N total
-- Quality issues: X critical, Y warnings, Z suggestions
-
-**Recommendation:** ready-to-commit | needs-fixes | needs-discussion
-
-## Models Used
-- **Claude (external) requested:** [REQUESTED_MODEL]
-- **Claude (external) confirmed:** [CONFIRMED_MODEL]
-- **Claude subagent:** [self-report your model name/version]
-```
-
-**If all plan items complete and no issues:**
-```markdown
-## Review Against Plan: [Plan Title/Path]
-
-All plan items implemented. No quality issues found.
-
-- Plan items: X/X complete
-- Quality issues: None
-
-**Recommendation:** ready-to-commit
-
-## Models Used
-- **Claude (external) requested:** [REQUESTED_MODEL]
-- **Claude (external) confirmed:** [CONFIRMED_MODEL]
-- **Claude subagent:** [self-report your model name/version]
-```
-
-### Important Notes
-
-- Only include validated feedback
-- Discard anything Claude couldn't justify
-- Include enough detail in "Suggested fix" for another AI to act on it
-- If the requested model is unavailable or errors occur:
-  1. Retry with `--model haiku` as fallback
-  2. Note in Models Used: "haiku (fallback from [REQUESTED_MODEL])"
-  3. Still capture MODEL_ID from Claude's response
-
----
+The orchestrator will:
+1. Fetch the diff itself based on the scope
+2. Spawn parallel `code-reviewer` agents (correctness, security, quality, **plan-compliance**) using the specified model
+3. The plan-compliance reviewer will read the plan file and check each item
+4. Validate all findings against actual source code
+5. Filter false positives and deduplicate
+6. Return structured feedback with plan coverage table
 
 ## Step 5: Present Results
 
-After subagent returns, present the structured feedback. **Always include the "Models Used" section** so the user can see what models were used.
-
-If the Claude confirmed model differs from what was requested, highlight this discrepancy.
+After the orchestrator returns, present its structured feedback to the user.
 
 If issues were found, ask:
 1. Would you like me to **address** specific issues?

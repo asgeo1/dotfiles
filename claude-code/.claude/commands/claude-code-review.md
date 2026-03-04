@@ -1,6 +1,6 @@
 # Claude Code Review
 
-Get a comprehensive code review from a separate Claude Code instance with validated, refined feedback. Uses a subagent to iterate with Claude and filter out invalid suggestions before presenting to you.
+Get a comprehensive code review using parallel specialized review agents. An orchestrator coordinates focused reviewers (correctness, security, quality), validates their findings against actual source code, and returns only high-confidence, actionable feedback.
 
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
@@ -87,217 +87,33 @@ Store these as:
 - `[PLAN_FILE_PATH]` - Path to plan file, or "none"
 - `[SUPPLEMENTARY_CONTEXT]` - Additional context from conversation, or "none"
 
-## Step 4: Spawn Subagent
+## Step 4: Spawn Review Orchestrator
 
-Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass scope and context. The subagent will instruct Claude to fetch its own diffs.
+Use the Agent tool to spawn a `review-orchestrator` agent (subagent_type: `review-orchestrator`, model: `sonnet`). **Do NOT pass any diff content or file contents** — only pass structured metadata. The orchestrator and its sub-agents will fetch everything themselves.
 
-Pass the following prompt VERBATIM (fill in placeholders):
+Pass the following prompt, filling in all placeholders with values from Steps 1-3:
 
----
-
-You are a code review assistant. Your job is to get feedback on code changes from an external Claude Code instance, **validate and refine** that feedback, then return actionable results.
-
-### CRITICAL RULES
-
-0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `env -u CLAUDECODE claude` commands shown below - nothing else.
-1. **READ-ONLY** - This is a review only. The external Claude runs with write tools disabled. You may read files to verify claims but make NO changes.
-2. **VALIDATE FEEDBACK** - Don't just relay Claude's feedback. Challenge vague or questionable points.
-3. **ITERATE** - Keep conversing with Claude until feedback is complete and validated.
-4. **ACTIONABLE OUTPUT** - Return structured feedback that an AI agent could act on.
-5. **CLAUDE FETCHES CONTEXT** - The external Claude will run git commands itself to get the diff. Do NOT fetch diffs yourself.
-
-### Scope
-
-**Scope:** [SCOPE]
-**Base (if branch scope):** [BASE]
-**Paths (if path scope):** [PATHS]
-
-### Context
-
-**Plan file path:** [PLAN_FILE_PATH]
-If a path is provided, you and the external Claude can read this file to understand the intent of the changes. Don't just blindly accept feedback that contradicts the plan.
-
-**Supplementary context:** [SUPPLEMENTARY_CONTEXT]
-This is additional relevant information from the main conversation that isn't in the plan file.
-
-**Commands Claude should run based on scope:**
-- `all`: `git diff` (unstaged) + `git diff --cached` (staged) + `git ls-files --others --exclude-standard` (untracked)
-- `uncommitted`: `git diff` (unstaged) + `git ls-files --others --exclude-standard` (untracked)
-- `staged`: `git diff --cached`
-- `branch [base]`: `git diff [base]...HEAD` + `git log [base]...HEAD --oneline`
-- `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
-- `path`: No git commands. Read and explore the paths directly.
-
-### Step 1: Start Claude Session
-
-Tell the external Claude to fetch the changes itself based on the scope. Include context if provided:
-
-```bash
-env -u CLAUDECODE claude -p \
-  --model [REQUESTED_MODEL] \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Review the code changes for scope: [SCOPE].
-
-First, fetch the changes by running the appropriate git commands:
-[GIT_COMMANDS_FOR_SCOPE]
-
-[IF PLAN_FILE_PATH != 'none']
-Read the plan file at: [PLAN_FILE_PATH]
-This describes the intent of the changes. Consider this when reviewing.
-[END IF]
-
-[IF SUPPLEMENTARY_CONTEXT != 'none']
-Additional context:
-[SUPPLEMENTARY_CONTEXT]
-[END IF]
-
-Then review the changes. For each issue you find, provide:
-1. What the issue is
-2. Where it is (file and line if possible)
-3. Why it matters
-4. How to fix it
-
-Consider:
-- Code correctness and logic errors
-- Security vulnerabilities
-- Performance issues
-- Code style and maintainability
-- Missing error handling
-- Test coverage gaps
-
-Read any additional files you need for context.
-
-Before your review, state: 'MODEL_ID: [your model name/version]'
-When your review is complete, say 'REVIEW COMPLETE'."
+```
+REVIEW_MODE: code-review
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+PLAN_FILE: [PLAN_FILE_PATH]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
 ```
 
-**IMPORTANT:** `env -u CLAUDECODE` unsets the nesting-detection env var so Claude Code CLI can run from within Claude Code.
-
-**For scope = path, use this prompt instead:**
-
-```bash
-env -u CLAUDECODE claude -p \
-  --model [REQUESTED_MODEL] \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Review the code at the following path(s): [PATHS]
-
-For each path:
-- If it's a directory, explore its structure and review key files
-- If it's a file, read and review its contents
-- Follow imports and references as needed for context
-
-[IF PLAN_FILE_PATH != 'none']
-Read the plan file at: [PLAN_FILE_PATH]
-This describes the intent of the changes. Consider this when reviewing.
-[END IF]
-
-[IF SUPPLEMENTARY_CONTEXT != 'none']
-Additional context:
-[SUPPLEMENTARY_CONTEXT]
-[END IF]
-
-For each issue you find, provide:
-1. What the issue is
-2. Where it is (file and line if possible)
-3. Why it matters
-4. How to fix it
-
-Consider:
-- Code correctness and logic errors
-- Security vulnerabilities
-- Performance issues
-- Code style and maintainability
-- Missing error handling
-- Test coverage gaps
-
-Before your review, state: 'MODEL_ID: [your model name/version]'
-When your review is complete, say 'REVIEW COMPLETE'."
-```
-
-### Step 1b: Capture Model Info
-
-After receiving Claude's initial response:
-- Look for a `MODEL_ID: ...` line in the output
-- Store the reported model as `[CONFIRMED_MODEL]`
-- If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
-
-### Step 2: Validate Feedback
-
-For each piece of feedback from Claude:
-
-1. **Is it specific?** If vague (e.g., "could be improved"), ask: "Can you be more specific about what should be improved and how?"
-
-2. **Is it correct?** If Claude claims something about the code, verify by reading the relevant file yourself. If Claude is wrong, discard that feedback.
-
-3. **Is it relevant?** Does the feedback apply to the actual changes, or is it about unrelated code? Discard tangential feedback.
-
-4. **Is it actionable?** Could an AI agent implement the suggested fix? If not, ask Claude to clarify.
-
-Resume the session to challenge questionable feedback:
-```bash
-CLAUDECODE= claude -p --continue \
-  --dangerously-skip-permissions \
-  --disallowedTools "Edit,Write,NotebookEdit" \
-  "Regarding your point about [X]: Can you clarify [specific question]? I want to make sure this feedback is accurate before including it."
-```
-
-### Step 3: Iterate Until Complete
-
-Continue the validation loop until:
-- All feedback has been validated or discarded
-- Claude has no more issues to raise
-- Max 5 iterations to prevent runaway
-
-### Step 4: Synthesize Validated Feedback
-
-Structure the validated feedback as follows:
-
-```markdown
-## Code Review Feedback
-
-### Issue 1: [Descriptive Title]
-**Severity:** critical | warning | suggestion
-**Location:** `path/to/file.ts:42`
-**Problem:** [Clear description of what the issue is]
-**Why it matters:** [Why this is a problem - security, performance, correctness, etc.]
-**Suggested fix:** [Concrete guidance on how to fix it - enough detail for an AI agent to implement]
-
-### Issue 2: ...
-[Repeat for each validated issue]
-
-## Summary
-- X critical issues requiring immediate attention
-- Y warnings that should be addressed
-- Z suggestions for improvement
-
-**Recommendation:** needs-fixes | minor-cleanup | looks-good
-
-## Models Used
-- **Claude (external) requested:** [REQUESTED_MODEL]
-- **Claude (external) confirmed:** [CONFIRMED_MODEL]
-- **Claude subagent:** [self-report your model name/version]
-```
-
-### Important Notes
-
-- Only include issues you have validated as legitimate
-- Discard feedback that Claude couldn't justify when challenged
-- If Claude finds no issues, that's a valid outcome - return "looks-good"
-- Include enough detail in "Suggested fix" that another AI could implement it
-- If the requested model is unavailable or errors occur:
-  1. Retry with `--model haiku` as fallback
-  2. Note in Models Used: "haiku (fallback from [REQUESTED_MODEL])"
-  3. Still capture MODEL_ID from Claude's response
-
----
+The orchestrator will:
+1. Fetch the diff itself based on the scope
+2. Spawn parallel `code-reviewer` agents (correctness, security, quality) using the specified model
+3. Validate all findings against actual source code
+4. Filter false positives and deduplicate
+5. Return structured feedback
 
 ## Step 5: Present Results
 
-After the subagent returns, present the structured feedback to the user. **Always include the "Models Used" section** so the user can see what models were used.
-
-If the Claude confirmed model differs from what was requested, highlight this discrepancy.
+After the orchestrator returns, present its structured feedback to the user.
 
 If issues were found, ask:
 1. Would you like me to **address** any of these issues?
