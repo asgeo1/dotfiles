@@ -1,6 +1,6 @@
 # Claude Review Against Plan
 
-Review code changes against an implementation plan using parallel specialized review agents. An orchestrator coordinates focused reviewers (correctness, security, quality, plan-compliance), validates findings, and returns a plan coverage table alongside code quality issues.
+Review code changes against an implementation plan using parallel specialized review agents. Spawns focused reviewers (correctness, security, quality, plan-compliance) in parallel, then a merger validates findings and returns a plan coverage table alongside code quality issues.
 
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
@@ -96,11 +96,71 @@ Gather supplementary context (do NOT read diffs or plan content!):
 
 Store as `[SUPPLEMENTARY_CONTEXT]` or "none".
 
-## Step 4: Spawn Review Orchestrator
+## Step 4: Create Review Session and Spawn Code Reviewers (Parallel)
 
-Use the Agent tool to spawn a `review-orchestrator` agent (subagent_type: `review-orchestrator`, model: `sonnet`). **Do NOT pass any diff content, file contents, or plan content** — only pass structured metadata. The orchestrator and its sub-agents will fetch everything themselves.
+**First**, call `mcp__review-tools__create_review_session` to create a temp directory for this review. If a plan file path is available, pass its basename (without `.md`) as the `slug`. Store the returned path as `[SESSION_DIR]`.
 
-Pass the following prompt, filling in all placeholders with values from Steps 1-3:
+**Then**, spawn **4** `code-reviewer` agents in parallel using the Agent tool. All 4 Agent calls MUST be in the **same message** for true parallelism. Each agent gets `subagent_type: "code-reviewer"` and `model: [REQUESTED_MODEL]`.
+
+**Do NOT pass any diff content, file contents, or plan content** — only pass structured metadata. Each reviewer fetches diffs and reads source files independently. Each reviewer writes findings to the session directory via MCP and returns only a brief summary.
+
+Spawn these 4 agents with these prompts (filling in placeholders from Steps 1-3):
+
+**Agent 1 — Correctness:**
+```
+FOCUS: correctness
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
+SESSION_DIR: [SESSION_DIR]
+```
+
+**Agent 2 — Security:**
+```
+FOCUS: security
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
+SESSION_DIR: [SESSION_DIR]
+```
+
+**Agent 3 — Quality:**
+```
+FOCUS: quality
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
+SESSION_DIR: [SESSION_DIR]
+```
+
+**Agent 4 — Plan Compliance:**
+```
+FOCUS: plan-compliance
+SCOPE: [SCOPE]
+BASE: [BASE or "N/A"]
+PATHS: [PATHS or "N/A"]
+PR: [PR_NUMBER or "N/A"]
+PLAN_FILE: [PLAN_FILE_PATH]
+PHASE: [PHASE or "all"]
+SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
+REVIEWER_MODEL: [REQUESTED_MODEL]
+SESSION_DIR: [SESSION_DIR]
+```
+
+## Step 5: Spawn Review Merger
+
+After all 4 code-reviewer agents return, spawn 1 `review-merger` agent (subagent_type: `review-merger`, model: `sonnet`).
+
+Pass only scope metadata and the session directory — the merger reads findings from temp files via MCP:
 
 ```
 REVIEW_MODE: review-against-plan
@@ -110,21 +170,22 @@ PATHS: [PATHS or "N/A"]
 PR: [PR_NUMBER or "N/A"]
 PLAN_FILE: [PLAN_FILE_PATH]
 PHASE: [PHASE or "all"]
-SUPPLEMENTARY_CONTEXT: [SUPPLEMENTARY_CONTEXT]
 REVIEWER_MODEL: [REQUESTED_MODEL]
+FOCUS_AREAS: correctness, security, quality, plan-compliance
+SESSION_DIR: [SESSION_DIR]
 ```
 
-The orchestrator will:
-1. Fetch the diff itself based on the scope
-2. Spawn parallel `code-reviewer` agents (correctness, security, quality, **plan-compliance**) using the specified model
-3. The plan-compliance reviewer will read the plan file and review against the specified phase (or the entire plan if "all")
-4. Validate all findings against actual source code
-5. Filter false positives and deduplicate
-6. Return structured feedback with plan coverage table
+The merger will:
+1. Load findings from the session directory via `mcp__review-tools__read_all_findings`
+2. Fetch the diff independently for validation
+3. Re-read source files to verify each finding
+4. Read the plan file to produce the coverage table
+5. Filter false positives, deduplicate across reviewers
+6. Produce final structured feedback with plan coverage table
 
-## Step 5: Present Results
+## Step 6: Present Results
 
-After the orchestrator returns, present its structured feedback to the user.
+After the merger returns, present its structured feedback to the user.
 
 If issues were found, ask:
 1. Would you like me to **address** specific issues?

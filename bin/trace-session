@@ -19,8 +19,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
+import shutil
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -103,10 +106,10 @@ def collapse_home(path: str) -> str:
 
 
 def short_agent_id(agent_id: str) -> str:
-    """Shorten agent ID: a580ec34a6dea6fcf -> a580..fcf"""
-    if len(agent_id) <= 8:
+    """Shorten agent ID like a git short SHA: a580ec34a6dea6fcf -> a580ec3"""
+    if len(agent_id) <= 7:
         return agent_id
-    return f"{agent_id[:4]}..{agent_id[-3:]}"
+    return agent_id[:7]
 
 
 def format_time(iso_timestamp: str) -> str:
@@ -118,15 +121,14 @@ def format_time(iso_timestamp: str) -> str:
         return "??:??:??"
 
 
-def summarize_tool(name: str, tool_input: dict, max_len: int = 80) -> str:
-    """Create a brief summary of a tool call."""
+def summarize_tool(name: str, tool_input: dict) -> str:
+    """Create a full summary of a tool call. No truncation — let the terminal wrap."""
     if name == "Bash":
         cmd = tool_input.get("command", "")
         desc = tool_input.get("description", "")
-        display = cmd if len(cmd) <= max_len else cmd[:max_len] + "..."
         if desc and not cmd:
-            display = desc
-        return display
+            return desc
+        return collapse_home(cmd)
     elif name == "Read":
         return collapse_home(tool_input.get("file_path", "???"))
     elif name == "Write":
@@ -162,24 +164,21 @@ def summarize_tool(name: str, tool_input: dict, max_len: int = 80) -> str:
             return f"{skill} {args}"
         return skill
     elif name == "WebFetch":
-        return tool_input.get("url", "???")[:max_len]
+        return tool_input.get("url", "???")
     elif name == "WebSearch":
-        return tool_input.get("query", "???")[:max_len]
+        return tool_input.get("query", "???")
     elif name.startswith("mcp__"):
         # MCP tool calls - show the tool name and key args
         parts = name.split("__")
         short_name = parts[-1] if len(parts) >= 3 else name
         args_str = ", ".join(f"{k}={v}" for k, v in tool_input.items() if v)
         if args_str:
-            return f"{short_name}({args_str[:max_len]})"
+            return f"{short_name}({args_str})"
         return short_name
     else:
         # Generic: show first key-value pair
         for k, v in tool_input.items():
-            s = str(v)
-            if len(s) > max_len:
-                s = s[:max_len] + "..."
-            return f"{k}={s}"
+            return f"{k}={v}"
         return ""
 
 
@@ -382,7 +381,12 @@ def parse_subagent_jsonl(jsonl_path: Path) -> List[ToolCall]:
 
 
 def build_trace(session_path: Path) -> Tuple[List[ToolCall], Dict[str, AgentTrace], dict]:
-    """Build the full trace from a session JSONL + its subagent JSONLs."""
+    """Build the full trace from a session JSONL + its subagent JSONLs.
+
+    Handles nested subagents (e.g., orchestrator spawns code-reviewers).
+    All subagent JSONLs live in the same flat subagents/ directory regardless
+    of nesting depth.
+    """
     main_calls, metadata = parse_tool_calls_from_jsonl(session_path)
 
     session_id = session_path.stem
@@ -390,37 +394,49 @@ def build_trace(session_path: Path) -> Tuple[List[ToolCall], Dict[str, AgentTrac
 
     agents: Dict[str, AgentTrace] = {}
 
-    # For each Agent tool call, find and parse the subagent JSONL
+    def resolve_agent(agent_id: str, subagent_type: Optional[str], description: str) -> None:
+        """Recursively resolve an agent and any subagents it spawned."""
+        if agent_id in agents:
+            return  # already resolved
+
+        agent_jsonl = subagents_dir / f"agent-{agent_id}.jsonl"
+        agent_calls = []
+        if agent_jsonl.exists():
+            agent_calls, _ = parse_tool_calls_from_jsonl(agent_jsonl)
+
+        agents[agent_id] = AgentTrace(
+            agent_id=agent_id,
+            label=short_agent_id(agent_id),
+            agent_type=subagent_type or "unknown",
+            description=description,
+            tool_calls=agent_calls,
+        )
+
+        # Recurse into any Agent tool calls this subagent made
+        for tc in agent_calls:
+            if tc.tool_name == "Agent" and tc.agent_id:
+                resolve_agent(
+                    tc.agent_id,
+                    tc.subagent_type,
+                    tc.full_input.get("description", ""),
+                )
+
+    # Resolve all agents spawned from main
     for tc in main_calls:
         if tc.tool_name == "Agent" and tc.agent_id:
-            agent_jsonl = subagents_dir / f"agent-{tc.agent_id}.jsonl"
-            agent_calls = []
-            if agent_jsonl.exists():
-                agent_calls = parse_subagent_jsonl(agent_jsonl)
-
-            agents[tc.agent_id] = AgentTrace(
-                agent_id=tc.agent_id,
-                label=short_agent_id(tc.agent_id),
-                agent_type=tc.subagent_type or "???",
-                description=tc.full_input.get("description", ""),
-                tool_calls=agent_calls,
+            resolve_agent(
+                tc.agent_id,
+                tc.subagent_type,
+                tc.full_input.get("description", ""),
             )
 
-    # Check for subagent JSONLs we didn't find via agent_progress
-    # (in case agent_progress entries were missed)
+    # Pick up any subagent JSONLs we didn't find via agent_progress
     if subagents_dir.exists():
         for agent_file in subagents_dir.iterdir():
             if agent_file.suffix == ".jsonl" and agent_file.stem.startswith("agent-"):
                 agent_id = agent_file.stem[len("agent-"):]
                 if agent_id not in agents:
-                    agent_calls = parse_subagent_jsonl(agent_file)
-                    agents[agent_id] = AgentTrace(
-                        agent_id=agent_id,
-                        label=short_agent_id(agent_id),
-                        agent_type="unknown",
-                        description="(unlinked agent)",
-                        tool_calls=agent_calls,
-                    )
+                    resolve_agent(agent_id, None, "(unlinked agent)")
 
     return main_calls, agents, metadata
 
@@ -517,42 +533,41 @@ def render_trace(
                         s = s[:120] + "..."
                     print(f"{indent}  {'':>{max_label_len}} {dim(f'{k}={s}')}")
 
-    # Render main calls + inline subagent calls
-    for tc in main_calls:
-        track_stats(tc)
+    shown_agent_ids: Set[str] = set()
 
-        if not should_show(tc.tool_name):
-            # Still need to show subagent calls if this is an Agent call
+    def render_calls(calls: List[ToolCall], label: str, depth: int = 0) -> None:
+        """Recursively render tool calls, nesting subagent calls under their parent."""
+        indent = "  " * depth
+        for tc in calls:
+            is_sub = depth > 0
+            track_stats(tc, is_agent=is_sub)
+
+            if not should_show(tc.tool_name):
+                # Still recurse into agents to track stats and render their children
+                if tc.tool_name == "Agent" and tc.agent_id and tc.agent_id in agents:
+                    shown_agent_ids.add(tc.agent_id)
+                    agent = agents[tc.agent_id]
+                    render_calls(agent.tool_calls, agent_labels.get(tc.agent_id, f"[{tc.agent_id[:7]}]"), depth + 1)
+                continue
+
+            print_tool_call(tc, label, indent=indent)
+
+            # Recurse into subagent's tool calls
             if tc.tool_name == "Agent" and tc.agent_id and tc.agent_id in agents:
+                shown_agent_ids.add(tc.agent_id)
                 agent = agents[tc.agent_id]
-                for atc in agent.tool_calls:
-                    track_stats(atc, is_agent=True)
-            continue
+                child_label = agent_labels.get(tc.agent_id, f"[{tc.agent_id[:7]}]")
+                render_calls(agent.tool_calls, child_label, depth + 1)
 
-        print_tool_call(tc, main_label)
-
-        # If this is an Agent call, show the subagent's tool calls indented
-        if tc.tool_name == "Agent" and tc.agent_id and tc.agent_id in agents:
-            agent = agents[tc.agent_id]
-            agent_label = agent_labels[tc.agent_id]
-            for atc in agent.tool_calls:
-                track_stats(atc, is_agent=True)
-                if should_show(atc.tool_name):
-                    print_tool_call(atc, agent_label, indent="  ")
+    render_calls(main_calls, main_label)
 
     # Show any unlinked agents at the end
-    shown_agent_ids = {tc.agent_id for tc in main_calls if tc.agent_id}
     for agent_id, agent in agents.items():
         if agent_id not in shown_agent_ids and agent.tool_calls:
             print()
-            print(
-                dim(f"  (unlinked agent: {agent.agent_type} [{agent.label}])")
-            )
-            agent_label = agent_labels[agent_id]
-            for atc in agent.tool_calls:
-                track_stats(atc, is_agent=True)
-                if should_show(atc.tool_name):
-                    print_tool_call(atc, agent_label, indent="  ")
+            print(dim(f"  (unlinked agent: {agent.agent_type} [{agent.label}])"))
+            child_label = agent_labels.get(agent_id, f"[{agent_id[:7]}]")
+            render_calls(agent.tool_calls, child_label, depth=1)
 
     # Stats
     if show_stats:
@@ -672,40 +687,73 @@ def main() -> None:
         help="List recent sessions instead of tracing",
     )
     parser.add_argument(
-        "--no-color",
+        "--color",
+        choices=["auto", "always", "never"],
+        default="auto",
+        help="Color mode: auto (default), always, or never",
+    )
+    parser.add_argument(
+        "--no-pager",
         action="store_true",
-        help="Disable colored output",
+        help="Disable automatic paging",
     )
 
     args = parser.parse_args()
 
-    if args.no_color:
-        global USE_COLOR
+    global USE_COLOR
+    if args.color == "never":
         USE_COLOR = False
+    elif args.color == "always":
+        USE_COLOR = True
+    # else "auto" — already set based on isatty()
 
-    project_dir = find_project_dir(args.project)
+    # Set up pager (like git does): pipe through less -R when outputting to a tty
+    pager_proc = None
+    if sys.stdout.isatty() and not args.no_pager:
+        USE_COLOR = True  # force color since we're piping to less -R
+        try:
+            pager_proc = subprocess.Popen(
+                ["less", "-R", "-F", "-X"],
+                stdin=subprocess.PIPE,
+                encoding="utf-8",
+            )
+            sys.stdout = pager_proc.stdin
+        except (FileNotFoundError, OSError):
+            pass  # no less available, just print normally
 
-    if args.list:
-        list_sessions_cmd(project_dir)
-        return
+    try:
+        project_dir = find_project_dir(args.project)
 
-    session_path = select_session(project_dir, args.session_id, args.last)
+        if args.list:
+            list_sessions_cmd(project_dir)
+            return
 
-    tool_filter = None
-    if args.filter:
-        tool_filter = set(args.filter.split(","))
+        session_path = select_session(project_dir, args.session_id, args.last)
 
-    main_calls, agents, metadata = build_trace(session_path)
+        tool_filter = None
+        if args.filter:
+            tool_filter = set(args.filter.split(","))
 
-    render_trace(
-        main_calls,
-        agents,
-        metadata,
-        verbose=args.verbose,
-        tool_filter=tool_filter,
-        agents_only=args.agents_only,
-        show_stats=args.stats,
-    )
+        main_calls, agents, metadata = build_trace(session_path)
+
+        render_trace(
+            main_calls,
+            agents,
+            metadata,
+            verbose=args.verbose,
+            tool_filter=tool_filter,
+            agents_only=args.agents_only,
+            show_stats=args.stats,
+        )
+    except BrokenPipeError:
+        pass  # user quit pager early
+    finally:
+        if pager_proc:
+            try:
+                sys.stdout.close()
+            except (BrokenPipeError, OSError):
+                pass
+            pager_proc.wait()
 
 
 if __name__ == "__main__":

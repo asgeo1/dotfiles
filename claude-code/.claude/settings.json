@@ -20,7 +20,10 @@
       "mcp__plan-tools__write_plan",
       "mcp__git-tools__git_diff",
       "mcp__git-tools__git_log",
-      "mcp__git-tools__git_commit"
+      "mcp__git-tools__git_commit",
+      "mcp__review-tools__create_review_session",
+      "mcp__review-tools__write_findings",
+      "mcp__review-tools__read_all_findings"
     ],
     "deny": [
       "Bash(git stash:*)",
