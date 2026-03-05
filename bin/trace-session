@@ -171,7 +171,17 @@ def summarize_tool(name: str, tool_input: dict) -> str:
         # MCP tool calls - show the tool name and key args
         parts = name.split("__")
         short_name = parts[-1] if len(parts) >= 3 else name
-        args_str = ", ".join(f"{k}={v}" for k, v in tool_input.items() if v)
+        display_items = {}
+        for k, v in tool_input.items():
+            if not v:
+                continue
+            # Truncate write_findings content — it's multi-KB review output
+            if short_name == "write_findings" and k == "content":
+                s = str(v)
+                display_items[k] = f"({len(s)} chars)"
+                continue
+            display_items[k] = v
+        args_str = ", ".join(f"{k}={v}" for k, v in display_items.items())
         if args_str:
             return f"{short_name}({args_str})"
         return short_name

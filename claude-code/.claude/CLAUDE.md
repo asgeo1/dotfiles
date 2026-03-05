@@ -202,12 +202,17 @@ Would you like me to [specific improvement]?"
 
 ## Git Commands
 
-### 🚨 CRITICAL: Run git commands normally
-**NEVER use `git -C <path>` syntax.** Just `cd` into the directory and run git commands directly.
-- ✅ `cd /path/to/repo && git diff --cached`
-- ❌ `git -C /path/to/repo diff --cached`
+### 🚨 CRITICAL: Use MCP git tools instead of bash
+**ALWAYS use `mcp__git-tools__*` MCP tools instead of running git commands via Bash.** Bash git commands trigger security prompts, especially compound commands like `cd /path && git diff`.
 
-The `-C` flag triggers security warnings in Claude Code. There is never a reason to use it.
+**Available MCP git tools:**
+- `mcp__git-tools__git_diff` — replaces `git diff`, `git status --porcelain`, etc.
+- `mcp__git-tools__git_log` — replaces `git log`
+
+**For git operations NOT covered by MCP tools** (e.g., `git branch`, `git checkout`, `git add`, `git stash`):
+- Run them as simple bash commands in the current working directory
+- **NEVER use `git -C <path>` syntax** — it triggers security warnings
+- **NEVER combine `cd` with git** in compound commands (e.g., `cd /path && git diff`) — this also triggers security warnings
 
 ## Working Together
 
@@ -242,10 +247,10 @@ To check which MCP tools are actually available in the current project, look for
 - **Key tools**: `mcp__MCP_DOCKER__resolve-library-id` → `mcp__MCP_DOCKER__get-library-docs`
 - **Web tools**: `mcp__MCP_DOCKER__tavily-search`, `mcp__MCP_DOCKER__tavily-extract`, `mcp__MCP_DOCKER__tavily-crawl`
 
-### 🗂️ Git & GitHub MCP - Version Control
-- **When to use**: ANY git operations - status, commits, branches, GitHub interactions
-- **Key principle**: Use Git MCP instead of bash `git` commands
-- **Key tools**: `mcp__MCP_DOCKER__git_status`, `mcp__MCP_DOCKER__git_commit`, `mcp__MCP_DOCKER__create_pull_request`
+### 🗂️ Git MCP - Version Control
+- **When to use**: ANY git diff/log operations — avoids security prompts from bash git commands
+- **Key principle**: Use `mcp__git-tools__*` instead of bash `git` commands
+- **Key tools**: `mcp__git-tools__git_diff`, `mcp__git-tools__git_log`
 
 ### 🤖 Zen - AI Assistant Tools
 - **When to use**: Complex analysis, planning, consensus building, or structured workflows
@@ -274,7 +279,7 @@ To check which MCP tools are actually available in the current project, look for
    - Use TodoWrite to track progress
 
 2. **Choose the right tools**
-   - Coding → Direct file editing + Git MCP
+   - Coding → Direct file editing + git-tools MCP (for diffs/logs)
    - Research → MCP_DOCKER (tavily) + Zen analysis tools
    - Testing → Playwright/Browser MCP
    - Analysis → Zen workflow tools
@@ -282,12 +287,11 @@ To check which MCP tools are actually available in the current project, look for
 3. **Execute systematically**
    - Follow the plan step by step
    - Use thinking tools to maintain quality
-   - Commit completed tasks individually
 
 ### 📝 Code Development Algorithm
 
 1. **Create Feature Branch**
-   - Use `mcp__MCP_DOCKER__git_create_branch` for new features
+   - Only create branches when the user explicitly asks
    - Follow naming convention: `feature/description` or `fix/description`
 
 2. **Explore & Understand**
@@ -305,9 +309,8 @@ To check which MCP tools are actually available in the current project, look for
    - Use specialized agents for complex tasks
    - Ensure all tests pass and linting is clean
 
-5. **Commit & Review**
-   - Commit individual completed tasks using Git MCP
-   - Only commit when 100% sure the task is complete
+5. **Review**
+   - Only commit when the user explicitly asks (e.g., via `/commit`)
    - Get zen codereview before major commits
    - **NEVER push unless explicitly instructed**
 
@@ -387,7 +390,7 @@ To check which MCP tools are actually available in the current project, look for
 
 | Task Type | Primary Tool | Supporting Tools |
 |-----------|--------------|------------------|
-| Code editing | Edit/MultiEdit | Git MCP, TodoWrite |
+| Code editing | Edit/MultiEdit | git-tools MCP, TodoWrite |
 | Debugging | Zen (debug) | Grep/Glob (code search) |
 | Code review | Zen (codereview) | Grep/Glob (analysis) |
 | Research | MCP_DOCKER (tavily) | Zen (synthesis) |
@@ -396,7 +399,7 @@ To check which MCP tools are actually available in the current project, look for
 | Documentation | MCP_DOCKER (library docs) | MCP_DOCKER (tavily) |
 | Security | Zen (secaudit) | Grep/Glob (patterns) |
 | Database work | Database MCP | Zen (analysis) |
-| Version control | Git MCP | TodoWrite |
+| Version control | git-tools MCP (diff/log) | TodoWrite |
 
 ---
 
@@ -432,7 +435,7 @@ To check which MCP tools are actually available in the current project, look for
    - Plan comprehensively to avoid rework
 
 2. **Leverage tool strengths**
-   - Git MCP for all version control operations
+   - `mcp__git-tools__git_diff` / `git_log` for version control reads
    - Zen for structured analysis and workflows
    - MCP_DOCKER for research and documentation
    - Playwright for visual verification
@@ -448,17 +451,17 @@ To check which MCP tools are actually available in the current project, look for
 
 ### 🚀 Starting Points
 
-- **Any coding task**: Create feature branch with Git MCP
+- **Any coding task**: Use `mcp__git-tools__git_diff` to understand current changes
 - **Complex analysis**: `mcp__zen__thinkdeep` or `mcp__zen__planner`
 - **Web research**: `mcp__MCP_DOCKER__tavily-search`
 - **Library docs**: `mcp__MCP_DOCKER__resolve-library-id`
 - **Browser automation**: `mcp__playwright__browser_navigate` (if available)
 - **Database queries**: Check if database MCP is available first
-- **Version control**: Use Git MCP instead of bash git commands
+- **Version control**: Use `mcp__git-tools__*` instead of bash git commands
 
 ### 💡 Remember
 
-- Use Git MCP for all version control operations
+- Use `mcp__git-tools__*` for git diff/log (never bash git for these)
 - Use TodoWrite to maintain context and track progress
 - Combine tools for powerful workflows
 - Think before acting, plan before executing
