@@ -353,11 +353,13 @@ All plan items implemented. No quality issues found.
 
 ## Step 5: Present Results
 
-After subagent returns, present the structured feedback. **Always include the "Models Used" section** so the user can see what models were used.
+**CRITICAL: Output the subagent's feedback VERBATIM.** Do NOT summarize, condense, or reformat it. The subagent produces detailed structured output with per-issue descriptions, locations, and suggested fixes — the user needs ALL of that detail to make informed decisions. Do NOT compress issues into a summary table with one-line descriptions.
 
-If the Codex confirmed model differs from what was requested, highlight this discrepancy.
+If the subagent's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
 
-If issues were found, ask:
+**Always include the "Models Used" section** so the user can see what models were used. If the Codex confirmed model differs from what was requested, highlight this discrepancy.
+
+After presenting the full output, ask:
 1. Would you like me to **address** specific issues?
 2. Would you like to **discuss** any points?
 3. Or **dismiss** the feedback and proceed?

@@ -161,9 +161,11 @@ The merger will:
 
 ## Step 6: Present Results
 
-After the merger returns, present its structured feedback to the user.
+**CRITICAL: Output the merger's feedback VERBATIM.** Do NOT summarize, condense, or reformat it. The merger produces detailed structured output with per-issue descriptions, locations, and suggested fixes — the user needs ALL of that detail to make informed decisions. Do NOT compress issues into a summary table with one-line descriptions.
 
-If issues were found, ask:
-1. Would you like me to **address** any of these issues?
-2. Would you like to **discuss** specific points?
-3. Or **dismiss** the feedback and proceed as-is?
+If the merger's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
+
+After presenting the full output, ask:
+1. Would you like me to **address** specific issues?
+2. Would you like to **discuss** any points?
+3. Or **dismiss** the feedback and proceed?

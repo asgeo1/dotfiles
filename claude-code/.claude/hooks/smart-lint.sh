@@ -882,16 +882,16 @@ lint_ruby() {
         if [[ -n "$mono_path" ]]; then
             # In a mono-repo subdirectory
             log_debug "Detected mono-repo structure with path: $mono_path"
-            dirty_files=$(cd "$git_root" && git status --porcelain | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
+            dirty_files=$(cd "$git_root" && git status --porcelain | grep -v '^D' | cut -c4- | grep "^${mono_path}" | sed "s|^${mono_path}||" | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
         else
             # In repo root or no git
-            dirty_files=$(git status --porcelain 2>/dev/null | cut -c4- | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
+            dirty_files=$(git status --porcelain 2>/dev/null | grep -v '^D' | cut -c4- | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
         fi
 
         if [[ -n "$dirty_files" ]]; then
             log_info "Running RuboCop on dirty files only"
             # Run rubocop on dirty files with auto-correct
-            if echo "$dirty_files" | xargs -r rubocop --autocorrect-all 2>&1; then
+            if echo "$dirty_files" | xargs -r rubocop --force-exclusion --autocorrect-all 2>&1; then
                 add_summary "success" "RuboCop check passed (dirty files)"
             else
                 add_summary "error" "RuboCop found issues"

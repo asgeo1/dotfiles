@@ -67,9 +67,11 @@ The principal engineer will:
 
 ## Step 4: Present Results
 
-After the agent returns, present its structured feedback to the user.
+**CRITICAL: Output the principal engineer's feedback VERBATIM.** Do NOT summarize, condense, or reformat it. The agent produces detailed structured output with concerns, suggestions, and architectural analysis — the user needs ALL of that detail to make informed decisions. Do NOT compress findings into a summary table with one-line descriptions.
 
-Then ask:
-1. Would you like to **incorporate** any of this feedback into the plan?
-2. Would you like to **discuss** specific points in more detail?
-3. Or **proceed** with the current plan as-is?
+If the agent's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
+
+After presenting the full output, ask:
+1. Would you like to **discuss** any concerns?
+2. Would you like me to **revise** the plan?
+3. Or **proceed** with implementation?

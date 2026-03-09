@@ -19,6 +19,46 @@ If ANY automated tool reports a problem — linters, formatters, type checkers, 
 
 This applies to: linters, formatters, type checkers, test suites, custom project checks, CI/CD failures, and ANY other automated validation tool.
 
+### 🚨 CRITICAL: NO ERROR SWALLOWING — EVER 🚨
+
+**NEVER silently swallow errors.** Every error handling block (rescue, catch, etc.) MUST either:
+1. **Re-raise/re-throw** the error (after optional logging/reporting), OR
+2. **Return a meaningful error** to the caller that clearly indicates failure
+
+**FORBIDDEN patterns:**
+- Catching an error and returning `nil`/`null`/`undefined`/default value as if nothing happened
+- Catching an error, logging it, but letting execution continue as if it succeeded
+- Catching an error and reporting to Sentry/monitoring WITHOUT re-raising or returning an error
+- Any pattern where the caller cannot distinguish an error from success
+
+**The test:** After your error handling runs, can the calling code tell that something went wrong? If no → you're swallowing errors. Fix it.
+
+This applies to ALL languages: Ruby (`rescue`), TypeScript/JavaScript (`catch`), Rust (`unwrap_or_default`, ignoring `Result`), etc.
+
+### 🚨 CRITICAL: NO FALLBACK LOGIC — EVER 🚨
+
+**NEVER use fallback/default values to mask missing or unexpected data.** Every code path must be EXPLICIT. If data is missing or doesn't match expected values, RAISE/THROW — never silently substitute a "safe" default.
+
+**FORBIDDEN patterns:**
+- `value || "default"` where nil indicates a bug, not an expected state
+- `value ?? 'fallback'` that hides missing data from the caller
+- `else` branches returning "safe" defaults instead of raising on unknown values
+- `rescue => e; return default_value` — swallowing + fallback combined
+- Functions that silently return a default when input doesn't match any known case
+- `catch (e) { return fallback }` — same pattern in TypeScript
+
+**The principle:** If you're writing an `else`/default branch in a conditional or switch, ask: "Can this case actually happen in correct operation?" If NO → raise/throw. If YES → handle it explicitly with a named case, not a catch-all default.
+
+**Exceptions (require explicit user approval):**
+- Error message fallbacks (e.g., `error.message ?? 'Unknown error'`) — acceptable because the error is still thrown/returned
+- UI loading placeholders that are never rendered (zeros for unconditional hooks)
+- Backwards compatibility shims — but these require user approval per the existing rule
+
+**This rule is related to but distinct from NO ERROR SWALLOWING:**
+- Error swallowing: hiding exceptions from the caller
+- Fallback logic: hiding missing/unexpected data through "sensible defaults"
+- Both are forbidden. Both cause silent data corruption.
+
 ## CRITICAL WORKFLOW - ALWAYS FOLLOW THIS!
 
 ### Research → Plan → Implement
