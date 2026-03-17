@@ -6,6 +6,22 @@ Run .osx like this:
 
 
 
+### Homebrew
+
+The `Brewfile` contains all Homebrew packages (formulae, casks, taps, and Mac App Store apps).
+
+**Restore on a new Mac:**
+
+    brew bundle install --file=~/Projects/dotfiles/Brewfile
+
+**Update after installing/removing packages:**
+
+    brew bundle dump --file=~/Projects/dotfiles/Brewfile --force
+
+**List explicitly installed packages with descriptions:**
+
+    brew desc $(brew leaves) | column -t -s ':'
+
 ### COLORS:
 
  - Kitty: `.config/kitty/theme.conf`
