@@ -16,5 +16,6 @@ paste-cache
 telemetry
 tasks/*
 backups/*
+sessions/*
 mcp-needs-auth-cache.json
 policy-limits.json
