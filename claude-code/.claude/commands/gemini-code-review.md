@@ -290,7 +290,22 @@ If the subagent's output is missing or empty, say so. Otherwise, paste it throug
 
 **Always include the "Models Used" section** so the user can see what models were used. If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
 
+**Save findings for triage:** After outputting the review verbatim, save the complete output using `mcp__plan-tools__write_plan`.
+
+**File naming:**
+1. **If a plan file is in context** (e.g., `~/.claude/plans/proud-skipping-wirth.md`):
+   - Extract the plan slug (filename without `.md`)
+   - Write to `~/.claude/plans/{plan-slug}-code-review-round-1.md`
+   - If `round-1` already exists, use `round-2`, `round-3`, etc.
+   - Use `mcp__plan-tools__find_plan_by_title` to check for existing rounds
+2. **If no plan file in context** (e.g., standalone code review):
+   - Create: `~/.claude/plans/code-review-{generated-slug}.md`
+
+**Prepend YAML frontmatter** with: `title` ("Code Review - {plan title or 'Standalone'} - Round N"), `date` (current ISO date), `review_type` ("code-review"), `scope` (the scope used), and `source_plan` (path to original plan file, or "none").
+
+This enables the `/triage-review` command to process findings interactively.
+
 After presenting the full output, ask:
-1. Would you like me to **address** specific issues?
+1. Would you like me to **address** specific issues (or run `/triage-review` to go through them one-by-one)?
 2. Would you like to **discuss** any points?
 3. Or **dismiss** the feedback and proceed?

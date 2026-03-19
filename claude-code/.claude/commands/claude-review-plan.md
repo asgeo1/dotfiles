@@ -71,7 +71,19 @@ The principal engineer will:
 
 If the agent's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
 
+**Save findings for triage:** After outputting the review verbatim, save the complete output using `mcp__plan-tools__write_plan`.
+
+**File naming:**
+- Extract the plan slug from the plan file path (filename without `.md`)
+- Write to `~/.claude/plans/{plan-slug}-plan-review-round-1.md`
+- If `round-1` already exists, use `round-2`, `round-3`, etc.
+- Use `mcp__plan-tools__find_plan_by_title` to check for existing rounds
+
+**Prepend YAML frontmatter** with: `title` ("Plan Review - {plan title} - Round N"), `date` (current ISO date), `review_type` ("plan-review"), and `source_plan` (path to original plan file).
+
+This enables the `/triage-review` command to process findings interactively.
+
 After presenting the full output, ask:
 1. Would you like to **discuss** any concerns?
-2. Would you like me to **revise** the plan?
+2. Would you like me to **revise** the plan (or run `/triage-review` to go through findings one-by-one)?
 3. Or **proceed** with implementation?
