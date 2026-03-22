@@ -108,14 +108,16 @@ multiSelect: false
 options:
   - label: "Fix as suggested"
     description: "Apply the suggested fix (press n to add notes)"
-    preview: [full_text of the issue — hard-wrapped, see below]
+    preview: [full_text of the issue, formatted as markdown — see formatting rules below]
   - label: "Skip"
     description: "Not important, don't address this issue"
+    preview: [same full_text as above — identical preview on ALL options]
   - label: "Disagree"
     description: "I disagree this is an issue (press n to explain why)"
+    preview: [same full_text as above — identical preview on ALL options]
 ```
 
-**Question text is plain text only** (Claude Code limitation) — keep it to one line: issue number, severity, and title. The `preview` field on the "Fix as suggested" option renders the full issue with markdown formatting and colors.
+**Question text is plain text only** (Claude Code limitation) — keep it to one line: issue number, severity, and title. **Put the SAME preview on ALL options** so the user can see the full issue details regardless of which option is focused.
 
 **CRITICAL: Preview content must be a VERBATIM copy-paste from the findings file.** Do NOT summarize, condense, paraphrase, abbreviate, or rewrite the issue text in any way. Copy the EXACT characters from the findings file for each issue — every word, every line, every code block, exactly as written. The preview must be byte-for-byte identical to what appears in the findings file between "Issue N:" and the next issue. If you summarize or shorten the text, the user loses critical detail needed for informed decisions.
 
@@ -130,11 +132,13 @@ multiSelect: false
 options:
   - label: "Accept & revise plan"
     description: "Incorporate this feedback into the plan (press n to add notes)"
-    preview: [full_text of the item — hard-wrapped, see below]
+    preview: [full_text of the item, formatted as markdown — see formatting rules below]
   - label: "Skip"
     description: "Not important, don't change the plan for this"
+    preview: [same full_text as above — identical preview on ALL options]
   - label: "Disagree"
     description: "I disagree with this feedback (press n to explain why)"
+    preview: [same full_text as above — identical preview on ALL options]
 ```
 
 **Preview renders markdown, question does not.** The question field is plain text only (Claude Code limitation). Use the `preview` field on the first option for the full formatted issue content.
@@ -157,7 +161,7 @@ options:
 
 4. **Blank line between every section.**
 
-5. **Wrap prose at 120 characters.**
+5. **Do NOT hard-wrap prose.** Let the preview renderer handle line display. Do not insert line breaks into prose text.
 
 Example (this is markdown that will be rendered in the preview box):
 
@@ -226,11 +230,13 @@ In `development_factors.rb`, change line 8 to:
 
 After each batch, collect the responses before presenting the next batch.
 
-## Step 4: Write Triage Decisions Back to Findings File
+## Step 4: Write Triage Decisions INTO the Findings File
 
 After all batches are answered, compile the decisions.
 
-**Read the current findings file content** using `mcp__plan-tools__read_plan`, then **append** the triage decisions section and write back using `mcp__plan-tools__write_plan`.
+**CRITICAL: Write into the SAME findings file, not a separate file.** Read the current findings file content using `mcp__plan-tools__read_plan`, then APPEND the triage decisions section to the end and write the whole thing back using `mcp__plan-tools__write_plan` to the SAME file path. Do NOT create a separate `-triage.md` file. The findings file must be self-contained — anyone reading it should see both the original issues AND the triage decisions in one place.
+
+**CRITICAL: Preserve user notes VERBATIM.** When the user adds notes via "n for notes" or "Type something", copy their EXACT text into the decisions. Do NOT summarize, condense, paraphrase, or truncate their notes. If they wrote 5 sentences, include all 5 sentences. Their notes contain critical context for implementation.
 
 Append this section to the existing content:
 
@@ -241,26 +247,29 @@ Append this section to the existing content:
 ## Triage Decisions
 
 Triaged on: [current ISO date]
-Review type: [code-review or plan-review]
 
-| # | Item | Decision | Notes |
-|---|------|----------|-------|
-| 1 | [Title or Category: Title] | Fix/Accept | "user notes if any" |
-| 2 | [Title] | Skip | — |
-| 3 | [Title] | Disagree | "user's explanation" |
-| 7 | [Title] | Other | "user's custom response" |
+### Issue 1: [Title]
+**Decision:** Fix as suggested
+**User notes:** [VERBATIM copy of everything the user typed — do NOT summarize]
 
-### Action Items
+### Issue 2: [Title]
+**Decision:** Skip
 
-[For each "Fix"/"Accept" or "Other" decision, list the action:]
+### Issue 3: [Title]
+**Decision:** Fix as suggested
+**User notes:** [VERBATIM copy — preserve every word, every sentence]
 
-1. **Item N: [Title]** — [Original suggested fix/concern summary]. User notes: "[any notes]"
-2. **Item M: [Title]** — User instruction: "[custom response text]"
+### Issue 7: [Title]
+**Decision:** Other
+**User response:** [VERBATIM copy of the user's full typed response]
 
-### Skipped / Disagreed
+---
 
-- **Item X: [Title]** — Skipped
-- **Item Y: [Title]** — Disagreed: "[user's reasoning]"
+### Summary
+- Fix: X issues
+- Skip: X issues
+- Disagree: X issues
+- Other: X issues
 
 ### Source Plan
 [Path to original plan file from the findings frontmatter `source_plan` field]
