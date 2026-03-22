@@ -17,5 +17,6 @@ telemetry
 tasks/*
 backups/*
 sessions/*
+channels/*
 mcp-needs-auth-cache.json
 policy-limits.json
