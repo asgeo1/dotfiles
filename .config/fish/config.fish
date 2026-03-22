@@ -102,3 +102,6 @@ status --is-interactive; and source (phpenv init -|psub)
 status --is-interactive; and source (nodenv init -|psub)
 status --is-interactive; and source (pyenv init -|psub)
 status --is-interactive; and source (goenv init -|psub)
+
+# OpenClaw Completion
+source "/Users/asgeo1/.openclaw/completions/openclaw.fish"

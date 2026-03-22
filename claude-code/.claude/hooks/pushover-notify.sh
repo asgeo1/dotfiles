@@ -213,6 +213,18 @@ curl -s \
   --form-string "sound=pushover" \
   https://api.pushover.net/1/messages.json > /dev/null
 
+# For now, don't notify OpenClaw as well
+#
+# Notify OpenClaw (sends to Telegram) — always send alongside Pushover for now
+# TMUX_TARGET=""
+# if [ -n "$TMUX" ]; then
+#   TMUX_TARGET="$(tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null)"
+# fi
+#
+# openclaw system event \
+#   --text "claude-code:${HOOK_EVENT}:${NOTIFICATION_TYPE:-none} project=${PROJECT_NAME} tmux=${TMUX_TARGET} transcript=${TRANSCRIPT_PATH} cwd=${CWD}" \
+#   --mode now 2>>/tmp/openclaw-notify.log &
+
 # Record timestamp for rate limiting
 record_notification
 
