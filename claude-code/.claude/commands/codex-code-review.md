@@ -262,6 +262,7 @@ Structure the validated feedback as follows:
 
 ### Issue 1: [Descriptive Title]
 **Severity:** critical | warning | suggestion
+**Focus:** correctness | security | quality | plan-compliance
 **Location:** `path/to/file.ts:42`
 **Problem:** [Clear description of what the issue is]
 **Why it matters:** [Why this is a problem - security, performance, correctness, etc.]

@@ -284,6 +284,7 @@ Structure ALL validated feedback:
 
 #### Issue 1: [Descriptive Title]
 **Severity:** critical | warning | suggestion
+**Focus:** correctness | security | quality | plan-compliance
 **Plan Item:** [Related plan item or "N/A - general quality"]
 **Location:** `path/to/file.ts:42`
 **Problem:** [Clear description]

@@ -46,6 +46,7 @@ Extract individual issues by splitting on the `Issue N:` pattern.
 ```
 Issue N: [Title]
 Severity: [critical|warning|suggestion]
+Source: [correctness|security|quality|plan-compliance]
 Plan Item: [phase reference]
 Location: [file:line]
 Problem: [description]
@@ -57,6 +58,7 @@ Suggested fix: [fix description and/or code]
 ```
 ### Issue N: [Title]
 **Severity:** [critical|warning|suggestion]
+**Focus:** [correctness|security|quality|plan-compliance]
 **Location:** [file:line]
 **Problem:** [description]
 **Why it matters:** [impact]
@@ -67,6 +69,7 @@ For each issue, extract:
 - `number` — the issue number
 - `title` — the descriptive title
 - `severity` — critical, warning, or suggestion
+- `focus` — the focus area that produced this finding (correctness, security, quality, plan-compliance). If the Focus field is missing (older findings), set to "unknown"
 - `location` — file path and line number
 - `problem` — condensed problem description (1-2 sentences)
 - `suggested_fix` — condensed fix description (1-2 sentences)
@@ -103,7 +106,7 @@ For each issue in the batch, create one question:
 
 ```
 header: "Issue N"
-question: "Issue N (severity): [Title] — how to handle?"
+question: "Issue N (severity) [focus]: [Title] — how to handle?"
 multiSelect: false
 options:
   - label: "Fix as suggested"
@@ -145,7 +148,7 @@ options:
 
 **IMPORTANT: The preview renders markdown.** Use full markdown formatting throughout — bold for labels, backticks for inline code, fenced code blocks with language hints, etc. Apply these formatting rules:
 
-1. **Short fields on one line with gutter.** Fields with short values (Severity, Plan Item, Location) use a consistent gutter. Align all values to the same column (longest label + 2 spaces). Continuation lines indent to the gutter column.
+1. **Short fields on one line with gutter.** Fields with short values (Severity, Source, Plan Item, Location) use a consistent gutter. Align all values to the same column (longest label + 2 spaces). Continuation lines indent to the gutter column.
 
 2. **Long fields: extra spacing via blank unicode line.** Fields with long prose values (Problem, Why it matters, Suggested fix) need extra visual separation. Before each of these labels, insert a line containing a single Unicode braille blank character `⠀` (U+2800). This forces an extra blank line since markdown collapses empty lines but not lines with content. Then the label on the next line in bold.
 
@@ -169,6 +172,8 @@ Example (this is markdown that will be rendered in the preview box):
 ### Issue 1: `key_phrases` Field Type Mismatch in GraphQL Type and Factory
 
 **Severity:** critical
+
+**Focus:** correctness
 
 **Plan Item:** Phase 6 (new GraphQL types) / Phase 3 (FactoryBot expansion)
 

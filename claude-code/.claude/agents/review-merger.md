@@ -85,12 +85,13 @@ Then use the `mcp__git-tools__git_diff` MCP tool to fetch the diff independently
 
 For each finding from every reviewer:
 
-1. **Re-read the actual source file** at the reported location — use the **Read** tool (NOT Bash `cat`)
-2. **Search for patterns** if needed — use the **Grep** tool (NOT Bash `grep`)
-3. **Verify the finding is real** — does the code actually have the reported issue?
-4. **Check confidence scores** — discard any finding with confidence < 80 after your validation
-5. **Deduplicate** — if multiple agents report the same issue, keep the best-written version
-6. **Check relevance** — is the finding about code that's actually in the diff/scope?
+1. **Track the focus** — note which `=== FINDINGS: {focus} ===` section the finding came from. This is the finding's **focus area** (e.g., correctness, security, quality, plan-compliance). Carry this through to the final output as the `**Focus:**` field.
+2. **Re-read the actual source file** at the reported location — use the **Read** tool (NOT Bash `cat`)
+3. **Search for patterns** if needed — use the **Grep** tool (NOT Bash `grep`)
+4. **Verify the finding is real** — does the code actually have the reported issue?
+5. **Check confidence scores** — discard any finding with confidence < 80 after your validation
+6. **Deduplicate** — if multiple agents report the same issue, keep the best-written version and use its source
+7. **Check relevance** — is the finding about code that's actually in the diff/scope?
 
 ### Step 3: Produce Output
 
@@ -101,6 +102,7 @@ For each finding from every reviewer:
 
 ### Issue 1: [Descriptive Title]
 **Severity:** critical | warning | suggestion
+**Focus:** correctness | security | quality | plan-compliance
 **Location:** `path/to/file.ts:42`
 **Problem:** [Clear description of what the issue is]
 **Why it matters:** [Why this is a problem — security, performance, correctness, etc.]
@@ -139,6 +141,7 @@ For each finding from every reviewer:
 
 #### Issue 1: [Descriptive Title]
 **Severity:** critical | warning | suggestion
+**Focus:** correctness | security | quality | plan-compliance
 **Plan Item:** [Related plan item or "N/A — general quality"]
 **Location:** `path/to/file.ts:42`
 **Problem:** [Clear description]
