@@ -9,8 +9,10 @@
 #   Every issue found is blocking - code must be 100% clean to proceed.
 #
 # OPTIONS
-#   --debug       Enable debug output
-#   --fast        Skip slow checks (import cycles, security scans)
+#   --debug        Enable debug output
+#   --fast         Skip slow checks (import cycles, security scans)
+#   --format-only  Only run formatters (prettier, gofmt, etc.), skip linters/typecheckers
+#                  Ideal for PostToolUse:Edit hooks where quick formatting is all you need
 #
 # EXIT CODES
 #   0 - Success (all checks passed - everything is ✅ GREEN)
@@ -426,6 +428,8 @@ lint_go() {
                 add_summary "success" "Go code formatted"
             fi
 
+            if [[ "$FORMAT_ONLY" == "true" ]]; then return 0; fi
+
             ck "go-lint"
             if ! make lint 2>&1; then
                 add_summary "error" "Go linting failed (make lint)"
@@ -448,6 +452,8 @@ lint_go() {
             else
                 add_summary "success" "Go formatting correct"
             fi
+
+            if [[ "$FORMAT_ONLY" == "true" ]]; then return 0; fi
 
             # Linting
             if command_exists golangci-lint; then
@@ -484,6 +490,8 @@ lint_go() {
         else
             add_summary "success" "Go formatting correct"
         fi
+
+        if [[ "$FORMAT_ONLY" == "true" ]]; then return 0; fi
 
         # Linting
         if command_exists golangci-lint; then
@@ -530,6 +538,8 @@ lint_python() {
             add_summary "error" "Python files need formatting"
         fi
     fi
+
+    if [[ "$FORMAT_ONLY" == "true" ]]; then return 0; fi
 
     # Linting
     if command_exists ruff; then
@@ -679,6 +689,12 @@ lint_javascript() {
         fi
 
         should_fail_fast && { cd "$original_dir"; return 0; }
+
+        # In format-only mode, skip everything after prettier
+        if [[ "$FORMAT_ONLY" == "true" ]]; then
+            cd "$original_dir" || return 1
+            return 0
+        fi
 
         # ESLint (lint after formatting)
         if grep -q "eslint" "$package_json_path" 2>/dev/null; then
@@ -974,6 +990,8 @@ lint_ruby() {
     else
         log_debug "RuboCop not found, skipping Ruby style checks"
     fi
+
+    if [[ "$FORMAT_ONLY" == "true" ]]; then return 0; fi
 
     # Sorbet type checking - only if sorbet/ directory exists AND sorbet is in Gemfile
     local has_sorbet=false
@@ -1272,6 +1290,7 @@ lint_objc() {
 
 # Parse command line options
 FAST_MODE=false
+FORMAT_ONLY=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         --debug)
@@ -1280,6 +1299,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --fast)
             FAST_MODE=true
+            shift
+            ;;
+        --format-only)
+            FORMAT_ONLY=true
             shift
             ;;
         *)
