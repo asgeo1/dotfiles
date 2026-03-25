@@ -577,7 +577,14 @@ lint_javascript() {
     local original_dir=$(pwd)
     cd "$project_dir" || return 1
 
-        # Check for Prettier FIRST (formatting before linting)
+        # Checks are ordered fastest-to-slowest for quick feedback on failure:
+        # 1. Prettier (fast - dirty files only)
+        # 2. ESLint (fast - dirty files only)
+        # 3. Knip (fast - unused exports/deps)
+        # 4. Dead code (fast - conditional, dirty ObjC files only)
+        # 5. TypeScript typecheck (slow - must check full project graph)
+
+        # Prettier (formatting before linting)
         # Priority: dirty variants first (faster), then full-project variants
         if command_exists npm; then
             ck "prettier"
@@ -710,7 +717,48 @@ lint_javascript() {
             fi
         fi
 
-        # Check for TypeScript type checking AFTER linting
+        # Knip - unused exports/dependencies
+        if npm_script_exists "knip"; then
+            ck "knip"
+            log_info "Running npm run knip"
+            local knip_output
+            knip_output=$(npm run knip 2>&1)
+            local knip_exit=$?
+
+            if [[ $knip_exit -ne 0 ]]; then
+                echo "$knip_output" >&2
+                add_summary "error" "Knip found unused exports/dependencies"
+            else
+                add_summary "success" "Knip check passed"
+            fi
+        fi
+
+        # Dead code detection (only runs on dirty ObjC files)
+        if npm_script_exists "find-dead-code:recent"; then
+            ck "dead-code"
+            # Get all dirty files (tracked and untracked) and filter for Objective-C files
+            local dirty_objc_files=$(get_dirty_files '\.(h|m)$')
+
+            if [[ -n "$dirty_objc_files" ]]; then
+                log_info "Running npm run find-dead-code:recent"
+                # Capture both stdout and stderr
+                local deadcode_output
+                deadcode_output=$(npm run find-dead-code:recent 2>&1)
+                local deadcode_exit=$?
+
+                # Always show output if there's an error so the user sees what failed
+                if [[ $deadcode_exit -ne 0 ]]; then
+                    echo "$deadcode_output" >&2
+                    add_summary "error" "Dead code found in Objective-C files"
+                else
+                    add_summary "success" "Dead code check passed"
+                fi
+            else
+                log_debug "No Objective-C files modified, skipping dead code check"
+            fi
+        fi
+
+        # TypeScript typecheck (slowest - must check full project graph)
         if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
             ck "typecheck"
             # Try npm run typecheck first
@@ -760,48 +808,6 @@ lint_javascript() {
                 add_summary "success" "TypeScript typecheck passed"
             else
                 add_summary "error" "TypeScript typecheck found issues"
-            fi
-        fi
-
-        # Check for dead code detection AFTER all other checks
-        # Only run if Objective-C files (.h/.m) were modified (including untracked files)
-        if npm_script_exists "find-dead-code:recent"; then
-            ck "dead-code"
-            # Get all dirty files (tracked and untracked) and filter for Objective-C files
-            local dirty_objc_files=$(get_dirty_files '\.(h|m)$')
-
-            if [[ -n "$dirty_objc_files" ]]; then
-                log_info "Running npm run find-dead-code:recent"
-                # Capture both stdout and stderr
-                local deadcode_output
-                deadcode_output=$(npm run find-dead-code:recent 2>&1)
-                local deadcode_exit=$?
-
-                # Always show output if there's an error so the user sees what failed
-                if [[ $deadcode_exit -ne 0 ]]; then
-                    echo "$deadcode_output" >&2
-                    add_summary "error" "Dead code found in Objective-C files"
-                else
-                    add_summary "success" "Dead code check passed"
-                fi
-            else
-                log_debug "No Objective-C files modified, skipping dead code check"
-            fi
-        fi
-
-        # Check for unused exports/dependencies with knip
-        if npm_script_exists "knip"; then
-            ck "knip"
-            log_info "Running npm run knip"
-            local knip_output
-            knip_output=$(npm run knip 2>&1)
-            local knip_exit=$?
-
-            if [[ $knip_exit -ne 0 ]]; then
-                echo "$knip_output" >&2
-                add_summary "error" "Knip found unused exports/dependencies"
-            else
-                add_summary "success" "Knip check passed"
             fi
         fi
 
