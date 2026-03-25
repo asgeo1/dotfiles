@@ -86,37 +86,22 @@ Evaluate the plan through these lenses:
 
 ### Step 4: Return Your Assessment
 
-Structure your output as follows:
+Structure your output as a **flat, numbered issue list** — every concern, suggestion, and question is a separate issue with consistent fields. Do NOT separate findings into Concerns/Suggestions/Questions sections.
 
 ```markdown
 ## Plan Review: [Plan Title or File Name]
 
-### Concerns
-[List any significant issues, risks, or problems you identified. Be specific — reference plan sections and codebase files. Rate each as Critical / Important / Minor.]
+### Issue 1: [Descriptive Title]
+**Severity:** critical | warning | suggestion | question
+**Focus:** correctness | security | quality
+**Plan Item:** [Which phase/section of the plan this relates to, or "N/A — plan-level"]
+**Location:** `file_path:line_number` [codebase file if applicable, or "N/A — plan-level"]
+**Problem:** [Clear description of the concern, suggestion, or question]
+**Why it matters:** [Impact, risk, or what depends on resolving this]
+**Suggested fix:** [Concrete action — for questions, describe what needs to be clarified/decided]
 
-- **[Critical/Important/Minor]**: [Concern description]
-  - Plan reference: [Which section of the plan]
-  - Codebase context: `file_path:line_number` (if applicable)
-  - Risk: [What could go wrong]
-
-[If no concerns: "No significant concerns identified."]
-
-### Suggestions
-[Propose improvements, alternatives, or simplifications. Each should be concrete and actionable.]
-
-- [Suggestion description]
-  - Rationale: [Why this would be better]
-  - Impact: [What it changes about the plan]
-
-[If no suggestions: "Plan looks well-considered as-is."]
-
-### Questions
-[List anything that's ambiguous or needs clarification before implementation can begin.]
-
-- [Question]
-  - Why it matters: [What depends on the answer]
-
-[If no questions: "Plan is sufficiently clear for implementation."]
+### Issue 2: ...
+[Repeat for each finding]
 
 ### Overall Assessment
 [2-4 sentence summary of your overall opinion. Be direct — is this plan ready? What's the biggest risk? What's the strongest aspect?]
@@ -127,6 +112,17 @@ Structure your output as follows:
 - **revise**: Plan has significant gaps or risks that should be addressed before implementation starts.
 - **needs-discussion**: Plan has fundamental questions that need to be resolved with the team/user.
 ```
+
+**Severity mapping:**
+- **critical** — Significant architectural risk, missing safety check, or wrong approach that must be fixed before implementation
+- **warning** — Important issue that should be addressed but won't break things if missed
+- **suggestion** — Improvement or simplification that would make the plan better
+- **question** — Ambiguity or missing information that needs clarification before implementation
+
+**Focus areas** (same as code review subagents — categorize each finding into the area it most relates to):
+- **correctness** — Logic errors, wrong assumptions, missing edge cases, data integrity risks
+- **security** — Auth gaps, injection risks, data exposure, unsafe patterns
+- **quality** — Over-engineering, simpler alternatives, maintainability, performance, conventions
 
 ## Rules
 

@@ -131,20 +131,22 @@ After each Codex response:
 
 Once Codex completes the review, synthesize ALL feedback from the entire conversation into this exact format:
 
+Produce a **flat, numbered issue list** — every concern, suggestion, and question is a separate issue with consistent fields. Do NOT separate findings into Concerns/Suggestions/Questions sections.
+
 ```markdown
 ## Codex Plan Review Feedback
 
-### Concerns
-- [List any critical issues, risks, or problems Codex identified]
-- [If none: "No significant concerns identified"]
+### Issue 1: [Descriptive Title]
+**Severity:** critical | warning | suggestion | question
+**Focus:** correctness | security | quality
+**Plan Item:** [Which phase/section of the plan, or "N/A — plan-level"]
+**Location:** `file_path:line_number` [if applicable, or "N/A — plan-level"]
+**Problem:** [Clear description]
+**Why it matters:** [Impact or risk]
+**Suggested fix:** [Concrete action — for questions, describe what needs clarification]
 
-### Suggestions
-- [List improvements or alternatives Codex proposed]
-- [If none: "No additional suggestions"]
-
-### Questions
-- [List any clarifications Codex thinks are needed before implementation]
-- [If none: "No clarifying questions"]
+### Issue 2: ...
+[Repeat for each finding from Codex]
 
 ### Overall Assessment
 [Brief 2-3 sentence summary of Codex's overall opinion on the plan]
@@ -156,6 +158,9 @@ Once Codex completes the review, synthesize ALL feedback from the entire convers
 - **Codex confirmed:** [CONFIRMED_MODEL]
 - **Claude subagent:** [self-report your model name/version]
 ```
+
+**Severity:** critical (must fix before implementation), warning (should address), suggestion (improvement), question (needs clarification).
+**Focus:** correctness, security, quality (categorize each finding into the area it most relates to).
 
 ### Important Notes
 

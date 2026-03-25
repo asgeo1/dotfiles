@@ -77,22 +77,20 @@ For each issue, extract:
 
 ### For plan reviews (`review_type: plan-review`):
 
-Extract items from the structured sections: Concerns, Suggestions, and Questions.
+Plan reviews now use the **same numbered issue format** as code reviews. Extract individual issues by splitting on the `Issue N:` or `### Issue N:` pattern — identical to Pattern A and Pattern B above.
 
-**Pattern C (Claude principal engineer output):**
-Look for sections like `### Concerns`, `### Suggestions`, `### Questions` (or `## Concerns`, etc.).
-Each bullet point under these sections is a separate item to triage.
+The only differences from code reviews:
+- **Severity** may include `question` (in addition to critical, warning, suggestion)
+- **Focus** uses the same categories as code reviews: `correctness | security | quality`
+- **Plan Item** references plan phases/sections
+- **Location** may be `N/A — plan-level` for plan-level findings
 
-**Pattern D (Gemini/Codex plan review output):**
-Same structure — `### Concerns`, `### Suggestions`, `### Questions` with bullet points.
+For each issue, extract the same fields as code reviews:
+- `number`, `title`, `severity`, `focus`, `location`, `problem`, `suggested_fix`, `full_text`
 
-For each item, extract:
-- `number` — assign sequentially (1, 2, 3, ...)
-- `category` — "Concern", "Suggestion", or "Question"
-- `title` — first sentence or phrase of the bullet (truncated to ~60 chars)
-- `full_text` — the complete bullet point text
+**Legacy format (pre-restructure):** If you encounter the old Concerns/Suggestions/Questions section format instead of numbered issues, parse each bullet point as a separate item, assign sequential numbers, derive severity from the section (Concerns → warning, Suggestions → suggestion, Questions → question), and set focus to "unknown".
 
-Store as a list. Tell the user: "Found N items to triage (X concerns, Y suggestions, Z questions)." or "Found N issues to triage." for code reviews.
+Store as a list. Tell the user: "Found N issues to triage (X critical, Y warnings, Z suggestions)." for both code and plan reviews.
 
 If no items found in the file, tell the user and stop.
 
@@ -126,16 +124,16 @@ options:
 
 ### For plan reviews:
 
-For each item in the batch, create one question:
+Plan reviews now use the same numbered issue format as code reviews. For each issue in the batch, create one question:
 
 ```
-header: "[Cat] N"   (e.g., "Concern 1", "Suggest 2", "Question 3" — max 12 chars)
-question: "[Category] N: [title] — how to handle?"
+header: "Issue N"
+question: "Issue N (severity) [focus]: [Title] — how to handle?"
 multiSelect: false
 options:
   - label: "Accept & revise plan"
     description: "Incorporate this feedback into the plan (press n to add notes)"
-    preview: [full_text of the item, formatted as markdown — see formatting rules below]
+    preview: [full_text of the issue, formatted as markdown — see formatting rules below]
   - label: "Skip"
     description: "Not important, don't change the plan for this"
     preview: [same full_text as above — identical preview on ALL options]
@@ -144,11 +142,13 @@ options:
     preview: [same full_text as above — identical preview on ALL options]
 ```
 
-**Preview renders markdown, question does not.** The question field is plain text only (Claude Code limitation). Use the `preview` field on the first option for the full formatted issue content.
+**Question text is plain text only** (Claude Code limitation) — keep it to one line: issue number, severity, focus, and title. **Put the SAME preview on ALL options** so the user can see the full issue details regardless of which option is focused.
+
+**CRITICAL: Preview content must be a VERBATIM copy-paste from the findings file.** Do NOT summarize, condense, paraphrase, abbreviate, or rewrite the issue text in any way. The same VERBATIM rule from code reviews applies here.
 
 **IMPORTANT: The preview renders markdown.** Use full markdown formatting throughout — bold for labels, backticks for inline code, fenced code blocks with language hints, etc. Apply these formatting rules:
 
-1. **Short fields on one line with gutter.** Fields with short values (Severity, Source, Plan Item, Location) use a consistent gutter. Align all values to the same column (longest label + 2 spaces). Continuation lines indent to the gutter column.
+1. **Short fields on one line with gutter.** Fields with short values (Severity, Focus, Plan Item, Location) use a consistent gutter. Align all values to the same column (longest label + 2 spaces). Continuation lines indent to the gutter column.
 
 2. **Long fields: extra spacing via blank unicode line.** Fields with long prose values (Problem, Why it matters, Suggested fix) need extra visual separation. Before each of these labels, insert a line containing a single Unicode braille blank character `⠀` (U+2800). This forces an extra blank line since markdown collapses empty lines but not lines with content. Then the label on the next line in bold.
 
