@@ -789,6 +789,22 @@ lint_javascript() {
             fi
         fi
 
+        # Check for unused exports/dependencies with knip
+        if npm_script_exists "knip"; then
+            ck "knip"
+            log_info "Running npm run knip"
+            local knip_output
+            knip_output=$(npm run knip 2>&1)
+            local knip_exit=$?
+
+            if [[ $knip_exit -ne 0 ]]; then
+                echo "$knip_output" >&2
+                add_summary "error" "Knip found unused exports/dependencies"
+            else
+                add_summary "success" "Knip check passed"
+            fi
+        fi
+
     # Return to original directory
     cd "$original_dir" || return 1
 
