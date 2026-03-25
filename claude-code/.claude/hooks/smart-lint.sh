@@ -90,6 +90,11 @@ command_exists() {
     command -v "$1" &> /dev/null
 }
 
+# Check if we should stop early due to fail-fast mode
+should_fail_fast() {
+    [[ "$CLAUDE_HOOKS_FAIL_FAST" == "true" && $CLAUDE_HOOKS_ERROR_COUNT -gt 0 ]]
+}
+
 # ============================================================================
 # PROJECT DETECTION
 # ============================================================================
@@ -673,7 +678,9 @@ lint_javascript() {
             fi
         fi
 
-        # Check for ESLint AFTER Prettier (lint after formatting)
+        should_fail_fast && { cd "$original_dir"; return 0; }
+
+        # ESLint (lint after formatting)
         if grep -q "eslint" "$package_json_path" 2>/dev/null; then
             ck "eslint"
             # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
@@ -717,6 +724,8 @@ lint_javascript() {
             fi
         fi
 
+        should_fail_fast && { cd "$original_dir"; return 0; }
+
         # Knip - unused exports/dependencies
         if npm_script_exists "knip"; then
             ck "knip"
@@ -732,6 +741,8 @@ lint_javascript() {
                 add_summary "success" "Knip check passed"
             fi
         fi
+
+        should_fail_fast && { cd "$original_dir"; return 0; }
 
         # Dead code detection (only runs on dirty ObjC files)
         if npm_script_exists "find-dead-code:recent"; then
@@ -757,6 +768,8 @@ lint_javascript() {
                 log_debug "No Objective-C files modified, skipping dead code check"
             fi
         fi
+
+        should_fail_fast && { cd "$original_dir"; return 0; }
 
         # TypeScript typecheck (slowest - must check full project graph)
         if [[ -f "tsconfig.json" ]] || [[ -f "jsconfig.json" ]]; then
