@@ -583,60 +583,82 @@ lint_javascript() {
             ck "prettier"
             if npm_script_exists "prettier:dirty"; then
                 log_info "Running npm run prettier:dirty"
-                if npm run prettier:dirty 2>&1; then
+                local prettier_output
+                prettier_output=$(npm run prettier:dirty 2>&1)
+                local prettier_exit=$?
+                if [[ $prettier_exit -eq 0 ]]; then
                     add_summary "success" "Prettier check passed (dirty)"
                 else
                     # Check failed, try to fix
                     if npm_script_exists "prettier:dirty:fix"; then
                         log_info "Running npm run prettier:dirty:fix to auto-fix"
-                        if npm run prettier:dirty:fix 2>&1; then
+                        local prettier_fix_output
+                        prettier_fix_output=$(npm run prettier:dirty:fix 2>&1)
+                        if [[ $? -eq 0 ]]; then
                             add_summary "success" "Prettier formatting applied (dirty:fix)"
                         else
+                            echo "$prettier_fix_output" >&2
                             add_summary "error" "Prettier formatting failed"
                         fi
                     else
+                        echo "$prettier_output" >&2
                         add_summary "error" "Prettier found formatting issues"
                     fi
                 fi
             elif npm_script_exists "prettier"; then
                 log_info "Running npm run prettier"
-                if npm run prettier 2>&1; then
+                local prettier_output
+                prettier_output=$(npm run prettier 2>&1)
+                local prettier_exit=$?
+                if [[ $prettier_exit -eq 0 ]]; then
                     add_summary "success" "Prettier check passed"
                 else
                     # Check failed, try to fix
                     if npm_script_exists "prettier:fix"; then
                         log_info "Running npm run prettier:fix to auto-fix"
-                        if npm run prettier:fix 2>&1; then
+                        local prettier_fix_output
+                        prettier_fix_output=$(npm run prettier:fix 2>&1)
+                        if [[ $? -eq 0 ]]; then
                             add_summary "success" "Prettier formatting applied"
                         else
+                            echo "$prettier_fix_output" >&2
                             add_summary "error" "Prettier formatting failed"
                         fi
                     else
+                        echo "$prettier_output" >&2
                         add_summary "error" "Prettier found formatting issues"
                     fi
                 fi
             elif npm_script_exists "prettier:fix"; then
                 log_info "Running npm run prettier:fix"
-                if npm run prettier:fix 2>&1; then
+                local prettier_fix_output
+                prettier_fix_output=$(npm run prettier:fix 2>&1)
+                if [[ $? -eq 0 ]]; then
                     add_summary "success" "Prettier formatting applied"
                 else
+                    echo "$prettier_fix_output" >&2
                     add_summary "error" "Prettier formatting failed"
                 fi
             else
                 # Fallback to direct prettier commands if config files exist
                 if [[ -f ".prettierrc" ]] || [[ -f "prettier.config.js" ]] || [[ -f ".prettierrc.json" ]]; then
+                    local prettier_output
                     if command_exists prettier; then
-                        if prettier --check . 2>/dev/null; then
+                        prettier_output=$(prettier --check . 2>&1)
+                        if [[ $? -eq 0 ]]; then
                             add_summary "success" "Prettier formatting correct"
                         else
                             prettier --write . 2>/dev/null
+                            echo "$prettier_output" >&2
                             add_summary "error" "Files need formatting with Prettier"
                         fi
                     elif command_exists npx; then
-                        if npx prettier --check . 2>/dev/null; then
+                        prettier_output=$(npx prettier --check . 2>&1)
+                        if [[ $? -eq 0 ]]; then
                             add_summary "success" "Prettier formatting correct"
                         else
                             npx prettier --write . 2>/dev/null
+                            echo "$prettier_output" >&2
                             add_summary "error" "Files need formatting with Prettier"
                         fi
                     fi
@@ -648,32 +670,41 @@ lint_javascript() {
         if grep -q "eslint" "$package_json_path" 2>/dev/null; then
             ck "eslint"
             # Try lint:dirty:fix first, then lint:dirty, then lint:fix, then fallback to lint
+            local eslint_output
             if npm_script_exists "lint:dirty:fix"; then
                 log_info "Running npm run lint:dirty:fix"
-                if npm run lint:dirty:fix 2>&1; then
+                eslint_output=$(npm run lint:dirty:fix 2>&1)
+                if [[ $? -eq 0 ]]; then
                     add_summary "success" "ESLint check passed (dirty:fix)"
                 else
+                    echo "$eslint_output" >&2
                     add_summary "error" "ESLint found issues"
                 fi
             elif npm_script_exists "lint:dirty"; then
                 log_info "Running npm run lint:dirty"
-                if npm run lint:dirty 2>&1; then
+                eslint_output=$(npm run lint:dirty 2>&1)
+                if [[ $? -eq 0 ]]; then
                     add_summary "success" "ESLint check passed (dirty)"
                 else
+                    echo "$eslint_output" >&2
                     add_summary "error" "ESLint found issues"
                 fi
             elif npm_script_exists "lint:fix"; then
                 log_info "Running npm run lint:fix"
-                if npm run lint:fix 2>&1; then
+                eslint_output=$(npm run lint:fix 2>&1)
+                if [[ $? -eq 0 ]]; then
                     add_summary "success" "ESLint check passed (fix)"
                 else
+                    echo "$eslint_output" >&2
                     add_summary "error" "ESLint found issues"
                 fi
             elif npm_script_exists "lint"; then
                 log_info "Running npm run lint"
-                if npm run lint 2>&1; then
+                eslint_output=$(npm run lint 2>&1)
+                if [[ $? -eq 0 ]]; then
                     add_summary "success" "ESLint check passed"
                 else
+                    echo "$eslint_output" >&2
                     add_summary "error" "ESLint found issues"
                 fi
             fi
