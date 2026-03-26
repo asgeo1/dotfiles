@@ -141,6 +141,14 @@ Your code must be 100% clean. No exceptions.
 - After fixing all issues and verifying the fix, continue where you left off
 - Use the todo list to track both the fix and your original task
 
+**Hook Loop Escape Strategy:**
+When a hook blocks repeatedly on issues that CANNOT be fixed in the current scope (e.g., Knip reports 64 unused exports that require building entire features):
+1. Do NOT loop more than twice on the same hook failure
+2. `git stash` your changes to break out of the loop
+3. Inform the user: explain what the hook is blocking on and why you can't fix it in-scope
+4. Ask the user to either: commit with `--no-verify`, or adjust the hook configuration
+5. NEVER blanket-ignore entire directories in linter configs to work around a hook — that masks real issues
+
 ## Working Memory Management
 
 ### When context gets long:
