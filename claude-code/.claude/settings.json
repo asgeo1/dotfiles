@@ -2,6 +2,7 @@
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
+      "Bash(cd:*)",
       "Bash(git diff:*)",
       "Bash(git status:*)",
       "Bash(git branch:*)",
@@ -42,6 +43,10 @@
     ]
   },
   "hooks": {
+    "PreToolUse": [{
+      "matcher": "Bash",
+      "hooks": [{"type": "command", "command": "bash ~/.claude/hooks/no-cd-chaining.sh"}]
+    }],
     "PostToolUse": [
       {
         "matcher": "Write|Edit|MultiEdit",
