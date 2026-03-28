@@ -341,6 +341,8 @@ add_summary() {
     if [[ "$level" == "error" ]]; then
         CLAUDE_HOOKS_ERROR_COUNT+=1
         CLAUDE_HOOKS_SUMMARY+=("${RED}❌${NC} $message")
+    elif [[ "$level" == "warn" ]]; then
+        CLAUDE_HOOKS_SUMMARY+=("${YELLOW}⚠️${NC}  $message")
     else
         CLAUDE_HOOKS_SUMMARY+=("${GREEN}✅${NC} $message")
     fi
@@ -348,11 +350,11 @@ add_summary() {
 
 print_summary() {
     if [[ $CLAUDE_HOOKS_ERROR_COUNT -gt 0 ]]; then
-        # Only show failures when there are errors
+        # Only show failures and warnings when there are errors
         echo -e "\n${BLUE}═══ Summary ═══${NC}" >&2
         for item in "${CLAUDE_HOOKS_SUMMARY[@]}"; do
-            # Only print error items
-            if [[ "$item" == *"❌"* ]]; then
+            # Print error and warning items
+            if [[ "$item" == *"❌"* ]] || [[ "$item" == *"⚠️"* ]]; then
                 echo -e "$item" >&2
             fi
         done
@@ -592,12 +594,35 @@ lint_javascript() {
     local original_dir=$(pwd)
     cd "$project_dir" || return 1
 
-        # Checks are ordered fastest-to-slowest for quick feedback on failure:
+        # Checks are ordered:
+        # 0. GraphQL codegen (generates types that affect everything below)
         # 1. Prettier (fast - dirty files only)
         # 2. ESLint (fast - dirty files only)
         # 3. Knip (fast - unused exports/deps)
         # 4. Dead code (fast - conditional, dirty ObjC files only)
         # 5. TypeScript typecheck (slow - must check full project graph)
+        # 6. Security audit (non-blocking)
+
+        # GraphQL codegen — regenerate types before linting/typechecking
+        # Only run on Stop (not format-only), and only if graphql files are dirty
+        if [[ "$FORMAT_ONLY" != "true" ]] && npm_script_exists "graphql-codegen"; then
+            local graphql_dirty=$(git status --porcelain 2>/dev/null | grep -v '^D' | grep -E '\.graphql|graphql/' || true)
+            if [[ -n "$graphql_dirty" ]]; then
+                ck "graphql-codegen"
+                log_info "Running npm run graphql-codegen"
+                local codegen_output
+                codegen_output=$(npm run graphql-codegen 2>&1)
+                local codegen_exit=$?
+                if [[ $codegen_exit -eq 0 ]]; then
+                    add_summary "success" "GraphQL codegen passed"
+                else
+                    echo "$codegen_output" >&2
+                    add_summary "error" "GraphQL codegen failed"
+                fi
+            fi
+        fi
+
+        should_fail_fast && { cd "$original_dir"; return 0; }
 
         # Prettier (formatting before linting)
         # Priority: dirty variants first (faster), then full-project variants
@@ -840,6 +865,22 @@ lint_javascript() {
             fi
         fi
 
+        # Security audit (non-blocking — agent can't fix dependency vulnerabilities)
+        if npm_script_exists "audit"; then
+            ck "audit"
+            log_info "Running npm run audit (non-blocking)"
+            local audit_output
+            audit_output=$(npm run audit 2>&1)
+            local audit_exit=$?
+
+            if [[ $audit_exit -ne 0 ]]; then
+                echo "$audit_output" >&2
+                add_summary "warn" "npm audit found vulnerabilities (non-blocking)"
+            else
+                add_summary "success" "npm audit passed"
+            fi
+        fi
+
     # Return to original directory
     cd "$original_dir" || return 1
 
@@ -905,9 +946,13 @@ lint_rust_single_project() {
     # Note: We run clippy but not cargo check because clippy includes compilation checks
     # Running both would be redundant - clippy will fail if there are type errors
     ck "clippy"
-    if cargo clippy --quiet -- -D warnings 2>&1; then
+    local clippy_output
+    clippy_output=$(cargo clippy -- -D warnings 2>&1)
+    local clippy_exit=$?
+    if [[ $clippy_exit -eq 0 ]]; then
         add_summary "success" "Clippy check passed"
     else
+        echo "$clippy_output" >&2
         add_summary "error" "Clippy found issues"
     fi
 
@@ -945,6 +990,8 @@ lint_ruby() {
 
     log_info "Running Ruby linters..."
 
+    local ruby_errors_before=$CLAUDE_HOOKS_ERROR_COUNT
+
     # RuboCop formatting and linting
     # Only run if RuboCop is in the Gemfile (not just globally installed)
     local has_rubocop=false
@@ -970,22 +1017,22 @@ lint_ruby() {
             dirty_files=$(git status --porcelain 2>/dev/null | grep -v '^D' | cut -c4- | grep -E '\.(rb|rake)$' | grep -v '\.podspec$' | tr '\n' ' ')
         fi
 
+        local rubocop_output
         if [[ -n "$dirty_files" ]]; then
             log_info "Running RuboCop on dirty files only"
-            # Run rubocop on dirty files with auto-correct
-            if echo "$dirty_files" | xargs -r rubocop --force-exclusion --autocorrect-all 2>&1; then
-                add_summary "success" "RuboCop check passed (dirty files)"
-            else
-                add_summary "error" "RuboCop found issues"
-            fi
+            rubocop_output=$(echo "$dirty_files" | xargs -r rubocop --force-exclusion --autocorrect-all 2>&1)
+            local rubocop_exit=$?
         else
             log_debug "No dirty Ruby files found, running full RuboCop"
-            # Run rubocop on all files
-            if rubocop --autocorrect-all 2>&1; then
-                add_summary "success" "RuboCop check passed"
-            else
-                add_summary "error" "RuboCop found issues"
-            fi
+            rubocop_output=$(rubocop --autocorrect-all 2>&1)
+            local rubocop_exit=$?
+        fi
+
+        if [[ $rubocop_exit -eq 0 ]]; then
+            add_summary "success" "RuboCop check passed"
+        else
+            echo "$rubocop_output" >&2
+            add_summary "error" "RuboCop found issues"
         fi
     else
         log_debug "RuboCop not found, skipping Ruby style checks"
@@ -1001,28 +1048,44 @@ lint_ruby() {
 
     if command_exists srb && [[ -d "sorbet" ]] && [[ "$has_sorbet" == "true" ]]; then
         ck "sorbet"
+        local sorbet_output
         if [[ -n "$dirty_files" ]]; then
             log_info "Running Sorbet on dirty files only"
-            # Run sorbet on dirty files
-            if echo "$dirty_files" | xargs -r srb tc 2>&1; then
-                add_summary "success" "Sorbet type check passed (dirty files)"
-            else
-                add_summary "error" "Sorbet type check failed"
-            fi
+            sorbet_output=$(echo "$dirty_files" | xargs -r srb tc 2>&1)
+            local sorbet_exit=$?
         else
             log_debug "No dirty Ruby files found, running full Sorbet check"
-            # Run sorbet on all files
-            if srb tc 2>&1; then
-                add_summary "success" "Sorbet type check passed"
-            else
-                add_summary "error" "Sorbet type check failed"
-            fi
+            sorbet_output=$(srb tc 2>&1)
+            local sorbet_exit=$?
+        fi
+
+        if [[ $sorbet_exit -eq 0 ]]; then
+            add_summary "success" "Sorbet type check passed"
+        else
+            echo "$sorbet_output" >&2
+            add_summary "error" "Sorbet type check failed"
         fi
     else
         if command_exists srb; then
             log_debug "Sorbet found but no sorbet/ directory, skipping type checks"
         else
             log_debug "Sorbet not found, skipping type checks"
+        fi
+    fi
+
+    # Run Ruby project-specific checks only if no errors so far
+    local ruby_errors_after=$CLAUDE_HOOKS_ERROR_COUNT
+    local ruby_checks_script="$(dirname "${BASH_SOURCE[0]}")/ruby-project-checks.sh"
+    if [[ $ruby_errors_after -eq $ruby_errors_before && -f "$ruby_checks_script" ]]; then
+        ck "project"
+        log_info "Running Ruby project checks..."
+        # Run directly (not captured) so progress and timings stream to stderr in real-time
+        bash "$ruby_checks_script"
+        local project_exit_code=$?
+        if [[ $project_exit_code -eq 0 ]]; then
+            add_summary "success" "Ruby project checks passed"
+        else
+            add_summary "error" "Ruby project checks failed"
         fi
     fi
 
@@ -1311,6 +1374,24 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Track file edits: format-only mode (PostToolUse on Write|Edit|MultiEdit) leaves a marker
+# so the Stop hook knows edits happened and checks are worth running.
+# Only applies when running as a Claude Code hook (stdin is not a terminal).
+# When run manually from the terminal, always run checks.
+_DIR_HASH=$(echo -n "$PWD" | md5 2>/dev/null || echo -n "$PWD" | md5sum 2>/dev/null | cut -c1-32)
+_EDIT_MARKER="/tmp/.claude-lint-edits-${_DIR_HASH:0:12}"
+if [[ "$FORMAT_ONLY" == "true" ]]; then
+    # PostToolUse: mark that edits happened in this directory
+    echo "$(date +%s)" > "$_EDIT_MARKER"
+elif [[ ! -t 0 ]]; then
+    # Running as a hook (stdin is not a terminal) — skip if no edits marker
+    if [[ ! -f "$_EDIT_MARKER" ]]; then
+        exit 0
+    fi
+    # Clean up the marker (will be recreated if more edits happen)
+    rm -f "$_EDIT_MARKER"
+fi
 
 # Print header
 echo "" >&2
