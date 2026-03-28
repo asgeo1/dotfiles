@@ -2,12 +2,15 @@ INPUT=$(cat)
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 [ -z "$COMMAND" ] && exit 0
 
+# All deny messages include this reminder because agents falsely believe cd doesn't persist.
+CD_NOTE="The working directory DOES persist between Bash tool calls."
+
 # Detect `git -C /path` — triggers security prompts. Agent should cd first.
 if echo "$COMMAND" | grep -qE '\bgit\s+-C\s+\S'; then
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/git +-C +[^ ]+ */git /')
   TARGET=$(echo "$COMMAND" | sed -E 's/.*git +-C +([^ ]+).*/\1/')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use git -C — it triggers security prompts. Instead, cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use git -C. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
@@ -17,7 +20,7 @@ if echo "$COMMAND" | grep -qE '\bnpm\s+--prefix\s+\S'; then
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/npm +--prefix +[^ ]+ */npm /')
   TARGET=$(echo "$COMMAND" | sed -E 's/.*npm +--prefix +([^ ]+).*/\1/')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use npm --prefix — it triggers security prompts. Instead, cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use npm --prefix. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
@@ -27,7 +30,7 @@ if echo "$COMMAND" | grep -qE 'docker +compose +--project-directory +\S'; then
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/docker +compose +--project-directory +[^ ]+ */docker compose /')
   TARGET=$(echo "$COMMAND" | sed -E 's/.*docker +compose +--project-directory +([^ ]+).*/\1/')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use docker compose --project-directory — hooks run in the current working directory, so they won't target the correct project. Instead, cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use docker compose --project-directory. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
@@ -37,7 +40,7 @@ if echo "$COMMAND" | grep -qE '\bbundle\b.*--gemfile=\S'; then
   TARGET=$(echo "$COMMAND" | sed -E 's/.*--gemfile=([^ ]+).*/\1/' | sed -E 's|/Gemfile$||')
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/ *--gemfile=[^ ]+ */ /')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use bundle --gemfile= — cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use bundle --gemfile=. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
@@ -47,7 +50,7 @@ if echo "$COMMAND" | grep -qE '^BUNDLE_GEMFILE=\S'; then
   TARGET=$(echo "$COMMAND" | sed -E 's/^BUNDLE_GEMFILE=([^ ]+).*/\1/' | sed -E 's|/Gemfile$||')
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/^BUNDLE_GEMFILE=[^ ]+ *//')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use BUNDLE_GEMFILE= prefix — cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use BUNDLE_GEMFILE= prefix. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
@@ -57,7 +60,7 @@ if echo "$COMMAND" | grep -qE '\bsrb\b.*--dir +\S'; then
   TARGET=$(echo "$COMMAND" | sed -E 's/.*--dir +([^ ]+).*/\1/')
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/ *--dir +[^ ]+ */ /')
   cat <<EOF
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use srb tc --dir — cd to $TARGET first, then run: $REAL_CMD"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use srb tc --dir. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
   exit 0
 fi
