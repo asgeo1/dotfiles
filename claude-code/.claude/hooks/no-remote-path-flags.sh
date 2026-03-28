@@ -22,4 +22,14 @@ EOF
   exit 0
 fi
 
+# Detect `docker compose --project-directory /path` — triggers security prompts. Agent should cd first.
+if echo "$COMMAND" | grep -qE 'docker +compose +--project-directory +\S'; then
+  REAL_CMD=$(echo "$COMMAND" | sed -E 's/docker +compose +--project-directory +[^ ]+ */docker compose /')
+  TARGET=$(echo "$COMMAND" | sed -E 's/.*docker +compose +--project-directory +([^ ]+).*/\1/')
+  cat <<EOF
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use docker compose --project-directory — hooks like smart-lint.sh run in the current working directory, so they won't target the correct project. Instead, cd to $TARGET first, then run: $REAL_CMD"}}
+EOF
+  exit 0
+fi
+
 exit 0
