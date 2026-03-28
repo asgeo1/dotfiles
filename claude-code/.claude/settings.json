@@ -47,7 +47,8 @@
       "matcher": "Bash",
       "hooks": [
         {"type": "command", "command": "bash ~/.claude/hooks/no-cd-chaining.sh"},
-        {"type": "command", "command": "bash ~/.claude/hooks/no-backslash-operators.sh"}
+        {"type": "command", "command": "bash ~/.claude/hooks/no-backslash-operators.sh"},
+        {"type": "command", "command": "bash ~/.claude/hooks/no-docker-port-prefix.sh"}
       ]
     }],
     "PostToolUse": [
