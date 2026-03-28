@@ -48,7 +48,8 @@
       "hooks": [
         {"type": "command", "command": "bash ~/.claude/hooks/no-cd-chaining.sh"},
         {"type": "command", "command": "bash ~/.claude/hooks/no-backslash-operators.sh"},
-        {"type": "command", "command": "bash ~/.claude/hooks/no-docker-port-prefix.sh"}
+        {"type": "command", "command": "bash ~/.claude/hooks/no-docker-port-prefix.sh"},
+        {"type": "command", "command": "bash ~/.claude/hooks/no-remote-path-flags.sh"}
       ]
     }],
     "PostToolUse": [
