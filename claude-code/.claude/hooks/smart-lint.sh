@@ -1354,6 +1354,7 @@ lint_objc() {
 # Parse command line options
 FAST_MODE=false
 FORMAT_ONLY=false
+SKIP_MARKER_CHECK=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         --debug)
@@ -1368,6 +1369,11 @@ while [[ $# -gt 0 ]]; do
             FORMAT_ONLY=true
             shift
             ;;
+        --no-marker-check)
+            # Called by smart-lint-stop.sh wrapper which already handled the marker
+            SKIP_MARKER_CHECK=true
+            shift
+            ;;
         *)
             echo "Unknown option: $1" >&2
             exit 2
@@ -1375,22 +1381,22 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Track file edits: format-only mode (PostToolUse on Write|Edit|MultiEdit) leaves a marker
-# so the Stop hook knows edits happened and checks are worth running.
-# Only applies when running as a Claude Code hook (stdin is not a terminal).
-# When run manually from the terminal, always run checks.
-_DIR_HASH=$(echo -n "$PWD" | md5 2>/dev/null || echo -n "$PWD" | md5sum 2>/dev/null | cut -c1-32)
-_EDIT_MARKER="/tmp/.claude-lint-edits-${_DIR_HASH:0:12}"
+# Track file edits per Claude Code session using PPID (the Claude Code process PID).
+# This is unique per instance, so multiple Claude Code sessions don't interfere.
+#
+# PostToolUse (--format-only): creates the marker to signal "edits happened"
+# Stop: handled by smart-lint-stop.sh wrapper which checks/cleans the marker
+# SubagentStop: checks the marker but doesn't clean it (parent Stop still needs it)
+# Manual run (terminal): skips marker logic entirely
+_EDIT_MARKER="/tmp/.claude-lint-edits-${PPID}"
 if [[ "$FORMAT_ONLY" == "true" ]]; then
-    # PostToolUse: mark that edits happened in this directory
+    # PostToolUse: mark that edits happened in this session
     echo "$(date +%s)" > "$_EDIT_MARKER"
-elif [[ ! -t 0 ]]; then
-    # Running as a hook (stdin is not a terminal) — skip if no edits marker
+elif [[ "${SKIP_MARKER_CHECK:-false}" != "true" ]] && [[ ! -t 0 ]]; then
+    # SubagentStop or direct hook call — check marker but don't clean it
     if [[ ! -f "$_EDIT_MARKER" ]]; then
         exit 0
     fi
-    # Clean up the marker (will be recreated if more edits happen)
-    rm -f "$_EDIT_MARKER"
 fi
 
 # Print header

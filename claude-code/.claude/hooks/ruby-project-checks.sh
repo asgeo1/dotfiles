@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ruby-project-checks.sh - Ruby/Rails project-specific CI checks
+# ruby-project-checks.sh — Ruby/Rails project-specific CI checks
 #
 # SYNOPSIS
 #   ruby-project-checks.sh

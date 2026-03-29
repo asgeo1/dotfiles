@@ -68,7 +68,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/smart-lint.sh"
+            "command": "~/.claude/hooks/smart-lint-stop.sh"
           },
           {
             "type": "command",
