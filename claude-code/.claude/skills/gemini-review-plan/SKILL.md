@@ -1,8 +1,14 @@
-# Codex Review Plan
+---
+name: gemini-review-plan
+description: Use when the user asks Gemini to review an implementation plan, or invokes /gemini-review-plan
+user-invocable: true
+---
 
-Get feedback on your implementation plan from OpenAI Codex. Uses a subagent to avoid context bloat from the multi-turn Codex conversation.
+# Gemini Review Plan
 
-Use the Task tool to spawn a subagent that handles the Codex interaction. The subagent will iterate with Codex until the review is complete, then return structured feedback.
+Get feedback on your implementation plan from Google Gemini. Uses a subagent to avoid context bloat from the multi-turn Gemini conversation.
+
+Use the Task tool to spawn a subagent that handles the Gemini interaction. The subagent will iterate with Gemini until the review is complete, then return structured feedback.
 
 ⚠️ **CRITICAL: Pass the prompt below VERBATIM to the subagent. DO NOT summarize, paraphrase, or truncate.**
 
@@ -10,7 +16,6 @@ Use the Task tool to spawn a subagent that handles the Codex interaction. The su
 
 1. **Parse arguments from `$ARGUMENTS`:**
    - Check for `--model X` flag, remove from args
-   - Check for `--reasoning X` flag, remove from args
    - Check for `phase: N` or `phase N` (N is a number) — extract as `[PHASE]`, remove from args
 
 2. **Determine the plan file path:**
@@ -35,31 +40,28 @@ Use the Task tool to spawn a subagent that handles the Codex interaction. The su
    - Any file paths mentioned in the plan
 
 4. **Determine model:**
-   - If user specified `--model X` in arguments, store as `[REQUESTED_MODEL]` and set `[MODEL_FLAG]` to `--model X`
-   - Otherwise, `[REQUESTED_MODEL]` = "default" and `[MODEL_FLAG]` = "" (empty, use Codex CLI's default)
-   - If user specified `--reasoning X`, store as `[REASONING_OVERRIDE]`
+   - If user specified `--model X` in arguments, use that as `[REQUESTED_MODEL]`
+   - Otherwise, default to `gemini-pro-latest` as `[REQUESTED_MODEL]`
+   - This ensures we always explicitly request the best available model
 
 5. **Construct the subagent prompt** using the template below, filling in:
    - `[PLAN_CONTENT]` - The actual plan markdown
    - `[GIT_STATUS]` - Output from git status
    - `[RELEVANT_FILES]` - List of file paths mentioned in the plan
-   - `[MODEL_FLAG]` - The --model flag (or empty if using default)
-   - `[REQUESTED_MODEL]` - The model name for reporting
-   - `[REASONING_OVERRIDE]` - The --reasoning flag if specified
+   - `[REQUESTED_MODEL]` - The model to use (user-specified or default)
 
 ---
 
 ## Subagent Prompt Template
 
-You are a plan review assistant. Your job is to get feedback on an implementation plan from OpenAI Codex, iterate until the review is thorough, then return structured feedback.
+You are a plan review assistant. Your job is to get feedback on an implementation plan from Google Gemini, iterate until the review is thorough, then return structured feedback.
 
 ### CRITICAL RULES
 
-0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `codex exec` commands shown below - nothing else.
-1. **READ-ONLY SANDBOX** - Always use `--sandbox read-only` with Codex
-2. **SUPPRESS THINKING** - Always append `2>/dev/null` to codex commands
-3. **ITERATE UNTIL COMPLETE** - Keep conversing with Codex until it signals the review is done
-4. **STRUCTURED OUTPUT** - Return feedback in the exact format specified
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `gemini` commands shown below - nothing else.
+1. **DEFAULT APPROVAL MODE** - Use default approval mode (Gemini will read files as needed)
+2. **ITERATE UNTIL COMPLETE** - Keep conversing with Gemini until it signals the review is done
+3. **STRUCTURED OUTPUT** - Return feedback in the exact format specified
 
 ### Context
 
@@ -73,21 +75,15 @@ You are a plan review assistant. Your job is to get feedback on an implementatio
 [GIT_STATUS]
 ```
 
-**Relevant Files (Codex can read these as needed):**
+**Relevant Files (Gemini can read these as needed):**
 [RELEVANT_FILES]
 
-### Step 1: Start Codex Session
+### Step 1: Start Gemini Session
 
-Run the initial Codex command:
+Run the initial Gemini command:
 
 ```bash
-codex exec \
-  --sandbox read-only \
-  --full-auto \
-  --skip-git-repo-check \
-  [MODEL_FLAG] \
-  [REASONING_OVERRIDE] \
-  "Review the following implementation plan. Analyze it in the context of this codebase.
+gemini -m [REQUESTED_MODEL] "Review the following implementation plan. Analyze it in the context of this codebase.
 
 [IF PHASE != 'all']
 Focus your review on **Phase [PHASE]** of the plan, but read the full plan for context.
@@ -106,35 +102,35 @@ Consider:
 Read any files you need from the codebase to give informed feedback.
 
 Before your review, state: 'MODEL_ID: [your model name/version]'
-When your review is complete, explicitly say 'REVIEW COMPLETE' at the end." 2>/dev/null
+When your review is complete, explicitly say 'REVIEW COMPLETE' at the end."
 ```
 
 ### Step 1b: Capture Model Info
 
-After receiving Codex's initial response:
+After receiving Gemini's initial response:
 - Look for a `MODEL_ID: ...` line in the output
 - Store the reported model as `[CONFIRMED_MODEL]`
 - If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Iterate Until Complete
 
-After each Codex response:
+After each Gemini response:
 
-1. **Check for completion signal**: If Codex says "REVIEW COMPLETE" (or similar), proceed to Step 3
-2. **If not complete**, resume the session with `--last`:
+1. **Check for completion signal**: If Gemini says "REVIEW COMPLETE" (or similar), proceed to Step 3
+2. **If not complete**, resume the session with `--resume latest`:
    ```bash
-   echo "Continue your review. If you have more concerns, suggestions, or questions, share them. Read additional files if needed. Say 'REVIEW COMPLETE' when done." | codex exec --skip-git-repo-check resume --last 2>/dev/null
+   gemini --resume latest "Continue your review. If you have more concerns, suggestions, or questions, share them. Read additional files if needed. Say 'REVIEW COMPLETE' when done."
    ```
-3. **Repeat** until Codex signals completion (max 5 iterations to prevent runaway)
+3. **Repeat** until Gemini signals completion (max 5 iterations to prevent runaway)
 
 ### Step 3: Synthesize Feedback
 
-Once Codex completes the review, synthesize ALL feedback from the entire conversation into this exact format:
+Once Gemini completes the review, synthesize ALL feedback from the entire conversation into this exact format:
 
 Produce a **flat, numbered issue list** — every concern, suggestion, and question is a separate issue with consistent fields. Do NOT separate findings into Concerns/Suggestions/Questions sections.
 
 ```markdown
-## Codex Plan Review Feedback
+## Gemini Plan Review Feedback
 
 ### Issue 1: [Descriptive Title]
 **Severity:** critical | warning | suggestion | question
@@ -146,16 +142,16 @@ Produce a **flat, numbered issue list** — every concern, suggestion, and quest
 **Suggested fix:** [Concrete action — for questions, describe what needs clarification]
 
 ### Issue 2: ...
-[Repeat for each finding from Codex]
+[Repeat for each finding from Gemini]
 
 ### Overall Assessment
-[Brief 2-3 sentence summary of Codex's overall opinion on the plan]
+[Brief 2-3 sentence summary of Gemini's overall opinion on the plan]
 
 **Recommendation:** [proceed | revise | needs-discussion]
 
 ## Models Used
-- **Codex requested:** [REQUESTED_MODEL]
-- **Codex confirmed:** [CONFIRMED_MODEL]
+- **Gemini requested:** [REQUESTED_MODEL]
+- **Gemini confirmed:** [CONFIRMED_MODEL]
 - **Claude subagent:** [self-report your model name/version]
 ```
 
@@ -164,13 +160,13 @@ Produce a **flat, numbered issue list** — every concern, suggestion, and quest
 
 ### Important Notes
 
-- If Codex encounters model errors or the requested model is unavailable:
-  1. Retry without --model flag (use CLI default)
-  2. Note in Models Used: "default (fallback from [REQUESTED_MODEL])"
-  3. Still capture MODEL_ID from Codex's response
-- If Codex CLI is not installed or fails version check, abort with clear error message
+- If Gemini hits quota errors or the requested model is unavailable:
+  1. Retry with `-m gemini-2.5-flash`
+  2. Note in Models Used: "gemini-2.5-flash (fallback from [REQUESTED_MODEL] due to quota)"
+  3. Still capture MODEL_ID from Gemini's response
+- If Gemini CLI is not installed or fails version check, abort with clear error message
 - Do NOT make any file modifications - this is a read-only review
-- Capture the essence of ALL Codex feedback across iterations, not just the final response
+- Capture the essence of ALL Gemini feedback across iterations, not just the final response
 
 ---
 
@@ -180,7 +176,7 @@ Produce a **flat, numbered issue list** — every concern, suggestion, and quest
 
 If the subagent's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
 
-**Always include the "Models Used" section** so the user can see what models were used. If the Codex confirmed model differs from what was requested, highlight this discrepancy.
+**Always include the "Models Used" section** so the user can see what models were used. If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
 
 **Save findings for triage:** After outputting the review verbatim, save the complete output using `mcp__plan-tools__write_plan`.
 

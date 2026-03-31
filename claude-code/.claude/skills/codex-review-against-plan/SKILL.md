@@ -1,3 +1,9 @@
+---
+name: codex-review-against-plan
+description: Use when the user asks Codex to review code changes against an implementation plan, or invokes /codex-review-against-plan
+user-invocable: true
+---
+
 # Codex Review Against Plan
 
 Review code changes against an implementation plan using OpenAI Codex. Uses a subagent to iterate with Codex and validate feedback before presenting results.

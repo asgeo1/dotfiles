@@ -1,3 +1,9 @@
+---
+name: review-feedback
+description: "Use when the user wants to triage PR feedback, review GitHub PR comments, or invokes /review-feedback"
+user-invocable: true
+---
+
 Review and triage PR feedback, distinguishing valid suggestions from those based on incorrect assumptions (especially from Copilot).
 
 ## CRITICAL: NO CD, NO GIT -C

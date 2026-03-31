@@ -1,3 +1,9 @@
+---
+name: claude-review-against-plan
+description: Use when the user asks Claude to review code changes against an implementation plan, or invokes /claude-review-against-plan
+user-invocable: true
+---
+
 # Claude Review Against Plan
 
 Review code changes against an implementation plan using parallel specialized review agents. Spawns focused reviewers (correctness, security, quality, plan-compliance) in parallel, then a merger validates findings and returns a plan coverage table alongside code quality issues.

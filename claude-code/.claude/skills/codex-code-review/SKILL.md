@@ -1,6 +1,12 @@
-# Gemini Code Review
+---
+name: codex-code-review
+description: Use when the user asks for a code review using OpenAI Codex, or invokes /codex-code-review
+user-invocable: true
+---
 
-Get a comprehensive code review from Google Gemini with validated, refined feedback. Uses a subagent to iterate with Gemini and filter out invalid suggestions before presenting to you.
+# Codex Code Review
+
+Get a comprehensive code review from OpenAI Codex with validated, refined feedback. Uses a subagent to iterate with Codex and filter out invalid suggestions before presenting to you.
 
 **Scopes:**
 - `all` - Review all changes (untracked + unstaged + staged)
@@ -12,7 +18,8 @@ Get a comprehensive code review from Google Gemini with validated, refined feedb
 
 **Flags:**
 - `--no-context` - Skip context gathering for a "blind" review
-- `--model X` - Override the Gemini model (default: gemini-pro-latest)
+- `--model X` - Override the Codex model (default: Codex CLI's default)
+- `--reasoning X` - Set reasoning effort (xhigh|high|medium|low)
 
 **Smart default:** If no scope given, detects feature branch → `branch`, otherwise → `all`
 
@@ -29,12 +36,13 @@ $ARGUMENTS = "$ARGUMENTS"
 **Flag detection:**
 - Check for `--no-context` flag anywhere in arguments
 - Check for `--model X` flag (X is the next token after --model)
+- Check for `--reasoning X` flag
 - Remove flags from arguments before parsing scope
 
 **Model determination:**
-- If user specified `--model X`, use that as `[REQUESTED_MODEL]`
-- Otherwise, default to `gemini-pro-latest` as `[REQUESTED_MODEL]`
-- This ensures we always explicitly request the best available model
+- If user specified `--model X`, store as `[REQUESTED_MODEL]` and set `[MODEL_FLAG]` to `--model X`
+- Otherwise, `[REQUESTED_MODEL]` = "default" and `[MODEL_FLAG]` = "" (empty, use Codex CLI's default)
+- If user specified `--reasoning X`, store as `[REASONING_OVERRIDE]` → `--config model_reasoning_effort="X"`
 
 **Scope detection logic:**
 1. If starts with `all` → scope = all
@@ -71,7 +79,7 @@ No validation needed. Proceed to context gathering.
 
 **Skip this step if `--no-context` flag was provided.**
 
-Gather context to help Gemini understand the INTENT of changes (do NOT fetch diffs!):
+Gather context to help Codex understand the INTENT of changes (do NOT fetch diffs!):
 
 1. **Plan file path**: Check if you're in plan mode or have a plan file in context. Note the PATH only - don't read the content. Each agent will read it themselves if needed.
 
@@ -89,22 +97,22 @@ Store these as:
 
 ## Step 4: Spawn Subagent
 
-Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass scope and context. The subagent will instruct Gemini to fetch its own diffs.
+Use the Task tool to spawn a subagent. **Do NOT pass any diff content** - only pass scope and context. The subagent will instruct Codex to fetch its own diffs.
 
 Pass the following prompt VERBATIM (fill in placeholders):
 
 ---
 
-You are a code review assistant. Your job is to get feedback on code changes from Google Gemini, **validate and refine** that feedback, then return actionable results.
+You are a code review assistant. Your job is to get feedback on code changes from OpenAI Codex, **validate and refine** that feedback, then return actionable results.
 
 ### CRITICAL RULES
 
-0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `gemini` commands shown below - nothing else.
-1. **READ-ONLY** - This is a review only. You may read files to verify claims but make NO changes.
-2. **VALIDATE FEEDBACK** - Don't just relay Gemini's feedback. Challenge vague or questionable points.
-3. **ITERATE** - Keep conversing with Gemini until feedback is complete and validated.
+0. **NO CD, NO GIT -C** - You are already in the correct working directory. Do NOT `cd`, do NOT use `git -C /path`. Just run commands directly. The ONLY Bash commands you should run are the `codex exec` commands shown below - nothing else.
+1. **READ-ONLY** - Codex runs with `--sandbox read-only`. You may read files to verify claims but make NO changes.
+2. **VALIDATE FEEDBACK** - Don't just relay Codex's feedback. Challenge vague or questionable points.
+3. **ITERATE** - Keep conversing with Codex until feedback is complete and validated.
 4. **ACTIONABLE OUTPUT** - Return structured feedback that an AI agent could act on.
-5. **GEMINI FETCHES CONTEXT** - Gemini will run git commands itself to get the diff. Do NOT fetch diffs yourself.
+5. **CODEX FETCHES CONTEXT** - Codex will run git commands itself to get the diff. Do NOT fetch diffs yourself.
 
 ### Scope
 
@@ -115,12 +123,12 @@ You are a code review assistant. Your job is to get feedback on code changes fro
 ### Context
 
 **Plan file path:** [PLAN_FILE_PATH]
-If a path is provided, you and Gemini can read this file to understand the intent of the changes. Don't just blindly accept feedback that contradicts the plan.
+If a path is provided, you and Codex can read this file to understand the intent of the changes. Don't just blindly accept feedback that contradicts the plan.
 
 **Supplementary context:** [SUPPLEMENTARY_CONTEXT]
 This is additional relevant information from the main conversation that isn't in the plan file.
 
-**How Gemini should fetch changes based on scope (use git-tools MCP if available, fall back to git commands):**
+**How Codex should fetch changes based on scope (use git-tools MCP if available, fall back to git commands):**
 - `all`: `mcp__git-tools__git_diff` with `scope: "all"` (or `git diff` + `git diff --cached` + `git ls-files --others --exclude-standard`)
 - `uncommitted`: `mcp__git-tools__git_diff` with `scope: "unstaged"` (or `git diff` + `git ls-files --others --exclude-standard`)
 - `staged`: `mcp__git-tools__git_diff` with `scope: "staged"` (or `git diff --cached`)
@@ -128,12 +136,18 @@ This is additional relevant information from the main conversation that isn't in
 - `pr <number>`: `gh pr diff <number>` + `gh pr view <number> --json title,body,files`
 - `path`: No git commands. Read and explore the paths directly.
 
-### Step 1: Start Gemini Session
+### Step 1: Start Codex Session
 
-Tell Gemini to fetch the changes itself based on the scope. Include context if provided:
+Tell Codex to fetch the changes itself based on the scope. Include context if provided:
 
 ```bash
-gemini -m [REQUESTED_MODEL] "Review the code changes for scope: [SCOPE].
+codex exec \
+  --sandbox read-only \
+  --full-auto \
+  --skip-git-repo-check \
+  [MODEL_FLAG] \
+  [REASONING_OVERRIDE] \
+  "Review the code changes for scope: [SCOPE].
 
 First, fetch the changes by running the appropriate git commands:
 [GIT_COMMANDS_FOR_SCOPE]
@@ -166,13 +180,19 @@ Consider:
 Read any additional files you need for context.
 
 Before your review, state: 'MODEL_ID: [your model name/version]'
-When your review is complete, say 'REVIEW COMPLETE'."
+When your review is complete, say 'REVIEW COMPLETE'." 2>/dev/null
 ```
 
 **For scope = path, use this prompt instead:**
 
 ```bash
-gemini -m [REQUESTED_MODEL] "Review the code at the following path(s): [PATHS]
+codex exec \
+  --sandbox read-only \
+  --full-auto \
+  --skip-git-repo-check \
+  [MODEL_FLAG] \
+  [REASONING_OVERRIDE] \
+  "Review the code at the following path(s): [PATHS]
 
 For each path:
 - If it's a directory, explore its structure and review key files
@@ -205,38 +225,38 @@ Consider:
 - Test coverage gaps
 
 Before your review, state: 'MODEL_ID: [your model name/version]'
-When your review is complete, say 'REVIEW COMPLETE'."
+When your review is complete, say 'REVIEW COMPLETE'." 2>/dev/null
 ```
 
 ### Step 1b: Capture Model Info
 
-After receiving Gemini's initial response:
+After receiving Codex's initial response:
 - Look for a `MODEL_ID: ...` line in the output
 - Store the reported model as `[CONFIRMED_MODEL]`
 - If no MODEL_ID line found, set `[CONFIRMED_MODEL]` to "unknown (not reported)"
 
 ### Step 2: Validate Feedback
 
-For each piece of feedback from Gemini:
+For each piece of feedback from Codex:
 
 1. **Is it specific?** If vague (e.g., "could be improved"), ask: "Can you be more specific about what should be improved and how?"
 
-2. **Is it correct?** If Gemini claims something about the code, verify by reading the relevant file yourself. If Gemini is wrong, discard that feedback.
+2. **Is it correct?** If Codex claims something about the code, verify by reading the relevant file yourself. If Codex is wrong, discard that feedback.
 
 3. **Is it relevant?** Does the feedback apply to the actual changes, or is it about unrelated code? Discard tangential feedback.
 
-4. **Is it actionable?** Could an AI agent implement the suggested fix? If not, ask Gemini to clarify.
+4. **Is it actionable?** Could an AI agent implement the suggested fix? If not, ask Codex to clarify.
 
 Resume the session to challenge questionable feedback:
 ```bash
-gemini --resume latest "Regarding your point about [X]: Can you clarify [specific question]? I want to make sure this feedback is accurate before including it."
+echo "Regarding your point about [X]: Can you clarify [specific question]? I want to make sure this feedback is accurate before including it." | codex exec --skip-git-repo-check resume --last 2>/dev/null
 ```
 
 ### Step 3: Iterate Until Complete
 
 Continue the validation loop until:
 - All feedback has been validated or discarded
-- Gemini has no more issues to raise
+- Codex has no more issues to raise
 - Max 5 iterations to prevent runaway
 
 ### Step 4: Synthesize Validated Feedback
@@ -265,21 +285,21 @@ Structure the validated feedback as follows:
 **Recommendation:** needs-fixes | minor-cleanup | looks-good
 
 ## Models Used
-- **Gemini requested:** [REQUESTED_MODEL]
-- **Gemini confirmed:** [CONFIRMED_MODEL]
+- **Codex requested:** [REQUESTED_MODEL]
+- **Codex confirmed:** [CONFIRMED_MODEL]
 - **Claude subagent:** [self-report your model name/version]
 ```
 
 ### Important Notes
 
 - Only include issues you have validated as legitimate
-- Discard feedback that Gemini couldn't justify when challenged
-- If Gemini finds no issues, that's a valid outcome - return "looks-good"
+- Discard feedback that Codex couldn't justify when challenged
+- If Codex finds no issues, that's a valid outcome - return "looks-good"
 - Include enough detail in "Suggested fix" that another AI could implement it
-- If Gemini hits quota errors or the requested model is unavailable:
-  1. Retry with `-m gemini-2.5-flash`
-  2. Note in Models Used: "gemini-2.5-flash (fallback from [REQUESTED_MODEL] due to quota)"
-  3. Still capture MODEL_ID from Gemini's response
+- If Codex encounters model errors or the requested model is unavailable:
+  1. Retry without --model flag (use CLI default)
+  2. Note in Models Used: "default (fallback from [REQUESTED_MODEL])"
+  3. Still capture MODEL_ID from Codex's response
 
 ---
 
@@ -289,7 +309,7 @@ Structure the validated feedback as follows:
 
 If the subagent's output is missing or empty, say so. Otherwise, paste it through exactly as returned.
 
-**Always include the "Models Used" section** so the user can see what models were used. If the Gemini confirmed model differs from what was requested, highlight this discrepancy.
+**Always include the "Models Used" section** so the user can see what models were used. If the Codex confirmed model differs from what was requested, highlight this discrepancy.
 
 **Save findings for triage:** After outputting the review verbatim, save the complete output using `mcp__plan-tools__write_plan`.
 

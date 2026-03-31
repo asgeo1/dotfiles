@@ -1,3 +1,9 @@
+---
+name: commit
+description: Use when the user asks to commit staged git changes or invokes /commit
+user-invocable: true
+---
+
 # Git Commit Assistant
 
 Use the Task tool to spawn a **haiku** subagent (model: "haiku") that handles this commit.

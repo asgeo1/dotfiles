@@ -1,3 +1,9 @@
+---
+name: submit-pr
+description: Use when the user asks to submit or create a pull request, or invokes /submit-pr
+user-invocable: true
+---
+
 # Submit PR
 
 Use the Task tool to spawn a subagent that handles PR submission.

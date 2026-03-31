@@ -1,3 +1,9 @@
+---
+name: triage-review
+description: Use when the user wants to interactively triage review findings one by one, or invokes /triage-review
+user-invocable: true
+---
+
 Interactively triage review findings one issue at a time using a tabbed question interface.
 
 ## CRITICAL: NO CD, NO GIT -C

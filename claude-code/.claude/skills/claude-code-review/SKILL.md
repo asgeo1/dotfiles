@@ -1,3 +1,9 @@
+---
+name: claude-code-review
+description: Use when the user asks for a code review using Claude with parallel review agents, or invokes /claude-code-review
+user-invocable: true
+---
+
 # Claude Code Review
 
 Get a comprehensive code review using parallel specialized review agents. Spawns focused reviewers (correctness, security, quality) in parallel, then a merger validates their findings against actual source code and returns only high-confidence, actionable feedback.

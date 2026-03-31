@@ -1,3 +1,9 @@
+---
+name: claude-review-plan
+description: Use when the user asks Claude to review an implementation plan for architectural soundness, or invokes /claude-review-plan
+user-invocable: true
+---
+
 # Claude Review Plan
 
 Get feedback on your implementation plan from a principal engineer agent. The agent reads the plan file, explores the codebase for context, and provides an advisory assessment with concerns, suggestions, questions, and a recommendation.

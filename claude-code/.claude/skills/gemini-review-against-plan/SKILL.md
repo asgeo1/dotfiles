@@ -1,3 +1,9 @@
+---
+name: gemini-review-against-plan
+description: Use when the user asks Gemini to review code changes against an implementation plan, or invokes /gemini-review-against-plan
+user-invocable: true
+---
+
 # Gemini Review Against Plan
 
 Review code changes against an implementation plan using Google Gemini. Uses a subagent to iterate with Gemini and validate feedback before presenting results.

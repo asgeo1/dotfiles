@@ -1,3 +1,9 @@
+---
+name: resolve-conflict
+description: Use when the user asks to resolve git merge or rebase conflicts, or invokes /resolve-conflict
+user-invocable: true
+---
+
 # Resolve Git Conflict
 
 Use the Task tool to spawn a subagent that handles conflict resolution.
