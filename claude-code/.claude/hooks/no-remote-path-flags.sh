@@ -15,10 +15,11 @@ EOF
   exit 0
 fi
 
-# Detect `npm --prefix /path` — triggers security prompts. Agent should cd first.
-if echo "$COMMAND" | grep -qE '\bnpm\s+--prefix\s+\S'; then
-  REAL_CMD=$(echo "$COMMAND" | sed -E 's/npm +--prefix +[^ ]+ */npm /')
-  TARGET=$(echo "$COMMAND" | sed -E 's/.*npm +--prefix +([^ ]+).*/\1/')
+# Detect `npm --prefix /path` anywhere in the command (before or after subcommand).
+# e.g. "npm --prefix /path run lint" or "npm run lint --prefix /path"
+if echo "$COMMAND" | grep -qE '\bnpm\b.*--prefix +\S'; then
+  TARGET=$(echo "$COMMAND" | sed -E 's/.*--prefix +([^ ]+).*/\1/')
+  REAL_CMD=$(echo "$COMMAND" | sed -E 's/ *--prefix +[^ ]+/ /' | sed -E 's/  +/ /g; s/^ +//; s/ +$//')
   cat <<EOF
 {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use npm --prefix. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
 EOF
