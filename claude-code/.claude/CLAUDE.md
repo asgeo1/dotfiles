@@ -59,6 +59,27 @@ This applies to ALL languages: Ruby (`rescue`), TypeScript/JavaScript (`catch`),
 - Fallback logic: hiding missing/unexpected data through "sensible defaults"
 - Both are forbidden. Both cause silent data corruption.
 
+### 🚨 CRITICAL: SENTRY/BUGSNAG CATCHES MUST ALSO LOG TO CONSOLE 🚨
+
+**Error monitoring services (Sentry, Bugsnag, etc.) do NOT send events in development.** If you catch an error and ONLY send it to Sentry, the error is **silently swallowed in dev** — you'll never see it.
+
+**EVERY `Sentry.captureException(e)` MUST be paired with `console.error('description:', e)`.**
+
+```typescript
+// ❌ WRONG — invisible in development
+.catch((e: unknown) => {
+  Sentry.captureException(e)
+})
+
+// ✅ CORRECT — visible in dev console AND reported to Sentry in prod
+.catch((e: unknown) => {
+  console.error('Audio initialization failed:', e)
+  Sentry.captureException(e)
+})
+```
+
+This applies to ALL error monitoring services and ALL patterns (direct calls, dynamic imports, inline catches).
+
 ## CRITICAL WORKFLOW - ALWAYS FOLLOW THIS!
 
 ### Research → Plan → Implement
