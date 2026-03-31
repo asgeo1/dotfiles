@@ -1,6 +1,6 @@
 ---
 name: submit-pr
-description: Use when the user asks to submit or create a pull request, or invokes /submit-pr
+description: Automated PR creation with quality checks. Invoke manually via /submit-pr.
 user-invocable: true
 ---
 

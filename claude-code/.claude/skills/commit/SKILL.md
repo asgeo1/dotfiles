@@ -1,6 +1,6 @@
 ---
 name: commit
-description: Use when the user asks to commit staged git changes or invokes /commit
+description: Git commit assistant. Invoke manually via /commit.
 user-invocable: true
 ---
 
