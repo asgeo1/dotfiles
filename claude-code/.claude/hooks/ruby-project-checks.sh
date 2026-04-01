@@ -129,6 +129,82 @@ docker_exec() {
     docker_compose exec -T app "$@"
 }
 
+# Like docker_exec but with an extra -e flag for an env override
+# Usage: docker_exec_with_env "KEY=VALUE" command args...
+docker_exec_with_env() {
+    local env_override="$1"
+    shift
+    docker_compose exec -T -e "$env_override" app "$@"
+}
+
+# Auto-detect the tapioca database env override from official config files.
+# Returns a KEY=VALUE string (e.g. "GC_DATABASE=guitarcanvas_tapioca") or empty.
+#
+# Detection strategy:
+#   1. Env var name: parse config/boot.rb for ENV["XXX_DATABASE"] (PostgreSQL projects)
+#      or config/database.yml for ENV.fetch("XXX_DATABASE") (MySQL projects)
+#   2. Tapioca DB name: parse docker-compose.yml for DATABASE_URL, extract dev db name,
+#      replace _development with _tapioca
+#   3. Fallback: parse bin/check_tapioca_dsl for the -e KEY=VALUE pair
+detect_tapioca_db_override() {
+    local db_env_var=""
+    local tapioca_db_name=""
+
+    # --- Step 1: Detect the XXX_DATABASE env var ---
+
+    # Try config/boot.rb first (PostgreSQL projects)
+    if [[ -f "config/boot.rb" ]]; then
+        db_env_var=$(grep -oE 'ENV\["[A-Z_]+_DATABASE"\]' config/boot.rb | head -1 | sed 's/ENV\["//;s/"\]//')
+    fi
+
+    # Fallback: try config/database.yml (MySQL projects like FieldFolio)
+    if [[ -z "$db_env_var" && -f "config/database.yml" ]]; then
+        db_env_var=$(grep -oE 'ENV\.fetch\("[A-Z_]+_DATABASE"\)' config/database.yml | head -1 | sed 's/ENV\.fetch("//;s/")//')
+    fi
+
+    # --- Step 2: Derive the tapioca database name ---
+
+    # Try docker-compose.yml — parse DATABASE_URL to get dev db name, replace _development with _tapioca
+    local compose_file=""
+    for candidate in docker-compose.yml docker-compose.yaml ../docker-compose.yml ../docker-compose.yaml; do
+        if [[ -f "$candidate" ]]; then
+            compose_file="$candidate"
+            break
+        fi
+    done
+
+    if [[ -n "$compose_file" ]]; then
+        local db_url
+        db_url=$(grep -E 'DATABASE_URL[=:]' "$compose_file" | grep -oE 'postgres://[^ "]+' | head -1)
+        if [[ -n "$db_url" ]]; then
+            # Extract db name from URL path: postgres://host:port/DB_NAME → DB_NAME
+            local dev_db_name
+            dev_db_name=$(echo "$db_url" | sed 's|.*/||')
+            if [[ -n "$dev_db_name" ]]; then
+                tapioca_db_name="${dev_db_name%_development}_tapioca"
+            fi
+        fi
+    fi
+
+    # --- Step 3: If we have both, return the override ---
+    if [[ -n "$db_env_var" && -n "$tapioca_db_name" ]]; then
+        echo "${db_env_var}=${tapioca_db_name}"
+        return 0
+    fi
+
+    # --- Step 4: Fallback — parse bin/check_tapioca_dsl for the -e KEY=VALUE pair ---
+    if [[ -f "bin/check_tapioca_dsl" ]]; then
+        local override
+        override=$(grep -oE '\-e [A-Z_]+=[^ ]+' bin/check_tapioca_dsl | head -1 | sed 's/^-e //')
+        if [[ -n "$override" ]]; then
+            echo "$override"
+            return 0
+        fi
+    fi
+
+    return 1
+}
+
 # Progress output — shows which check is currently running
 run_msg() {
     echo -e "  ${BLUE}→${NC} $1..." >&2
@@ -293,12 +369,48 @@ else
     fi
 
     # tapioca dsl (needs DB)
-    ck "tap-dsl"
-    run_msg "tapioca dsl"
-    if docker_exec bundle exec tapioca dsl >/dev/null 2>&1; then
-        add_result "success" "tapioca dsl"
+    # Auto-detect tapioca database override from config files
+    tapioca_db_env=$(detect_tapioca_db_override)
+
+    if [[ -n "$tapioca_db_env" ]]; then
+        # Resync: drop/create/schema:load a clean tapioca-specific database
+        ck "tap-dsl-resync"
+        run_msg "Resyncing tapioca database ($tapioca_db_env)"
+
+        # Drop (ignore failure — DB may not exist on first run)
+        docker_exec_with_env "$tapioca_db_env" rake db:drop >/dev/null 2>&1 || true
+
+        if docker_exec_with_env "$tapioca_db_env" rake db:create db:schema:load >/dev/null 2>&1; then
+            add_result "success" "tapioca dsl db resync"
+
+            ck "tap-dsl"
+            run_msg "tapioca dsl (clean schema)"
+            if docker_exec_with_env "$tapioca_db_env" bundle exec tapioca dsl >/dev/null 2>&1; then
+                add_result "success" "tapioca dsl (clean schema)"
+            else
+                add_result "warn" "tapioca dsl failed (non-blocking)"
+            fi
+        else
+            add_result "warn" "tapioca dsl db resync failed"
+
+            # Resync failed — fall back to dev database
+            ck "tap-dsl"
+            run_msg "tapioca dsl (fallback to dev DB)"
+            if docker_exec bundle exec tapioca dsl >/dev/null 2>&1; then
+                add_result "warn" "tapioca dsl (used dev DB — resync failed)"
+            else
+                add_result "warn" "tapioca dsl failed (non-blocking)"
+            fi
+        fi
     else
-        add_result "warn" "tapioca dsl failed (non-blocking)"
+        # No tapioca db override detected — run against dev DB as before
+        ck "tap-dsl"
+        run_msg "tapioca dsl"
+        if docker_exec bundle exec tapioca dsl >/dev/null 2>&1; then
+            add_result "success" "tapioca dsl"
+        else
+            add_result "warn" "tapioca dsl failed (non-blocking)"
+        fi
     fi
     # GraphQL schema dump — only if app/graphql files are dirty
     ck "graphql-dump"

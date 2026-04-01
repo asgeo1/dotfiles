@@ -1388,13 +1388,20 @@ done
 # Stop: handled by smart-lint-stop.sh wrapper which checks/cleans the marker
 # SubagentStop: checks the marker but doesn't clean it (parent Stop still needs it)
 # Manual run (terminal): skips marker logic entirely
-_EDIT_MARKER="/tmp/.claude-lint-edits-${PPID}"
+# Session ID for marker files. Uses PPID (the Claude Code process PID) which is
+# unique per instance and consistent across all hooks in one session.
+# CLAUDE_LINT_SESSION can override this for testing, since bash's $PPID is
+# read-only and can't be faked with env: CLAUDE_LINT_SESSION=test123
+_SESSION_ID="${CLAUDE_LINT_SESSION:-${PPID}}"
+_EDIT_MARKER="/tmp/.claude-lint-edits-${_SESSION_ID}"
+_ERROR_MARKER="/tmp/.claude-lint-error-${_SESSION_ID}"
 if [[ "$FORMAT_ONLY" == "true" ]]; then
     # PostToolUse: mark that edits happened in this session
     echo "$(date +%s)" > "$_EDIT_MARKER"
 elif [[ "${SKIP_MARKER_CHECK:-false}" != "true" ]] && [[ ! -t 0 ]]; then
-    # SubagentStop or direct hook call — check marker but don't clean it
-    if [[ ! -f "$_EDIT_MARKER" ]]; then
+    # SubagentStop or direct hook call — check edit marker OR error marker
+    # Error marker means previous run failed and we must re-check
+    if [[ ! -f "$_EDIT_MARKER" ]] && [[ ! -f "$_ERROR_MARKER" ]]; then
         exit 0
     fi
 fi

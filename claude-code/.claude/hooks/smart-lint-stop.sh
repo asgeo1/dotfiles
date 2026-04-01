@@ -15,19 +15,31 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SMART_LINT="$SCRIPT_DIR/smart-lint.sh"
 
 # ============================================================================
-# EDIT MARKER CHECK — skip if no edits happened this session
+# MARKER CHECK — skip if no reason to run
 # ============================================================================
+#
+# Two markers, both per-session (PPID):
+#   edit marker  — created by PostToolUse when files are edited
+#   error marker — created here when checks fail; ensures we re-run next turn
+#                  even if no new edits happened (e.g. agent ran bundle install
+#                  to fix a dependency error, but didn't edit any files)
 
-_EDIT_MARKER="/tmp/.claude-lint-edits-${PPID}"
+# Session ID for marker files. Uses PPID (the Claude Code process PID) which is
+# unique per instance and consistent across all hooks in one session.
+# CLAUDE_LINT_SESSION can override this for testing, since bash's $PPID is
+# read-only and can't be faked with env: CLAUDE_LINT_SESSION=test123
+_SESSION_ID="${CLAUDE_LINT_SESSION:-${PPID}}"
+_EDIT_MARKER="/tmp/.claude-lint-edits-${_SESSION_ID}"
+_ERROR_MARKER="/tmp/.claude-lint-error-${_SESSION_ID}"
 
-# Manual run (terminal) always proceeds; hook run checks the marker
+# Manual run (terminal) always proceeds; hook run checks markers
 if [[ ! -t 0 ]]; then
-    if [[ ! -f "$_EDIT_MARKER" ]]; then
+    if [[ ! -f "$_EDIT_MARKER" ]] && [[ ! -f "$_ERROR_MARKER" ]]; then
         exit 0
     fi
 fi
 
-# Clean up the marker now (we're the Stop hook, the final consumer)
+# Clean up the edit marker (consumed). Error marker is handled after checks.
 rm -f "$_EDIT_MARKER"
 
 # ============================================================================
@@ -37,7 +49,7 @@ rm -f "$_EDIT_MARKER"
 GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 if [[ -z "$GIT_ROOT" ]]; then
     # Not in a git repo — just run smart-lint.sh in cwd
-    bash "$SMART_LINT"
+    bash "$SMART_LINT" --no-marker-check
     exit $?
 fi
 
@@ -56,13 +68,17 @@ CHANGED_DIRS=$(
 if [[ -z "$CHANGED_DIRS" ]]; then
     if [[ -t 0 ]]; then
         echo "No git changes detected. Running in all project subdirectories anyway." >&2
-        # Find all subdirectories that look like projects
+        # Find all subdirectories
         CHANGED_DIRS=$(
             cd "$GIT_ROOT" &&
             for d in */; do
                 echo "${d%/}"
             done
         )
+    elif [[ -f "$_ERROR_MARKER" ]]; then
+        # No new changes, but previous run failed — re-run in the directories
+        # that failed last time (stored in the error marker)
+        CHANGED_DIRS=$(cat "$_ERROR_MARKER")
     else
         exit 0
     fi
@@ -73,6 +89,7 @@ fi
 # ============================================================================
 
 EXIT_CODE=0
+FAILED_DIRS=""
 
 # Run smart-lint.sh in each changed directory.
 # smart-lint.sh handles project detection internally — if a directory isn't a
@@ -94,7 +111,20 @@ for dir in $CHANGED_DIRS; do
     local_exit=$?
     if [[ $local_exit -ne 0 ]]; then
         EXIT_CODE=$local_exit
+        FAILED_DIRS="${FAILED_DIRS}${dir}\n"
     fi
 done
+
+# ============================================================================
+# ERROR MARKER — persist failure so next turn re-runs even without new edits
+# ============================================================================
+
+if [[ $EXIT_CODE -ne 0 ]]; then
+    # Write failed directories so we know what to re-check
+    printf "$FAILED_DIRS" > "$_ERROR_MARKER"
+else
+    # All passed — clear any previous error marker
+    rm -f "$_ERROR_MARKER"
+fi
 
 exit $EXIT_CODE
