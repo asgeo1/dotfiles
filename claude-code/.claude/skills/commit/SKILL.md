@@ -69,4 +69,4 @@ $ARGUMENTS
 
 ---
 
-After the subagent completes, report the commit result to the user.
+After the subagent completes, simply relay its response to the user. Do NOT independently check git status, staged changes, or run any git commands yourself. The subagent has already handled everything — just pass along what it reported.
