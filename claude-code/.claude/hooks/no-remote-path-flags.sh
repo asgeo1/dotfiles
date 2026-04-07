@@ -66,6 +66,27 @@ EOF
   exit 0
 fi
 
+# Detect `tsc --project /path` or `tsc -p /path` — agent should cd to project root first.
+if echo "$COMMAND" | grep -qE '\btsc\b.*(--project|-p) +/'; then
+  TARGET_FILE=$(echo "$COMMAND" | sed -E 's/.*(--project|-p) +(\/[^ ]+).*/\2/')
+  if echo "$TARGET_FILE" | grep -qE '\.json$'; then
+    TARGET=$(dirname "$TARGET_FILE")
+    TSCONFIG_NAME=$(basename "$TARGET_FILE")
+    if [ "$TSCONFIG_NAME" = "tsconfig.json" ]; then
+      REAL_CMD="npx tsc"
+    else
+      REAL_CMD="npx tsc --project $TSCONFIG_NAME"
+    fi
+  else
+    TARGET="$TARGET_FILE"
+    REAL_CMD="npx tsc"
+  fi
+  cat <<EOF
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use tsc --project with absolute paths. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
+EOF
+  exit 0
+fi
+
 # Warn if running bundle install/update inside Docker — remind to also run on host for IDE tools.
 if echo "$COMMAND" | grep -qE 'docker +compose +exec +\S+ +bundle +(install|update|add)'; then
   HOST_CMD=$(echo "$COMMAND" | sed -E 's/docker +compose +exec +[^ ]+ +//')
