@@ -5,6 +5,16 @@ COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
 # All deny messages include this reminder because agents falsely believe cd doesn't persist.
 CD_NOTE="The working directory DOES persist between Bash tool calls."
 
+# Detect `env -C /path` — triggers security prompts. Agent should cd first.
+if echo "$COMMAND" | grep -qE '\benv +-C +\S'; then
+  TARGET=$(echo "$COMMAND" | sed -E 's/.*env +-C +([^ ]+).*/\1/')
+  REAL_CMD=$(echo "$COMMAND" | sed -E 's/env +-C +[^ ]+ *//')
+  cat <<EOF
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use env -C. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
+EOF
+  exit 0
+fi
+
 # Detect `git -C /path` — triggers security prompts. Agent should cd first.
 if echo "$COMMAND" | grep -qE '\bgit\s+-C\s+\S'; then
   REAL_CMD=$(echo "$COMMAND" | sed -E 's/git +-C +[^ ]+ */git /')
