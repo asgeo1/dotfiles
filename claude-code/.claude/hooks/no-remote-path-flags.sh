@@ -97,6 +97,19 @@ EOF
   exit 0
 fi
 
+# Detect absolute paths to node_modules/.bin/ binaries — agent should cd first and use npx.
+# e.g. /path/to/project/node_modules/.bin/ts-node /path/to/project/tests/foo.ts
+if echo "$COMMAND" | grep -qE '/\S+/node_modules/\.bin/'; then
+  BINARY=$(echo "$COMMAND" | sed -E 's|.*/node_modules/\.bin/([^ ]+).*|\1|')
+  TARGET=$(echo "$COMMAND" | sed -E 's|(.*)/node_modules/\.bin/.*|\1|')
+  # Replace absolute paths that share the same prefix with relative paths
+  REAL_CMD=$(echo "$COMMAND" | sed -E "s|$TARGET/node_modules/\.bin/|npx |" | sed -E "s|$TARGET/||g")
+  cat <<EOF
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"Do not use absolute paths to node_modules/.bin/ binaries. $CD_NOTE First call: cd $TARGET — Second call: $REAL_CMD"}}
+EOF
+  exit 0
+fi
+
 # Warn if running bundle install/update inside Docker — remind to also run on host for IDE tools.
 if echo "$COMMAND" | grep -qE 'docker +compose +exec +\S+ +bundle +(install|update|add)'; then
   HOST_CMD=$(echo "$COMMAND" | sed -E 's/docker +compose +exec +[^ ]+ +//')
